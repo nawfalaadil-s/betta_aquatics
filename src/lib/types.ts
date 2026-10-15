@@ -160,6 +160,7 @@ export type SectionType =
   | 'flash_deal' 
   | 'specimen_showcase' 
   | 'curated_collection' 
+  | 'breeder_story' 
   | 'care_guide' 
   | 'testimonials' 
   | 'trust_badges' 

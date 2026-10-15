@@ -9,10 +9,39 @@ import { TrustBadges } from '../components/home/TrustBadges';
 import { ReviewCarousel } from '../components/home/ReviewCarousel';
 import { QuickViewModal } from '../components/common/QuickViewModal';
 import { SEO } from '../components/common/SEO';
-import { Product } from '../lib/types';
+import { Product, HomepageSection } from '../lib/types';
+import { mockDb } from '../lib/mockDatabase';
 
 export const HomePage: React.FC = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [sections] = useState<HomepageSection[]>(() => {
+    const list = mockDb.getHomepageSections();
+    return list.filter(s => s.is_active).sort((a, b) => a.display_order - b.display_order);
+  });
+
+  const renderSection = (sec: HomepageSection) => {
+    switch (sec.type) {
+      case 'hero':
+        return <HeroCarousel key={sec.id} />;
+      case 'categories':
+        return <CategoryBar key={sec.id} />;
+      case 'flash_deal':
+        return <FlashDealSection key={sec.id} onQuickView={(p) => setQuickViewProduct(p)} />;
+      case 'specimen_showcase':
+      case 'curated_collection':
+        return <SpecimenShowcase key={sec.id} onQuickView={(p) => setQuickViewProduct(p)} />;
+      case 'breeder_story':
+        return <BreederStory key={sec.id} />;
+      case 'trust_badges':
+        return <TrustBadges key={sec.id} />;
+      case 'care_guide':
+        return <CareGuideSection key={sec.id} />;
+      case 'testimonials':
+        return <ReviewCarousel key={sec.id} />;
+      default:
+        return null;
+    }
+  };
 
   // Schema.org Structured Data for WebSite & Organization
   const homepageSchema = [
@@ -66,29 +95,8 @@ export const HomePage: React.FC = () => {
         ]}
       />
 
-      {/* 1. Hero Campaign Banner */}
-      <HeroCarousel />
-
-      {/* 2. Category Discovery Strip */}
-      <CategoryBar />
-
-      {/* 3. Deal of the Day / Flash Specimen Drop */}
-      <FlashDealSection onQuickView={(p) => setQuickViewProduct(p)} />
-
-      {/* 4. Main Living Specimen Showcase (Show Bettas & Strain Tabs) */}
-      <SpecimenShowcase onQuickView={(p) => setQuickViewProduct(p)} />
-
-      {/* 5. Human Story: Meet the Breeders Behind Betta Aquatics */}
-      <BreederStory />
-
-      {/* 6. Gold Standard Packing & Welfare Trust Badges */}
-      <TrustBadges />
-
-      {/* 7. Betta Care & Acclimation Masterclass */}
-      <CareGuideSection />
-
-      {/* 8. Verified Customer Feedback */}
-      <ReviewCarousel />
+      {/* Dynamic Database-Driven CMS Sections */}
+      {sections.map(renderSection)}
 
       {/* Global Quick View Modal */}
       <QuickViewModal

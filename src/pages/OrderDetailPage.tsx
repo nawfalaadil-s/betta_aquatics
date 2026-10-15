@@ -3,11 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import { 
   Package, Truck, ArrowLeft, Copy, ExternalLink, 
   CheckCircle2, Clock, AlertCircle, ShieldCheck, 
-  Upload, Check 
+  Upload, Check, Printer, FileText 
 } from 'lucide-react';
 import { mockDb } from '../lib/mockDatabase';
 import { formatCurrency, formatDate } from '../lib/utils';
 import { useToast } from '../contexts/ToastContext';
+import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
+import { SEO } from '../components/common/SEO';
 
 export const OrderDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +18,7 @@ export const OrderDetailPage: React.FC = () => {
   const [order, setOrder] = useState(() => mockDb.getOrderById(id || ''));
   const [resubmitUtr, setResubmitUtr] = useState('');
   const [resubmitProof, setResubmitProof] = useState<string | null>(null);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   if (!order) {
     return (
@@ -65,6 +68,10 @@ export const OrderDetailPage: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
+      <SEO 
+        title={`Order #${order.order_number} Consignment & Invoice | Betta Aquatics`} 
+        description={`Track live shipment status and view official GST tax invoice for order #${order.order_number}.`} 
+      />
       <div className="max-w-4xl mx-auto px-4">
         {/* Back Link */}
         <Link
@@ -89,13 +96,20 @@ export const OrderDetailPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold px-3 py-1 rounded-full border bg-slate-100 text-slate-800">
               Payment: {order.payment_status.toUpperCase()}
             </span>
             <span className="text-xs font-bold px-3 py-1 rounded-full border bg-ocean-950 text-aqua-300 border-ocean-800">
               Fulfillment: {order.fulfillment_status.toUpperCase()}
             </span>
+            <button
+              onClick={() => setIsInvoiceOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-ocean-900 hover:bg-ocean-800 text-white text-xs font-bold transition-colors shadow-sm ml-auto sm:ml-0"
+            >
+              <Printer className="w-3.5 h-3.5 text-aqua-400" />
+              <span>Tax Invoice</span>
+            </button>
           </div>
         </div>
 
@@ -294,6 +308,13 @@ export const OrderDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Reusable Tax Invoice Modal */}
+      <TaxInvoiceModal
+        isOpen={isInvoiceOpen}
+        order={order}
+        onClose={() => setIsInvoiceOpen(false)}
+      />
     </div>
   );
 };

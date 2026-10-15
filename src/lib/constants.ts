@@ -445,12 +445,27 @@ export const INITIAL_HOMEPAGE_SECTIONS: HomepageSection[] = [
     }
   },
   {
+    id: 'sec-breeder-story',
+    type: 'breeder_story',
+    title: 'Meet The Breeder: Raised with Respect & Care',
+    subtitle: 'Behind every vibrant living specimen is Anand, our head aquarist.',
+    is_active: true,
+    display_order: 6,
+    config: {
+      breederName: 'Anand R.',
+      experienceYears: '9+ Years',
+      whatsapp: '+91 98450 12345',
+      specimensBred: '14,000+',
+      satisfaction: '99.4%'
+    }
+  },
+  {
     id: 'sec-care-guide',
     type: 'care_guide',
     title: 'Master Aquarium Care Guides',
     subtitle: 'Everything you need to know about water chemistry, acclimation, and feeding',
     is_active: true,
-    display_order: 6,
+    display_order: 7,
     config: {}
   },
   {
