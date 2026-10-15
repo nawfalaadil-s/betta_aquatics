@@ -4,16 +4,18 @@ import confetti from 'canvas-confetti';
 import { 
   ShieldCheck, QrCode, 
   Upload, CheckCircle2, ArrowRight, 
-  Copy, Building, Lock, Check, MessageSquare
+  Copy, Building, Lock, Check, MessageSquare,
+  Smartphone, ExternalLink, X, FileText, Printer
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useStoreSettings } from '../contexts/StoreSettingsContext';
 import { useToast } from '../contexts/ToastContext';
 import { mockDb } from '../lib/mockDatabase';
-import { Address } from '../lib/types';
+import { Address, Order } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
 import { SEO } from '../components/common/SEO';
+import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
 
 export const CheckoutPage: React.FC = () => {
   const { user, addresses, addAddress } = useAuth();
@@ -40,8 +42,12 @@ export const CheckoutPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'bank_transfer'>('upi');
   const [upiReference, setUpiReference] = useState('');
   const [proofImage, setProofImage] = useState<string | null>(null);
+  const [hasClickedPayNow, setHasClickedPayNow] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [placedOrderNumber, setPlacedOrderNumber] = useState<string | null>(null);
+  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   if (items.length === 0 && !placedOrderNumber) {
     return (
@@ -63,6 +69,12 @@ export const CheckoutPage: React.FC = () => {
   const handleCopyUPI = () => {
     navigator.clipboard.writeText(settings.upi_id);
     showToast(`UPI ID ${settings.upi_id} copied to clipboard!`, 'success');
+  };
+
+  const handleOpenUPIApp = () => {
+    setHasClickedPayNow(true);
+    window.location.href = upiUri;
+    showToast('Opening UPI app... Complete the transfer and return here to upload your screenshot!', 'info');
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,9 +117,16 @@ export const CheckoutPage: React.FC = () => {
       shippingAddress = existing;
     }
 
-    if (!upiReference.trim()) {
-      showToast('Please enter your 12-digit UTR or Transaction Reference number', 'error');
-      return;
+    if (paymentMethod === 'upi') {
+      if (!upiReference.trim()) {
+        showToast('Please enter your 12-digit UTR or Transaction Reference number', 'error');
+        return;
+      }
+
+      if (!proofImage) {
+        showToast('Please upload a screenshot of your completed UPI payment', 'error');
+        return;
+      }
     }
 
     setIsPlacingOrder(true);
@@ -157,6 +176,7 @@ export const CheckoutPage: React.FC = () => {
       }
 
       setPlacedOrderNumber(newOrder.order_number);
+      setPlacedOrder(newOrder);
       clearCart();
       setIsPlacingOrder(false);
       showToast('Order placed successfully! Awaiting admin payment verification.', 'success');
@@ -186,14 +206,34 @@ export const CheckoutPage: React.FC = () => {
               Order Number: <strong className="text-ocean-950 font-mono text-base">{placedOrderNumber}</strong>
             </p>
 
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-left text-xs space-y-2 mb-8">
+            {/* Uploaded Screenshot & UTR Summary */}
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-left text-xs space-y-3 mb-8">
               <div className="flex items-center gap-2 text-slate-800 font-bold">
-                <ShieldCheck className="w-4 h-4 text-aqua-600 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Next Step: Admin Payment Verification</span>
               </div>
               <p className="text-slate-600 leading-relaxed">
-                Your payment submission (UTR: <strong>{upiReference}</strong>) has been routed to our verification desk. Once credited, your order will transition to <strong>Processing</strong> and our specialist packers will prepare your insulated oxygen crate.
+                Your payment submission (UTR: <strong className="font-mono text-ocean-950">{upiReference}</strong>) has been routed to our verification desk. Once credited, our team will prepare your insulated live oxygen crate.
               </p>
+
+              {proofImage && (
+                <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200 mt-2">
+                  <img
+                    src={proofImage}
+                    alt="Payment Proof"
+                    className="w-14 h-14 object-cover rounded-lg border border-slate-200 shrink-0"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold text-emerald-700 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Payment Screenshot Attached</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-mono block mt-0.5">
+                      Ref: {upiReference}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -201,9 +241,20 @@ export const CheckoutPage: React.FC = () => {
                 to="/account/orders"
                 className="px-6 py-3 bg-ocean-900 hover:bg-ocean-800 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
               >
-                <span>View Order & Tracking Status</span>
+                <span>View Order & Tracking</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
+
+              {placedOrder && (
+                <button
+                  type="button"
+                  onClick={() => setIsInvoiceOpen(true)}
+                  className="px-5 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
+                >
+                  <FileText className="w-4 h-4 text-aqua-600" />
+                  <span>View Tax Invoice</span>
+                </button>
+              )}
 
               <Link
                 to="/"
@@ -214,6 +265,13 @@ export const CheckoutPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Tax Invoice Modal */}
+        <TaxInvoiceModal
+          isOpen={isInvoiceOpen}
+          order={placedOrder}
+          onClose={() => setIsInvoiceOpen(false)}
+        />
       </div>
     );
   }
@@ -438,100 +496,226 @@ export const CheckoutPage: React.FC = () => {
 
                 {/* Payment Details Container */}
                 {paymentMethod === 'upi' ? (
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-4 mb-6">
-                    <div className="flex flex-col sm:flex-row items-center gap-6">
-                      {/* Dynamic QR Code */}
-                      <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-md text-center shrink-0">
-                        <img
-                          src={qrCodeUrl}
-                          alt="UPI QR Code"
-                          className="w-36 h-36 mx-auto rounded-lg"
-                        />
-                        <span className="block text-[10px] text-slate-400 mt-1 font-mono">
+                  <div className="space-y-4 mb-6">
+                    {/* Step A: Direct Pay with UPI App */}
+                    <div className="p-4 sm:p-5 bg-gradient-to-br from-emerald-50 via-teal-50/50 to-cyan-50/30 rounded-2xl border border-emerald-200 text-xs space-y-3.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <div className="flex items-center gap-2 font-bold text-sm text-emerald-950">
+                          <Smartphone className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>Step 1: Open UPI App & Pay</span>
+                        </div>
+                        <span className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200 self-start sm:self-auto">
                           Exact Amount: {formatCurrency(total)}
                         </span>
                       </div>
 
-                      <div className="space-y-2 flex-1">
-                        <div className="text-slate-800 font-bold text-sm">
-                          Scan to Pay via any UPI App
-                        </div>
-                        <p className="text-slate-600 leading-relaxed text-xs">
-                          Open Google Pay, PhonePe, Paytm, or BHIM. Scan the QR code or copy the UPI ID below to transfer <strong>{formatCurrency(total)}</strong>.
-                        </p>
-                        <div className="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200">
+                      <p className="text-slate-600 leading-relaxed text-xs">
+                        Tap the button below to directly launch your UPI app (Google Pay, PhonePe, Paytm, or BHIM) with amount <strong>{formatCurrency(total)}</strong> and verified payee <strong>{settings.upi_payee_name}</strong> pre-filled.
+                      </p>
+
+                      {/* Primary Direct UPI Button */}
+                      <div>
+                        <button
+                          type="button"
+                          onClick={handleOpenUPIApp}
+                          className="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
+                        >
+                          <Smartphone className="w-5 h-5 text-emerald-200" />
+                          <span>Pay Now via UPI App ({formatCurrency(total)})</span>
+                          <ExternalLink className="w-4 h-4 text-emerald-200" />
+                        </button>
+                      </div>
+
+                      {/* Direct App Launch Shortcuts */}
+                      <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px]">
+                        <span className="text-slate-400 font-medium">Or choose specific app:</span>
+                        <a
+                          href={upiUri}
+                          onClick={() => setHasClickedPayNow(true)}
+                          className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-800 font-semibold rounded-lg border border-slate-200 shadow-xs transition-colors inline-flex items-center gap-1"
+                        >
+                          <span>Google Pay</span>
+                        </a>
+                        <a
+                          href={upiUri}
+                          onClick={() => setHasClickedPayNow(true)}
+                          className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-800 font-semibold rounded-lg border border-slate-200 shadow-xs transition-colors inline-flex items-center gap-1"
+                        >
+                          <span>PhonePe</span>
+                        </a>
+                        <a
+                          href={upiUri}
+                          onClick={() => setHasClickedPayNow(true)}
+                          className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-800 font-semibold rounded-lg border border-slate-200 shadow-xs transition-colors inline-flex items-center gap-1"
+                        >
+                          <span>Paytm / BHIM</span>
+                        </a>
+                      </div>
+
+                      {/* UPI ID copy pill */}
+                      <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-emerald-200 text-[11px]">
+                        <div className="flex items-center gap-2">
                           <span className="text-slate-500">UPI ID:</span>
                           <span className="font-mono font-bold text-ocean-950">{settings.upi_id}</span>
-                          <button
-                            type="button"
-                            onClick={handleCopyUPI}
-                            className="ml-auto text-aqua-700 hover:text-aqua-800 p-1"
-                            title="Copy UPI ID"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
                         </div>
-                        <div className="text-[11px] text-slate-500">
-                          Payee: <strong>{settings.upi_payee_name}</strong>
+                        <button
+                          type="button"
+                          onClick={handleCopyUPI}
+                          className="text-aqua-700 hover:text-aqua-800 font-bold inline-flex items-center gap-1 p-1"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy</span>
+                        </button>
+                      </div>
+
+                      {/* Desktop QR Code Toggle */}
+                      <div className="pt-2 border-t border-emerald-200/60">
+                        <button
+                          type="button"
+                          onClick={() => setShowQRCode(!showQRCode)}
+                          className="text-[11px] text-emerald-800 font-semibold hover:underline flex items-center gap-1"
+                        >
+                          <QrCode className="w-3.5 h-3.5" />
+                          <span>{showQRCode ? 'Hide Desktop QR Code' : 'Paying from PC / Another Phone? Show QR Code'}</span>
+                        </button>
+
+                        {showQRCode && (
+                          <div className="mt-3 p-3 bg-white rounded-xl border border-slate-200 text-center w-fit mx-auto shadow-sm">
+                            <img src={qrCodeUrl} alt="UPI QR Code" className="w-32 h-32 mx-auto rounded-lg" />
+                            <span className="block text-[10px] text-slate-400 mt-1 font-mono">Scan with any UPI App</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Step B: Mandatory Confirmation & Proof Submission */}
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-200/70">
+                        <div className="flex items-center gap-2 font-bold text-sm text-ocean-950">
+                          <span className="w-6 h-6 rounded-full bg-ocean-950 text-aqua-300 text-xs flex items-center justify-center font-bold">2</span>
+                          <span>Submit UTR & Payment Screenshot</span>
                         </div>
+                        <span className="text-[10px] uppercase font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
+                          Mandatory
+                        </span>
+                      </div>
+
+                      {hasClickedPayNow && (
+                        <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>UPI app triggered! Complete your transfer, then upload your screenshot and enter the 12-digit UTR below.</span>
+                        </div>
+                      )}
+
+                      {/* 12-Digit UTR */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-800 mb-1">
+                          12-Digit Transaction Reference (UTR Number) *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={upiReference}
+                          onChange={(e) => setUpiReference(e.target.value)}
+                          placeholder="e.g. 407519823412 (Found in receipt)"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-aqua-500"
+                        />
+                        <span className="text-[10px] text-slate-400 block mt-1">
+                          Found in your Google Pay, PhonePe, or Paytm receipt (labeled 'UPI transaction ID' or 'UTR').
+                        </span>
+                      </div>
+
+                      {/* Upload Payment Screenshot (Mandatory) */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-800 mb-1">
+                          Payment Screenshot Proof *
+                        </label>
+
+                        {proofImage ? (
+                          <div className="p-3 bg-white rounded-2xl border border-emerald-200 space-y-2">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={proofImage}
+                                alt="Uploaded Screenshot"
+                                className="w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-sm shrink-0"
+                              />
+                              <div className="text-xs space-y-0.5 flex-1">
+                                <div className="flex items-center gap-1.5 text-emerald-800 font-bold">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                                  <span>Screenshot Attached</span>
+                                </div>
+                                <div className="text-[11px] text-slate-500">Ready for instant admin verification</div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setProofImage(null)}
+                                className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                                title="Remove Screenshot"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <label className="cursor-pointer flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 hover:border-aqua-500 hover:bg-white rounded-2xl text-xs transition-all text-center">
+                              <Upload className="w-6 h-6 text-aqua-600 mb-1.5" />
+                              <span className="font-bold text-slate-700">Tap to Upload Payment Screenshot</span>
+                              <span className="text-[11px] text-slate-400 mt-0.5">JPEG, PNG or WebP from your device</span>
+                              <input
+                                type="file"
+                                required
+                                accept="image/*"
+                                onChange={handleFileUpload}
+                                className="hidden"
+                              />
+                            </label>
+                            <span className="text-[10px] text-slate-400 block mt-1">
+                              Please attach a clear screenshot showing the successful payment confirmation screen and transfer amount.
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2 mb-6">
-                    <div className="font-bold text-sm text-slate-900 mb-2">NEFT / IMPS Bank Transfer Details</div>
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-4 mb-6">
+                    <div className="font-bold text-sm text-slate-900 mb-1">NEFT / IMPS Bank Transfer Details</div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div><span className="text-slate-400">Bank Name:</span> <strong>{settings.bank_name}</strong></div>
                       <div><span className="text-slate-400">Account No:</span> <strong className="font-mono">{settings.bank_account_no}</strong></div>
                       <div><span className="text-slate-400">IFSC Code:</span> <strong className="font-mono">{settings.bank_ifsc}</strong></div>
                       <div><span className="text-slate-400">Beneficiary:</span> <strong>{settings.bank_account_holder}</strong></div>
                     </div>
-                  </div>
-                )}
 
-                {/* Proof & Reference Inputs */}
-                <div className="space-y-4 pt-2">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      12-Digit UTR / Transaction Reference ID *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={upiReference}
-                      onChange={(e) => setUpiReference(e.target.value)}
-                      placeholder="e.g. 407519823412 or IMPS Reference"
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-aqua-500"
-                    />
-                    <span className="text-[10px] text-slate-400 block mt-1">
-                      Located in your payment receipt from Google Pay, PhonePe, or Banking App.
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Upload Payment Screenshot (Optional for faster verification)
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-slate-300 hover:bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 transition-colors">
-                        <Upload className="w-4 h-4 text-aqua-600" />
-                        <span>Select Screenshot</span>
+                    <div className="pt-2 border-t border-slate-200 space-y-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-800 mb-1">
+                          IMPS / NEFT Reference Number *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={upiReference}
+                          onChange={(e) => setUpiReference(e.target.value)}
+                          placeholder="e.g. 407519823412 or Bank Ref"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-800 mb-1">
+                          Bank Transfer Receipt Screenshot (Optional)
+                        </label>
                         <input
                           type="file"
                           accept="image/*"
                           onChange={handleFileUpload}
-                          className="hidden"
+                          className="text-xs"
                         />
-                      </label>
-                      {proofImage && (
-                        <div className="flex items-center gap-2 text-xs text-emerald-700 font-semibold">
-                          <Check className="w-4 h-4 text-emerald-600" />
-                          <span>Proof Attached</span>
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -607,11 +791,17 @@ export const CheckoutPage: React.FC = () => {
                     <span>Confirming Order...</span>
                   ) : (
                     <>
-                      <span>Submit Payment & Place Order</span>
+                      <span>Submit Payment Proof & Confirm Order</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
+
+                <p className="text-[10px] text-center text-slate-400 font-medium">
+                  {paymentMethod === 'upi'
+                    ? 'Payment screenshot & 12-digit UTR required for live specimen order approval'
+                    : 'Bank IMPS/NEFT reference required for order approval'}
+                </p>
 
                 <div className="p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 text-xs text-emerald-950 space-y-1.5">
                   <div className="flex items-center gap-1.5 font-bold text-emerald-900">
