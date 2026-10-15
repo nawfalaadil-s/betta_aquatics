@@ -1,0 +1,15 @@
+# Robots.txt for Betta Aquatics
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /product/
+Allow: /page/
+
+# Disallow private user accounts and admin operations
+Disallow: /admin
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /account
+Disallow: /account/
+
+Sitemap: https://bettaaquatics.in/sitemap.xml

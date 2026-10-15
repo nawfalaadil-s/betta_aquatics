@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { 
-  ShieldCheck, MapPin, QrCode, CreditCard, 
-  Upload, CheckCircle2, AlertCircle, ArrowRight, 
-  Copy, Sparkles, Building, Lock, Check 
+  ShieldCheck, QrCode, 
+  Upload, CheckCircle2, ArrowRight, 
+  Copy, Building, Lock, Check, MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -13,9 +13,9 @@ import { useToast } from '../contexts/ToastContext';
 import { mockDb } from '../lib/mockDatabase';
 import { Address } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
+import { SEO } from '../components/common/SEO';
 
 export const CheckoutPage: React.FC = () => {
-  const navigate = useNavigate();
   const { user, addresses, addAddress } = useAuth();
   const { items, subtotal, deliveryFee, packingCharge, discountAmount, appliedCoupon, total, clearCart } = useCart();
   const { settings } = useStoreSettings();
@@ -46,6 +46,7 @@ export const CheckoutPage: React.FC = () => {
   if (items.length === 0 && !placedOrderNumber) {
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center">
+        <SEO title="Checkout | Betta Aquatics" description="Complete your live fish order securely." />
         <h2 className="text-xl font-bold text-slate-800 mb-2">No Items in Cart</h2>
         <p className="text-xs sm:text-sm text-slate-500 mb-4">Please add live fish or aquarium products to proceed with checkout.</p>
         <Link to="/shop" className="px-5 py-2.5 bg-ocean-900 text-white rounded-xl text-xs font-bold">
@@ -166,6 +167,7 @@ export const CheckoutPage: React.FC = () => {
   if (placedOrderNumber) {
     return (
       <div className="bg-slate-50 min-h-screen py-12 sm:py-16">
+        <SEO title={`Order ${placedOrderNumber} Confirmed | Betta Aquatics`} description="Thank you for your order. Our team will verify your payment and prepare your insulated live fish consignment." />
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-xl">
             <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
@@ -218,6 +220,10 @@ export const CheckoutPage: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
+      <SEO 
+        title="Secure Checkout & Payment | Betta Aquatics" 
+        description="Finalize your Betta Aquatics live fish order. Safe insulated packaging, verified manual UPI payment, and live arrival guarantee." 
+      />
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -339,6 +345,16 @@ export const CheckoutPage: React.FC = () => {
                         value={newAddrStreet}
                         onChange={(e) => setNewAddrStreet(e.target.value)}
                         placeholder="House / Apartment / Street Name"
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">Nearby Landmark (Optional)</label>
+                      <input
+                        type="text"
+                        value={newAddrLandmark}
+                        onChange={(e) => setNewAddrLandmark(e.target.value)}
+                        placeholder="e.g. Near Metro Station / Behind Temple"
                         className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
                       />
                     </div>
@@ -597,8 +613,30 @@ export const CheckoutPage: React.FC = () => {
                   )}
                 </button>
 
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-500 leading-relaxed">
-                  <strong>Notice:</strong> As an ornamental fish sanctuary, we verify transactions manually before capturing bank credit to protect against specimen race conditions.
+                <div className="p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 text-xs text-emerald-950 space-y-1.5">
+                  <div className="flex items-center gap-1.5 font-bold text-emerald-900">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Why Manual Verification?</span>
+                  </div>
+                  <p className="text-emerald-800 text-[11px] leading-relaxed">
+                    Every ornamental fish in your order is a living 1-of-1 specimen. Our head breeder personally inspects fin integrity and vigor before approving cargo transit.
+                  </p>
+                </div>
+
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-bold text-slate-800">Need help with payment?</div>
+                    <div className="text-[11px] text-slate-500">Chat directly with breeder Anand</div>
+                  </div>
+                  <a
+                    href="https://wa.me/919845012345?text=Hi%20Anand,%20I%20am%20at%20checkout%20and%20need%20assistance%20with%20payment"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 shrink-0"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>WhatsApp</span>
+                  </a>
                 </div>
               </div>
             </div>

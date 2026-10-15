@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
-  Heart, ShoppingCart, ShieldCheck, Truck, 
-  MapPin, Check, Sparkles, AlertTriangle, 
-  Share2, ArrowLeft, Star, Send 
+  Heart, ShoppingBag, ShieldCheck, Truck, 
+  MapPin, Check, Sparkles, ArrowLeft, Star, Send, 
+  HeartHandshake, MessageCircle 
 } from 'lucide-react';
 import { mockDb } from '../lib/mockDatabase';
 import { formatCurrency, calculateDiscount } from '../lib/utils';
@@ -12,6 +12,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import { useToast } from '../contexts/ToastContext';
 import { StarRating } from '../components/common/StarRating';
 import { ProductCard } from '../components/common/ProductCard';
+import { SEO } from '../components/common/SEO';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -41,10 +42,11 @@ export const ProductDetailPage: React.FC = () => {
   if (!product) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-xl font-bold text-slate-800 mb-2">Product Not Found</h2>
-        <p className="text-sm text-slate-500 mb-6">The specimen or item you are looking for has been adopted or moved.</p>
+        <SEO title="Specimen Not Found" description="The requested ornamental fish specimen has already found a home." />
+        <h2 className="text-xl font-bold text-slate-800 mb-2">Specimen Not Found</h2>
+        <p className="text-sm text-slate-500 mb-6">This unique fish has either been adopted or moved to a breeding project.</p>
         <Link to="/shop" className="px-5 py-2.5 bg-ocean-900 text-white rounded-xl text-xs font-bold">
-          Return to Catalog
+          Explore Available Bettas
         </Link>
       </div>
     );
@@ -53,6 +55,37 @@ export const ProductDetailPage: React.FC = () => {
   const discount = calculateDiscount(product.price, product.compare_at_price);
   const isWishlisted = isInWishlist(product.id);
   const isOutOfStock = product.stock_quantity <= 0;
+
+  // JSON-LD Structured Data for Google Rich Results
+  const productSchema = {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: product.name,
+    image: product.images,
+    description: product.description,
+    sku: product.sku,
+    brand: {
+      '@type': 'Brand',
+      name: 'Betta Aquatics',
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `https://bettaaquatics.in/product/${product.slug}`,
+      priceCurrency: 'INR',
+      price: product.price,
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: product.stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'Betta Aquatics',
+      },
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: product.rating,
+      reviewCount: product.review_count || 1,
+    },
+  };
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;
@@ -68,7 +101,7 @@ export const ProductDetailPage: React.FC = () => {
   const handleCheckPincode = (e: React.FormEvent) => {
     e.preventDefault();
     if (!pincode || pincode.trim().length !== 6) {
-      showToast('Please enter a valid 6-digit PIN code', 'error');
+      showToast('Please enter a valid 6-digit Indian PIN code', 'error');
       return;
     }
     const res = mockDb.checkPincodeServiceability(pincode);
@@ -82,7 +115,7 @@ export const ProductDetailPage: React.FC = () => {
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reviewName || !reviewTitle || !reviewComment) {
-      showToast('Please fill in all review fields', 'error');
+      showToast('Please fill in your name, rating, and feedback', 'error');
       return;
     }
     const newRev = mockDb.submitReview({
@@ -94,7 +127,7 @@ export const ProductDetailPage: React.FC = () => {
       is_verified: true,
     });
     setReviewsList([newRev, ...reviewsList]);
-    showToast('Thank you! Your verified review has been published.', 'success');
+    showToast('Thank you! Your verified review is published.', 'success');
     setReviewTitle('');
     setReviewComment('');
   };
@@ -105,47 +138,77 @@ export const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
+      {/* SEO Injection */}
+      <SEO
+        title={product.name}
+        description={product.short_description || product.description}
+        canonical={`https://bettaaquatics.in/product/${product.slug}`}
+        ogImage={product.images[0]}
+        ogType="product"
+        jsonLd={productSchema}
+        keywords={[
+          product.name.toLowerCase(),
+          product.strain?.toLowerCase() || 'betta fish',
+          'buy betta fish india',
+          'live ornamental fish',
+          'betta splendens show class'
+        ]}
+      />
+
       <div className="max-w-7xl mx-auto px-4">
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between text-xs text-slate-500 mb-6">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <Link to="/" className="hover:text-ocean-950">Home</Link>
+        <nav aria-label="Breadcrumb" className="flex items-center justify-between text-xs text-slate-500 mb-6">
+          <ol className="flex items-center gap-1.5 flex-wrap" itemScope itemType="https://schema.org/BreadcrumbList">
+            <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+              <Link to="/" itemProp="item" className="hover:text-ocean-950">
+                <span itemProp="name">Home</span>
+              </Link>
+              <meta itemProp="position" content="1" />
+            </li>
             <span>/</span>
-            <Link to="/shop" className="hover:text-ocean-950">Catalog</Link>
+            <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+              <Link to="/shop" itemProp="item" className="hover:text-ocean-950">
+                <span itemProp="name">Shop</span>
+              </Link>
+              <meta itemProp="position" content="2" />
+            </li>
             <span>/</span>
-            <Link to={`/shop?cat=${product.category_id}`} className="hover:text-ocean-950 font-medium">
-              {product.category_name}
-            </Link>
+            <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+              <Link to={`/shop?cat=${product.category_id}`} itemProp="item" className="hover:text-ocean-950 font-medium">
+                <span itemProp="name">{product.category_name}</span>
+              </Link>
+              <meta itemProp="position" content="3" />
+            </li>
             <span>/</span>
-            <span className="text-slate-900 font-semibold truncate max-w-[200px] sm:max-w-none">
+            <li className="text-slate-900 font-semibold truncate max-w-[200px] sm:max-w-none">
               {product.name}
-            </span>
-          </div>
+            </li>
+          </ol>
           <Link to="/shop" className="hidden sm:flex items-center gap-1 text-aqua-700 font-semibold hover:underline">
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Products</span>
+            <span>Back to All Fish</span>
           </Link>
-        </div>
+        </nav>
 
         {/* Main Product Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
-          {/* Left Column: Gallery (5 cols) */}
+          {/* Gallery Left (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="aspect-square bg-white rounded-3xl overflow-hidden border border-slate-200 relative shadow-sm">
+            <div className="aspect-square bg-white rounded-3xl overflow-hidden border border-slate-200/80 relative shadow-sm">
               <img
                 src={product.images[selectedImg] || product.images[0]}
-                alt={product.name}
+                alt={`${product.name} - ${product.strain || 'Live Fish'} available at Betta Aquatics`}
                 className="w-full h-full object-cover object-center"
               />
-              {/* Floating badges */}
+              {/* Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.is_unique_specimen && (
-                  <span className="inline-flex items-center gap-1.5 bg-ocean-950/95 backdrop-blur-md text-aqua-300 border border-aqua-400/40 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                  <span className="inline-flex items-center gap-1.5 bg-ocean-950/90 backdrop-blur-md text-aqua-300 border border-aqua-400/40 text-xs font-bold px-3 py-1 rounded-full shadow-md">
                     <Sparkles className="w-3.5 h-3.5 text-aqua-400" />
-                    <span>Exact Specimen Shown</span>
+                    <span>Exact Specimen Pictured</span>
                   </span>
                 )}
-                {discount > 0 && (
+                {discount > 0 && !product.is_unique_specimen && (
                   <span className="inline-flex items-center bg-coral-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
                     {discount}% OFF
                   </span>
@@ -155,18 +218,18 @@ export const ProductDetailPage: React.FC = () => {
               {/* Wishlist Button */}
               <button
                 onClick={() => toggleWishlist(product.id)}
-                className={`absolute top-4 right-4 w-11 h-11 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md transition-all ${
+                className={`absolute top-4 right-4 w-11 h-11 rounded-full flex items-center justify-center shadow-md backdrop-blur-md transition-all ${
                   isWishlisted
                     ? 'bg-rose-50 text-rose-500 border border-rose-200'
                     : 'bg-white/90 hover:bg-white text-slate-600 hover:text-rose-500'
                 }`}
-                aria-label="Wishlist"
+                aria-label="Save to Wishlist"
               >
                 <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-rose-500' : ''}`} />
               </button>
             </div>
 
-            {/* Thumbnail Row */}
+            {/* Thumbnails */}
             {product.images.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-1">
                 {product.images.map((img, idx) => (
@@ -177,56 +240,54 @@ export const ProductDetailPage: React.FC = () => {
                       selectedImg === idx ? 'border-aqua-500 shadow-md ring-2 ring-aqua-500/20' : 'border-slate-200 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                    <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
             )}
 
-            {/* Specimen Transparency Note */}
-            {product.is_unique_specimen && (
-              <div className="bg-ocean-950 text-slate-200 p-4 rounded-2xl border border-ocean-800 text-xs flex items-start gap-3 shadow-md">
-                <Sparkles className="w-5 h-5 text-aqua-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-aqua-300 block mb-0.5">True-To-Specimen Transparency</span>
-                  <span>
-                    Unlike commercial stores that show generic stock photography, this listing is for the <strong>exact living fish</strong> pictured. No substitutions are ever made.
-                  </span>
-                </div>
+            {/* Reassuring Breeder Commitment */}
+            <div className="bg-warm-50 text-warm-900 p-4 rounded-3xl border border-warm-200 text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold text-slate-900">
+                <HeartHandshake className="w-4 h-4 text-aqua-700 shrink-0" />
+                <span>Conditioned with Care by Indian Aquascapers</span>
               </div>
-            )}
+              <p className="text-slate-600 leading-relaxed text-[11px]">
+                This fish has completed a minimum 72-hour biosecure quarantine. Fed with live artemia and high-protein micro pellets to ensure active, vibrant behavior right out of the shipping bag.
+              </p>
+            </div>
           </div>
 
-          {/* Right Column: Information & Actions (6 cols) */}
+          {/* Details Right (6 cols) */}
           <div className="lg:col-span-6 space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-aqua-700 bg-aqua-50 px-2.5 py-0.5 rounded-full border border-aqua-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-aqua-700 bg-aqua-50 px-3 py-0.5 rounded-full border border-aqua-200">
                   {product.category_name}
                 </span>
                 {product.strain && (
-                  <span className="text-xs text-slate-500 font-medium">
+                  <span className="text-xs text-slate-500">
                     Strain: <strong className="text-slate-800">{product.strain}</strong>
                   </span>
                 )}
                 <span className="text-xs text-slate-400 font-mono ml-auto">SKU: {product.sku}</span>
               </div>
 
-              <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 font-display leading-tight mb-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-ocean-950 font-display leading-snug mb-3">
                 {product.name}
               </h1>
 
-              {/* Rating */}
+              {/* Rating & Availability */}
               <div className="flex items-center gap-3 mb-4">
                 <StarRating rating={product.rating} reviewCount={product.review_count} size="md" />
                 <span className="text-xs text-slate-300">•</span>
-                <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md">
-                  In Stock & Ready for Express Dispatch
+                <span className="text-xs text-emerald-800 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Ready for Express Dispatch
                 </span>
               </div>
 
               {/* Price Block */}
-              <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-baseline gap-3 mb-6">
+              <div className="p-4 bg-white rounded-3xl border border-slate-200 shadow-sm flex items-baseline gap-3 mb-6">
                 <span className="text-3xl sm:text-4xl font-black text-ocean-950 font-display">
                   {formatCurrency(product.price)}
                 </span>
@@ -235,7 +296,7 @@ export const ProductDetailPage: React.FC = () => {
                     <span className="text-base sm:text-lg text-slate-400 line-through">
                       {formatCurrency(product.compare_at_price)}
                     </span>
-                    <span className="text-xs font-bold text-coral-600 bg-coral-50 border border-coral-200 px-2 py-0.5 rounded-md">
+                    <span className="text-xs font-bold text-coral-600 bg-coral-50 border border-coral-200 px-2.5 py-0.5 rounded-full">
                       Save {formatCurrency(product.compare_at_price - product.price)} ({discount}% OFF)
                     </span>
                   </>
@@ -247,31 +308,31 @@ export const ProductDetailPage: React.FC = () => {
                 {product.description}
               </p>
 
-              {/* Biological Quick Specs Grid */}
+              {/* Habitat & Care Highlights */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3.5 bg-white rounded-2xl border border-slate-200 text-xs mb-6">
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Water Temp</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Water Temp</span>
                   <span className="font-bold text-slate-900">{product.temperature_range || '24°C - 28°C'}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Care Level</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Care Level</span>
                   <span className="font-bold text-slate-900">{product.care_level || 'Moderate'}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Gender</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Gender</span>
                   <span className="font-bold text-slate-900">{product.gender || 'Single Male'}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Size</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Size</span>
                   <span className="font-bold text-slate-900">{product.size || '3.5 - 4.5 cm'}</span>
                 </div>
               </div>
 
-              {/* Pincode Delivery Checker */}
-              <div className="p-4 bg-slate-100/70 rounded-2xl border border-slate-200/90 mb-6">
+              {/* Humanized PIN Code Checker */}
+              <div className="p-4 bg-slate-100/70 rounded-3xl border border-slate-200 mb-6">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 mb-2">
                   <MapPin className="w-4 h-4 text-aqua-600" />
-                  <span>Check Live Fish Express Transit Time</span>
+                  <span>Will this fish reach you safely? Check delivery time</span>
                 </div>
                 <form onSubmit={handleCheckPincode} className="flex gap-2">
                   <input
@@ -286,7 +347,7 @@ export const ProductDetailPage: React.FC = () => {
                     type="submit"
                     className="bg-ocean-900 hover:bg-ocean-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shrink-0"
                   >
-                    Check
+                    Check PIN
                   </button>
                 </form>
 
@@ -298,11 +359,11 @@ export const ProductDetailPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Purchase Action Strip */}
+              {/* Purchase Actions */}
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3">
                   {!product.is_unique_specimen && product.stock_quantity > 1 && (
-                    <div className="flex items-center border border-slate-300 rounded-xl overflow-hidden h-12 bg-white">
+                    <div className="flex items-center border border-slate-300 rounded-2xl overflow-hidden h-12 bg-white">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                         className="px-4 py-2 hover:bg-slate-100 text-slate-700 font-bold"
@@ -326,91 +387,97 @@ export const ProductDetailPage: React.FC = () => {
                   <button
                     onClick={handleAddToCart}
                     disabled={isOutOfStock}
-                    className={`flex-1 h-12 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md ${
+                    className={`flex-1 h-12 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md ${
                       isOutOfStock
                         ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                         : 'bg-ocean-900 hover:bg-ocean-800 text-white active:scale-95'
                     }`}
                   >
-                    <ShoppingCart className="w-4 h-4 text-aqua-400" />
-                    <span>Add to Cart</span>
+                    <ShoppingBag className="w-4 h-4 text-aqua-400" />
+                    <span>Add to Tank</span>
                   </button>
 
                   <button
                     onClick={handleBuyNow}
                     disabled={isOutOfStock}
-                    className="flex-1 h-12 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-aqua-500 to-aqua-600 hover:from-aqua-400 hover:to-aqua-500 text-ocean-950 transition-all shadow-glow-aqua active:scale-95"
+                    className="flex-1 h-12 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-aqua-500 to-aqua-600 hover:from-aqua-400 hover:to-aqua-500 text-ocean-950 transition-all shadow-glow-aqua active:scale-95"
                   >
-                    <span>Instant Checkout</span>
+                    <span>Adopt Now</span>
                   </button>
                 </div>
               </div>
 
-              {/* Guarantees List */}
-              <div className="pt-6 border-t border-slate-200 grid grid-cols-2 gap-3 text-xs text-slate-600">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>100% Live Arrival Guarantee</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-aqua-600 shrink-0" />
-                  <span>Medical Oxygen Packing</span>
-                </div>
+              {/* WhatsApp direct consultation */}
+              <div className="pt-4 flex items-center justify-between text-xs text-slate-500 border-t border-slate-200">
+                <span>Unsure about tank compatibility?</span>
+                <a
+                  href="https://wa.me/919876543210"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 text-emerald-700 font-bold hover:underline"
+                >
+                  <MessageCircle className="w-4 h-4 text-emerald-600" />
+                  <span>Ask our breeder on WhatsApp</span>
+                </a>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Detailed Specs and Acclimation Tabs */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-16 space-y-6">
+        {/* Simple Care Guide Summary */}
+        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-16 space-y-6">
           <h2 className="text-xl font-bold text-ocean-950 font-display">
-            Care Guidelines & Habitat Requirements
+            Habitat & Floating Acclimation Guide
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm">
             <div className="space-y-3">
               <h3 className="font-bold text-slate-900 uppercase tracking-wider text-xs">
-                Aquarium Setup & Water Chemistry
+                Aquarium Setup Checklist
               </h3>
               <ul className="space-y-2 text-slate-600 list-disc list-inside">
-                <li><strong>Recommended Minimum Tank:</strong> 15 Litres (3.5 Gallons) or larger with gentle sponge filter.</li>
-                <li><strong>Ideal Temperature:</strong> 24°C to 28°C (Heater strongly recommended during monsoon and winter).</li>
-                <li><strong>pH Range:</strong> 6.5 - 7.5 (Slightly soft water enriched with Indian Almond leaf tannins).</li>
-                <li><strong>Substrate & Flora:</strong> Live natural plants like Anubias, Java Fern, or floating Salvinia to create resting spots.</li>
+                <li><strong>Tank Volume:</strong> Minimum 15 Litres (3.5 Gallons) with a gentle filter flow.</li>
+                <li><strong>Temperature:</strong> Tropical 24°C to 28°C (Heater recommended).</li>
+                <li><strong>pH Range:</strong> Soft, neutral water (pH 6.5 - 7.5).</li>
+                <li><strong>Resting Leaves:</strong> Add Indian Almond leaves to replicate natural Amazonian tannins.</li>
               </ul>
             </div>
 
             <div className="space-y-3">
               <h3 className="font-bold text-slate-900 uppercase tracking-wider text-xs">
-                Acclimation & Live Arrival Protocol
+                Simple Acclimation Steps
               </h3>
               <p className="text-slate-600 leading-relaxed">
-                Float the sealed insulated bag on top of your aquarium water for 15-20 minutes to equalize temperatures. Gently open the bag, add small cup amounts of aquarium water every 5 minutes for 20 minutes, and net the fish in. Discard shipping water.
+                1. Float the sealed shipping bag on your tank surface for 15-20 minutes to equalize temperature.
+                <br />
+                2. Add 1/4 cup of aquarium water every 5 minutes for 20 minutes.
+                <br />
+                3. Gently net your Betta into his new home. Do not dump the transit bag water.
               </p>
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs">
-                <strong>DOA Coverage:</strong> In the rare event of transit fatality, record a continuous 30-second video of the unopened bag within 2 hours of delivery for full store credit or replacement.
+              <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-xs">
+                <strong>100% Live Arrival Guarantee:</strong> If anything happens in transit, simply record a 30-second video of the unopened shipping bag within 2 hours of delivery for an instant replacement or refund.
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Verified Customer Reviews */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-16">
+        {/* Customer Reviews Section */}
+        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-16">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
             <div>
               <h2 className="text-xl font-bold text-ocean-950 font-display">
-                Customer Reviews ({reviewsList.length})
+                Aquarist Reviews ({reviewsList.length})
               </h2>
               <div className="flex items-center gap-2 mt-1">
                 <StarRating rating={product.rating} size="md" />
-                <span className="text-xs text-slate-500">Based on verified purchases</span>
+                <span className="text-xs text-slate-500">Verified buyer community</span>
               </div>
             </div>
           </div>
 
-          {/* Review Submission Form */}
-          <form onSubmit={handleReviewSubmit} className="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 mb-8 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900">Write A Verified Buyer Review</h3>
+          {/* Form */}
+          <form onSubmit={handleReviewSubmit} className="bg-slate-50 p-5 rounded-3xl border border-slate-200/80 mb-8 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900">Share Your Experience with this Fish</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Your Name</label>
@@ -429,29 +496,29 @@ export const ProductDetailPage: React.FC = () => {
                   onChange={(e) => setReviewRating(Number(e.target.value))}
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
                 >
-                  <option value={5}>5 Stars - Outstanding Health & Vitality</option>
-                  <option value={4}>4 Stars - Very Good</option>
-                  <option value={3}>3 Stars - Average</option>
+                  <option value={5}>5 Stars - Pristine Health & Gorgeous Color</option>
+                  <option value={4}>4 Stars - Very Healthy</option>
+                  <option value={3}>3 Stars - Good</option>
                 </select>
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Headline</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Review Headline</label>
               <input
                 type="text"
                 value={reviewTitle}
                 onChange={(e) => setReviewTitle(e.target.value)}
-                placeholder="e.g. Gorgeous Betta, arrived lively!"
+                placeholder="e.g. Arrived active, colors are breathtaking!"
                 className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Feedback Comments</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Detailed Feedback</label>
               <textarea
                 rows={3}
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
-                placeholder="Share your experience regarding packing, water temperature, and acclimation..."
+                placeholder="How was the packaging, temperature, and fish behavior?"
                 className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
               />
             </div>
@@ -481,13 +548,13 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div>
+          <div className="mb-10">
             <h2 className="text-xl sm:text-2xl font-bold text-ocean-950 font-display mb-6">
-              You May Also Like
+              Other Specimens You Might Adore
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {relatedProducts.map((p) => (
@@ -498,10 +565,10 @@ export const ProductDetailPage: React.FC = () => {
         )}
       </div>
 
-      {/* Sticky Mobile Purchase Action Bar */}
+      {/* Sticky Mobile Purchase Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 flex items-center justify-between gap-3 shadow-2xl">
         <div>
-          <div className="text-[10px] text-slate-400 font-medium">Price:</div>
+          <div className="text-[10px] text-slate-400 font-medium">Adopt Price:</div>
           <div className="text-lg font-bold text-ocean-950 font-display leading-tight">
             {formatCurrency(product.price)}
           </div>
@@ -512,14 +579,14 @@ export const ProductDetailPage: React.FC = () => {
             disabled={isOutOfStock}
             className="px-4 py-2.5 rounded-xl bg-ocean-900 text-white font-bold text-xs"
           >
-            Add
+            Add to Tank
           </button>
           <button
             onClick={handleBuyNow}
             disabled={isOutOfStock}
             className="px-5 py-2.5 rounded-xl bg-aqua-500 text-ocean-950 font-bold text-xs"
           >
-            Buy Now
+            Adopt Now
           </button>
         </div>
       </div>

@@ -31,9 +31,12 @@ export default {
           800: '#115E59',
           900: '#134E4A',
         },
-        cyanGlow: {
-          DEFAULT: '#00F2FE',
-          dark: '#4FACFE',
+        warm: {
+          50: '#FAF8F5',
+          100: '#F5EFEB',
+          200: '#EAE1D7',
+          800: '#433A36',
+          900: '#2B2320',
         },
         coral: {
           50: '#FFF1F2',
@@ -54,8 +57,7 @@ export default {
       },
       boxShadow: {
         'glow-aqua': '0 0 20px -3px rgba(20, 184, 166, 0.35)',
-        'glow-cyan': '0 0 25px -4px rgba(0, 242, 254, 0.4)',
-        'card-hover': '0 12px 30px -10px rgba(7, 19, 38, 0.15)',
+        'card-hover': '0 12px 30px -10px rgba(7, 19, 38, 0.12)',
         'subtle': '0 2px 10px rgba(0, 0, 0, 0.04)',
       },
       animation: {

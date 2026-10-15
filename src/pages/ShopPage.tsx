@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
-  SlidersHorizontal, X, ChevronDown, Check, 
-  Search, RotateCcw, Sparkles 
+  SlidersHorizontal, X, Search, RotateCcw, 
+  Sparkles, MessageCircle 
 } from 'lucide-react';
 import { mockDb } from '../lib/mockDatabase';
 import { ProductCard } from '../components/common/ProductCard';
 import { QuickViewModal } from '../components/common/QuickViewModal';
+import { SEO } from '../components/common/SEO';
 import { Product } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
 
@@ -43,12 +44,9 @@ export const ShopPage: React.FC = () => {
   // Filtering Logic
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
-      // Category filter
       if (selectedCategory !== 'all' && product.category_id !== selectedCategory) {
         return false;
       }
-
-      // Query filter
       if (queryParam) {
         const q = queryParam.toLowerCase();
         const matchesName = product.name.toLowerCase().includes(q);
@@ -59,37 +57,24 @@ export const ShopPage: React.FC = () => {
           return false;
         }
       }
-
-      // Strain filter
       if (selectedStrain !== 'all' && product.strain !== selectedStrain) {
         return false;
       }
-
-      // Gender filter
       if (selectedGender !== 'all' && product.gender !== selectedGender) {
         return false;
       }
-
-      // Unique specimen filter
       if (onlyUnique && !product.is_unique_specimen) {
         return false;
       }
-
-      // Sale filter
       if (onlySale && (!product.compare_at_price || product.compare_at_price <= product.price)) {
         return false;
       }
-
-      // In stock filter
       if (onlyInStock && product.stock_quantity <= 0) {
         return false;
       }
-
-      // Price filter
       if (product.price > priceRange) {
         return false;
       }
-
       return true;
     }).sort((a, b) => {
       if (sortBy === 'price-low') return a.price - b.price;
@@ -112,6 +97,14 @@ export const ShopPage: React.FC = () => {
     setSearchParams({});
   };
 
+  const currentCategoryName = categories.find(c => c.id === selectedCategory)?.name || 'All Collections';
+
+  const seoTitle = queryParam 
+    ? `Search "${queryParam}" | Betta Aquatics` 
+    : `${currentCategoryName} | Buy Live Ornamental Fish Online India`;
+
+  const seoDescription = `Browse authentic ${currentCategoryName.toLowerCase()} at Betta Aquatics. Hand-conditioned specimens with certified overnight air transport and live arrival guarantee.`;
+
   const hasActiveFilters = 
     selectedCategory !== 'all' || 
     selectedStrain !== 'all' || 
@@ -124,13 +117,21 @@ export const ShopPage: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen py-6 sm:py-8">
+      {/* SEO Injection */}
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        canonical="https://bettaaquatics.in/shop"
+        keywords={['buy betta fish', 'show class bettas', 'halfmoon betta', 'guppy pairs', 'aquarium plants']}
+      />
+
       <div className="max-w-7xl mx-auto px-4">
-        {/* Breadcrumb & Header Title */}
+        {/* Header Breadcrumb */}
         <div className="mb-6">
           <div className="text-xs text-slate-500 mb-2 flex items-center gap-1.5">
             <span>Home</span>
             <span>/</span>
-            <span className="text-slate-800 font-semibold">Live Fish & Aquarium Catalog</span>
+            <span className="text-slate-800 font-semibold">{currentCategoryName}</span>
             {queryParam && (
               <>
                 <span>/</span>
@@ -140,11 +141,11 @@ export const ShopPage: React.FC = () => {
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-ocean-950 font-display">
-                {queryParam ? `Results for "${queryParam}"` : 'All Livestock & Aquarium Supplies'}
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-ocean-950 font-display">
+                {queryParam ? `Search Results for "${queryParam}"` : currentCategoryName}
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Showing {filteredProducts.length} of {allProducts.length} verified products
+                Showing {filteredProducts.length} healthy live specimens available for adoption
               </p>
             </div>
 
@@ -152,13 +153,13 @@ export const ShopPage: React.FC = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsMobileFilterOpen(true)}
-                className="lg:hidden flex items-center gap-2 bg-white border border-slate-300 px-4 py-2 rounded-xl text-xs font-semibold text-slate-800 shadow-sm"
+                className="lg:hidden flex items-center gap-2 bg-white border border-slate-300 px-4 py-2 rounded-2xl text-xs font-semibold text-slate-800 shadow-sm"
               >
                 <SlidersHorizontal className="w-4 h-4 text-aqua-600" />
                 <span>Filters {hasActiveFilters && '• Active'}</span>
               </button>
 
-              <div className="flex items-center gap-2 bg-white border border-slate-300 px-3 py-1.5 rounded-xl shadow-sm">
+              <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-2xl shadow-sm">
                 <span className="text-xs text-slate-400 font-medium">Sort by:</span>
                 <select
                   value={sortBy}
@@ -201,7 +202,7 @@ export const ShopPage: React.FC = () => {
             )}
             {onlySale && (
               <span className="inline-flex items-center gap-1 text-xs bg-coral-50 text-coral-600 border border-coral-200 px-2.5 py-1 rounded-lg">
-                On Sale
+                Special Offers
                 <button onClick={() => setOnlySale(false)}><X className="w-3 h-3" /></button>
               </span>
             )}
@@ -225,11 +226,11 @@ export const ShopPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Desktop Filter Sidebar */}
           <aside className="hidden lg:block lg:col-span-1 space-y-6">
-            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-6">
+            <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-6">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2 font-bold text-sm text-ocean-950">
                   <SlidersHorizontal className="w-4 h-4 text-aqua-600" />
-                  <span>Filter Products</span>
+                  <span>Filter Specimens</span>
                 </div>
                 {hasActiveFilters && (
                   <button
@@ -243,19 +244,19 @@ export const ShopPage: React.FC = () => {
 
               {/* Categories */}
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 font-mono">
                   Categories
                 </h3>
-                <div className="space-y-1.5 text-xs">
+                <div className="space-y-1 text-xs">
                   <button
                     onClick={() => setSelectedCategory('all')}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-lg font-medium transition-colors ${
+                    className={`w-full text-left px-3 py-2 rounded-xl font-medium transition-colors ${
                       selectedCategory === 'all'
                         ? 'bg-aqua-50 text-aqua-900 font-bold'
                         : 'text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    All Categories ({allProducts.length})
+                    All Collections ({allProducts.length})
                   </button>
                   {categories.map((c) => {
                     const count = allProducts.filter(p => p.category_id === c.id).length;
@@ -263,7 +264,7 @@ export const ShopPage: React.FC = () => {
                       <button
                         key={c.id}
                         onClick={() => setSelectedCategory(c.id)}
-                        className={`w-full text-left px-2.5 py-1.5 rounded-lg transition-colors flex items-center justify-between ${
+                        className={`w-full text-left px-3 py-2 rounded-xl transition-colors flex items-center justify-between ${
                           selectedCategory === c.id
                             ? 'bg-aqua-50 text-aqua-900 font-bold'
                             : 'text-slate-600 hover:bg-slate-50'
@@ -280,7 +281,7 @@ export const ShopPage: React.FC = () => {
               {/* Price Filter Slider */}
               <div className="pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
                     Max Price
                   </h3>
                   <span className="text-xs font-bold text-ocean-950 font-display">
@@ -305,13 +306,13 @@ export const ShopPage: React.FC = () => {
               {/* Betta Strains */}
               {availableStrains.length > 0 && (
                 <div className="pt-4 border-t border-slate-100">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 font-mono">
                     Fish Strain / Tail Type
                   </h3>
-                  <div className="space-y-1.5 text-xs max-h-48 overflow-y-auto pr-1">
+                  <div className="space-y-1 text-xs max-h-48 overflow-y-auto pr-1">
                     <button
                       onClick={() => setSelectedStrain('all')}
-                      className={`w-full text-left px-2.5 py-1 rounded-lg ${
+                      className={`w-full text-left px-2.5 py-1.5 rounded-lg ${
                         selectedStrain === 'all' ? 'bg-aqua-50 text-aqua-900 font-bold' : 'text-slate-600'
                       }`}
                     >
@@ -321,7 +322,7 @@ export const ShopPage: React.FC = () => {
                       <button
                         key={strain}
                         onClick={() => setSelectedStrain(strain)}
-                        className={`w-full text-left px-2.5 py-1 rounded-lg truncate ${
+                        className={`w-full text-left px-2.5 py-1.5 rounded-lg truncate ${
                           selectedStrain === strain ? 'bg-aqua-50 text-aqua-900 font-bold' : 'text-slate-600 hover:bg-slate-50'
                         }`}
                       >
@@ -332,7 +333,7 @@ export const ShopPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Checkbox Options */}
+              {/* Checkboxes */}
               <div className="pt-4 border-t border-slate-100 space-y-2.5 text-xs">
                 <label className="flex items-center gap-2 text-slate-700 cursor-pointer">
                   <input
@@ -351,7 +352,7 @@ export const ShopPage: React.FC = () => {
                     onChange={(e) => setOnlySale(e.target.checked)}
                     className="rounded text-aqua-600 focus:ring-aqua-500 w-4 h-4"
                   />
-                  <span>Special Discount Offers</span>
+                  <span>Special Offers</span>
                 </label>
 
                 <label className="flex items-center gap-2 text-slate-700 cursor-pointer">
@@ -370,18 +371,29 @@ export const ShopPage: React.FC = () => {
           {/* Product Grid Area */}
           <div className="lg:col-span-3">
             {filteredProducts.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+              <div className="bg-white rounded-3xl p-10 text-center border border-slate-200">
                 <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-800 mb-2">No Products Match Your Criteria</h3>
+                <h3 className="text-lg font-bold text-slate-800 mb-2">No Matching Specimens Right Now</h3>
                 <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto mb-6">
-                  Try clearing some filter options or searching with different terms.
+                  Looking for a specific Betta strain or rare imported pair? Message our breeder on WhatsApp.
                 </p>
-                <button
-                  onClick={handleResetFilters}
-                  className="px-6 py-2.5 bg-ocean-900 text-white rounded-xl text-xs font-bold hover:bg-ocean-800 transition-colors"
-                >
-                  Reset All Filters
-                </button>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    onClick={handleResetFilters}
+                    className="px-5 py-2.5 bg-ocean-900 text-white rounded-xl text-xs font-bold hover:bg-ocean-800 transition-colors"
+                  >
+                    Reset Filters
+                  </button>
+                  <a
+                    href="https://wa.me/919876543210"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-500"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Inquire on WhatsApp</span>
+                  </a>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
@@ -408,13 +420,12 @@ export const ShopPage: React.FC = () => {
           <div className="relative ml-auto w-4/5 max-w-sm bg-white h-full shadow-2xl flex flex-col justify-between overflow-y-auto p-5 z-10">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
-                <h3 className="font-bold text-base text-ocean-950">Filter Products</h3>
+                <h3 className="font-bold text-base text-ocean-950">Filter Specimens</h3>
                 <button onClick={() => setIsMobileFilterOpen(false)} className="p-1">
                   <X className="w-5 h-5 text-slate-600" />
                 </button>
               </div>
 
-              {/* Mobile Filter Sections */}
               <div className="space-y-6 text-xs">
                 <div>
                   <h4 className="font-bold uppercase tracking-wider text-slate-500 mb-2">Categories</h4>
