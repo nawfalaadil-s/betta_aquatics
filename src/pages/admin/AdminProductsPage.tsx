@@ -106,14 +106,14 @@ export const AdminProductsPage: React.FC = () => {
 
     refreshProducts();
     setIsModalOpen(false);
-    showToast(`Product ${saved.name} saved successfully!`, 'success');
+    showToast(`Specimen ${saved.name} saved successfully!`, 'success');
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this product?')) {
+    if (confirm('Are you sure you want to delete this live specimen?')) {
       mockDb.deleteProduct(id);
       refreshProducts();
-      showToast('Product removed from inventory', 'info');
+      showToast('Specimen removed from inventory', 'info');
     }
   };
 
@@ -144,28 +144,28 @@ export const AdminProductsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-400 font-mono">
+          <span className="text-xs font-bold uppercase tracking-wider text-ocean-700 font-mono">
             Catalog Management
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">
             Live Specimen & Inventory Control
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Total active specimens in stock: <strong>{products.length}</strong>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Total active specimens in stock: <strong className="text-slate-800">{products.length}</strong>
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={handleExportCSV}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
           >
-            <Download className="w-4 h-4 text-aqua-400" />
+            <Download className="w-4 h-4 text-ocean-700" />
             <span>Export CSV</span>
           </button>
           <button
             onClick={handleOpenAdd}
-            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-ocean-950 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md"
+            className="px-4 py-2 rounded-xl bg-ocean-950 hover:bg-ocean-900 text-aqua-400 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Specimen</span>
@@ -174,24 +174,24 @@ export const AdminProductsPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 w-full md:w-80">
+      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search products by title, strain, SKU..."
-            className="w-full bg-transparent text-white placeholder-slate-500 outline-none"
+            placeholder="Search by title, strain, SKU..."
+            className="w-full bg-transparent text-slate-900 placeholder-slate-400 outline-none"
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-slate-400 font-medium">Category:</span>
+        <div className="flex items-center gap-2 self-start md:self-auto">
+          <span className="text-slate-500 font-medium">Category:</span>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="bg-slate-900 border border-slate-700 text-white rounded-xl px-2.5 py-1.5 outline-none cursor-pointer"
+            className="bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-2.5 py-1.5 outline-none cursor-pointer text-xs focus:ring-1 focus:ring-ocean-600"
           >
             <option value="all">All Categories</option>
             {categories.map((c) => (
@@ -204,10 +204,10 @@ export const AdminProductsPage: React.FC = () => {
       </div>
 
       {/* Products Table */}
-      <div className="bg-slate-800/80 rounded-3xl border border-slate-700 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[11px] font-semibold border-b border-slate-700">
+            <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider text-[11px] font-semibold border-b border-slate-200">
               <tr>
                 <th className="p-4">Specimen / Image</th>
                 <th className="p-4">Category & Strain</th>
@@ -217,35 +217,40 @@ export const AdminProductsPage: React.FC = () => {
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/60 text-slate-300">
+            <tbody className="divide-y divide-slate-100 text-slate-600">
               {filtered.map((product) => (
-                <tr key={product.id} className="hover:bg-slate-700/30 transition-colors">
+                <tr key={product.id} className="hover:bg-slate-50/60 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <img
                         src={product.images[0]}
                         alt={product.name}
-                        className="w-12 h-12 rounded-xl object-cover bg-slate-900 border border-slate-700 shrink-0"
+                        className="w-12 h-12 rounded-xl object-cover bg-slate-100 border border-slate-200 shrink-0"
                       />
                       <div>
-                        <div className="font-bold text-white line-clamp-1">{product.name}</div>
-                        <div className="text-[10px] text-slate-400 font-mono mt-0.5">SKU: {product.sku}</div>
+                        <div className="font-bold text-slate-900 line-clamp-1">{product.name}</div>
+                        <div className="text-[10px] text-slate-500 font-mono mt-0.5">SKU: {product.sku}</div>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="font-semibold text-slate-200">{product.category_name}</div>
-                    <div className="text-[11px] text-aqua-400">{product.strain || 'Standard'}</div>
+                    <div className="font-semibold text-slate-800">{product.category_name}</div>
+                    <div className="text-[11px] text-ocean-700 font-medium">{product.strain || 'Standard'}</div>
                   </td>
-                  <td className="p-4 font-bold text-white font-display text-sm">
+                  <td className="p-4 font-bold text-slate-900 font-display text-sm">
                     {formatCurrency(product.price)}
+                    {product.compare_at_price && (
+                      <span className="block text-[11px] text-slate-400 line-through font-normal">
+                        {formatCurrency(product.compare_at_price)}
+                      </span>
+                    )}
                   </td>
                   <td className="p-4">
                     <span
                       className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                         product.stock_quantity > 0
-                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                          : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200'
                       }`}
                     >
                       {product.stock_quantity > 0 ? `${product.stock_quantity} In Stock` : 'Out of Stock'}
@@ -253,26 +258,26 @@ export const AdminProductsPage: React.FC = () => {
                   </td>
                   <td className="p-4">
                     {product.is_unique_specimen ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-aqua-300 bg-ocean-950 border border-aqua-400/40 px-2 py-0.5 rounded-full">
-                        <Sparkles className="w-3 h-3 text-aqua-400" />
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-ocean-900 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-full">
+                        <Sparkles className="w-3 h-3 text-sky-600" />
                         <span>Unique (1-of-1)</span>
                       </span>
                     ) : (
-                      <span className="text-slate-400 text-[11px]">Batch Stock</span>
+                      <span className="text-slate-500 text-[11px]">Batch Stock</span>
                     )}
                   </td>
-                  <td className="p-4 text-right space-x-2">
+                  <td className="p-4 text-right space-x-1">
                     <button
                       onClick={() => handleOpenEdit(product)}
-                      className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-                      title="Edit"
+                      className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                      title="Edit Specimen"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
-                      className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded-lg transition-colors"
-                      title="Delete"
+                      className="p-1.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                      title="Delete Specimen"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -287,61 +292,69 @@ export const AdminProductsPage: React.FC = () => {
       {/* ADD / EDIT PRODUCT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/80" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 max-w-2xl w-full z-10 text-xs text-slate-300 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h2 className="text-base font-bold text-white">
-                {editingProduct ? 'Edit Live Specimen' : 'Add New Aquarium Specimen'}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)}>
-                <X className="w-5 h-5 text-slate-400" />
+          <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs" onClick={() => setIsModalOpen(false)} />
+          <div className="relative bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full z-10 text-xs text-slate-700 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <span className="text-[10px] font-bold font-mono text-ocean-700 uppercase tracking-wider">
+                  Live Stock Database
+                </span>
+                <h2 className="text-base font-bold text-slate-900">
+                  {editingProduct ? 'Edit Live Specimen' : 'Add New Aquarium Specimen'}
+                </h2>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSaveProduct} className="space-y-4">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Specimen Title *</label>
+                <label className="block text-slate-700 font-semibold mb-1">Specimen Title *</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Royal Blue Halfmoon Betta (Show Class)"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-aqua-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Price (₹) *</label>
+                  <label className="block text-slate-700 font-semibold mb-1">Price (₹) *</label>
                   <input
                     type="number"
                     required
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="1499"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-aqua-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Compare Price (₹ MRP)</label>
+                  <label className="block text-slate-700 font-semibold mb-1">Compare Price (₹ MRP)</label>
                   <input
                     type="number"
                     value={comparePrice}
                     onChange={(e) => setComparePrice(e.target.value)}
                     placeholder="1899"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Category</label>
+                  <label className="block text-slate-700 font-semibold mb-1">Category</label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -349,33 +362,33 @@ export const AdminProductsPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Stock Quantity</label>
+                  <label className="block text-slate-700 font-semibold mb-1">Stock Quantity</label>
                   <input
                     type="number"
                     value={stockQuantity}
                     onChange={(e) => setStockQuantity(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Strain / Variety</label>
+                  <label className="block text-slate-700 font-semibold mb-1">Strain / Variety</label>
                   <input
                     type="text"
                     value={strain}
                     onChange={(e) => setStrain(e.target.value)}
                     placeholder="e.g. Halfmoon"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Gender</label>
+                  <label className="block text-slate-700 font-semibold mb-1">Gender</label>
                   <select
                     value={gender}
                     onChange={(e) => setGender(e.target.value as FishGender)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                   >
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -384,11 +397,11 @@ export const AdminProductsPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Care Level</label>
+                  <label className="block text-slate-700 font-semibold mb-1">Care Level</label>
                   <select
                     value={careLevel}
                     onChange={(e) => setCareLevel(e.target.value as CareLevel)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                   >
                     <option value="Easy">Easy</option>
                     <option value="Moderate">Moderate</option>
@@ -398,48 +411,61 @@ export const AdminProductsPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Image URL</label>
-                <input
-                  type="text"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"
-                />
+                <label className="block text-slate-700 font-semibold mb-1">Image URL</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
+                  />
+                  {imageUrl && (
+                    <img 
+                      src={imageUrl} 
+                      alt="Preview" 
+                      className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0" 
+                    />
+                  )}
+                </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Description & Pedigree</label>
+                <label className="block text-slate-700 font-semibold mb-1">Description & Pedigree</label>
                 <textarea
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus:border-ocean-600 focus:bg-white"
                 />
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer pt-1">
-                <input
-                  type="checkbox"
-                  checked={isUnique}
-                  onChange={(e) => setIsUnique(e.target.checked)}
-                  className="accent-aqua-500 w-4 h-4 rounded"
-                />
-                <span className="font-semibold text-white">Unique Specimen: Exact Fish Pictured (Locks Qty to 1)</span>
-              </label>
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isUnique}
+                    onChange={(e) => setIsUnique(e.target.checked)}
+                    className="accent-ocean-900 w-4 h-4 rounded"
+                  />
+                  <span className="font-semibold text-slate-800">
+                    Unique Specimen: Exact Fish Pictured (WYSIWYG - Locks Stock to 1)
+                  </span>
+                </label>
+              </div>
 
-              <div className="flex gap-2 justify-end pt-4 border-t border-slate-800">
+              <div className="flex gap-2 justify-end pt-4 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-700 rounded-xl text-xs text-slate-300 font-semibold"
+                  className="px-4 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-xs text-slate-700 font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-ocean-950 font-bold text-xs rounded-xl shadow-md"
+                  className="px-5 py-2.5 bg-ocean-950 hover:bg-ocean-900 text-aqua-400 font-bold text-xs rounded-xl shadow-md"
                 >
-                  Save Product
+                  Save Specimen
                 </button>
               </div>
             </form>
