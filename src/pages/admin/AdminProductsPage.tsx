@@ -205,7 +205,8 @@ export const AdminProductsPage: React.FC = () => {
 
       {/* Products Table */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table (hidden on mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider text-[11px] font-semibold border-b border-slate-200">
               <tr>
@@ -286,6 +287,79 @@ export const AdminProductsPage: React.FC = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card List (Phones & Small Devices) */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {filtered.map((product) => (
+            <div key={product.id} className="p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="w-16 h-16 rounded-xl object-cover bg-slate-100 border border-slate-200 shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-slate-900 text-sm line-clamp-1">{product.name}</div>
+                  <div className="text-[10px] text-slate-500 font-mono">SKU: {product.sku}</div>
+                  <div className="flex items-center gap-1.5 mt-1 text-xs">
+                    <span className="font-semibold text-slate-700">{product.category_name}</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-ocean-700 font-medium">{product.strain || 'Standard'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs pt-1">
+                <div>
+                  <span className="font-bold text-slate-900 font-display text-base">
+                    {formatCurrency(product.price)}
+                  </span>
+                  {product.compare_at_price && (
+                    <span className="text-[11px] text-slate-400 line-through ml-1.5 font-normal">
+                      {formatCurrency(product.compare_at_price)}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      product.stock_quantity > 0
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-rose-50 text-rose-700 border border-rose-200'
+                    }`}
+                  >
+                    {product.stock_quantity > 0 ? `${product.stock_quantity} In Stock` : 'Out of Stock'}
+                  </span>
+
+                  {product.is_unique_specimen && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-ocean-900 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-full">
+                      <Sparkles className="w-3 h-3 text-sky-600" />
+                      <span>1-of-1</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                <button
+                  onClick={() => handleOpenEdit(product)}
+                  className="flex-1 min-h-[40px] py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>Edit Specimen</span>
+                </button>
+                <button
+                  onClick={() => handleDelete(product.id)}
+                  className="min-h-[40px] px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 border border-rose-200"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

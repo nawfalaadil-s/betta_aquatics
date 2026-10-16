@@ -3,7 +3,7 @@ import {
   Search, Filter, CheckCircle2, AlertCircle, 
   Clock, Truck, Package, X, Copy, ExternalLink, 
   ShieldCheck, ArrowRight, Eye, ChevronDown, 
-  FileText, ZoomIn, Download, Smartphone 
+  FileText, ZoomIn, Download, Smartphone, Check 
 } from 'lucide-react';
 import { mockDb } from '../../lib/mockDatabase';
 import { useToast } from '../../contexts/ToastContext';
@@ -195,7 +195,8 @@ export const AdminOrdersPage: React.FC = () => {
 
       {/* Orders Data Table (Pristine White) */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Data Table (hidden on mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10px] uppercase tracking-wider font-semibold">
               <tr>
@@ -347,6 +348,138 @@ export const AdminOrdersPage: React.FC = () => {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card List View (Phones & Small Devices) */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {filteredOrders.length === 0 ? (
+            <div className="py-12 text-center text-slate-400 text-xs">
+              No matching consignment orders found.
+            </div>
+          ) : (
+            filteredOrders.map((order) => {
+              const isPending = order.payment_status === 'pending';
+              const hasProof = Boolean(order.payment_details?.proof_image_url);
+
+              return (
+                <div
+                  key={order.id}
+                  className={`p-4 space-y-3 transition-colors ${
+                    isPending ? 'bg-amber-50/30' : 'bg-white'
+                  }`}
+                >
+                  {/* Top Bar: Order ID, Date, Amount */}
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="font-mono font-bold text-slate-900 text-sm block">
+                        {order.order_number}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {formatDate(order.created_at)}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-extrabold text-slate-900 font-display text-base">
+                        {formatCurrency(order.total_amount)}
+                      </span>
+                      <div className="text-[10px] text-slate-500 font-medium">
+                        {order.items.length} {order.items.length === 1 ? 'Specimen' : 'Specimens'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Customer Info */}
+                  <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <strong className="text-slate-900 block font-semibold">{order.customer_name}</strong>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 mt-0.5">
+                      <span>{order.customer_phone}</span>
+                      <span>{order.shipping_address.city}, {order.shipping_address.state}</span>
+                    </div>
+                  </div>
+
+                  {/* Status Badges */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                        order.payment_status === 'verified'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : order.payment_status === 'rejected'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}
+                    >
+                      Pay: {order.payment_status}
+                    </span>
+                    <span
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                        order.fulfillment_status === 'shipped'
+                          ? 'bg-sky-50 text-sky-800 border-sky-200'
+                          : order.fulfillment_status === 'delivered'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : 'bg-slate-100 text-slate-700 border-slate-200'
+                      }`}
+                    >
+                      Ship: {order.fulfillment_status}
+                    </span>
+                  </div>
+
+                  {/* UTR & Proof Preview */}
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <div className="font-mono text-[11px]">
+                      <span className="text-slate-400 block text-[10px]">UTR / Ref:</span>
+                      <div className="flex items-center gap-1 font-bold text-slate-800">
+                        <span>{order.payment_details?.upi_reference || 'N/A'}</span>
+                        {order.payment_details?.upi_reference && (
+                          <button
+                            onClick={() => handleCopy(order.payment_details!.upi_reference!, 'UTR')}
+                            className="text-slate-400 hover:text-aqua-700 p-1"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {hasProof && (
+                      <button
+                        type="button"
+                        onClick={() => setZoomedImage(order.payment_details!.proof_image_url!)}
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700"
+                      >
+                        <img
+                          src={order.payment_details!.proof_image_url!}
+                          alt="Proof"
+                          className="w-5 h-5 rounded object-cover"
+                        />
+                        <span>View Proof</span>
+                        <ZoomIn className="w-3 h-3 text-slate-400" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Mobile Action Controls */}
+                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                    {isPending && (
+                      <button
+                        onClick={() => handleApprovePayment(order.id)}
+                        className="flex-1 min-h-[40px] py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center justify-center gap-1.5"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>Approve Payment</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setSelectedOrder(order)}
+                      className="flex-1 min-h-[40px] py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>Manage Order</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 

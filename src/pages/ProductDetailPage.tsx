@@ -565,28 +565,43 @@ export const ProductDetailPage: React.FC = () => {
         )}
       </div>
 
-      {/* Sticky Mobile Purchase Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 flex items-center justify-between gap-3 shadow-2xl">
-        <div>
-          <div className="text-[10px] text-slate-400 font-medium">Adopt Price:</div>
-          <div className="text-lg font-bold text-ocean-950 font-display leading-tight">
-            {formatCurrency(product.price)}
+      {/* Sticky Mobile Purchase Bar (Amazon / Flipkart-style Ergonomics) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200 px-3.5 pt-2.5 pb-[calc(env(safe-area-inset-bottom,8px)+8px)] flex items-center justify-between gap-2.5 shadow-2xl">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => toggleWishlist(product.id)}
+            className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-colors shrink-0 ${
+              isWishlisted
+                ? 'bg-rose-50 text-rose-500 border-rose-200'
+                : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-rose-500'
+            }`}
+            aria-label={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          >
+            <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-rose-500' : ''}`} />
+          </button>
+          <div>
+            <div className="text-[10px] text-slate-400 font-medium leading-none mb-0.5">Live Specimen:</div>
+            <div className="text-base font-extrabold text-ocean-950 font-display leading-tight">
+              {formatCurrency(product.price)}
+            </div>
           </div>
         </div>
+
         <div className="flex items-center gap-2 flex-1 justify-end">
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className="px-4 py-2.5 rounded-xl bg-ocean-900 text-white font-bold text-xs"
+            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-ocean-950 hover:bg-ocean-900 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
           >
-            Add to Tank
+            <ShoppingBag className="w-3.5 h-3.5 text-aqua-400" />
+            <span>Add to Tank</span>
           </button>
           <button
             onClick={handleBuyNow}
             disabled={isOutOfStock}
-            className="px-5 py-2.5 rounded-xl bg-aqua-500 text-ocean-950 font-bold text-xs"
+            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-gradient-to-r from-aqua-500 to-aqua-600 hover:from-aqua-400 hover:to-aqua-500 active:scale-95 text-ocean-950 font-extrabold text-xs flex items-center justify-center gap-1 shadow-glow-aqua transition-all"
           >
-            Adopt Now
+            <span>Adopt Now</span>
           </button>
         </div>
       </div>

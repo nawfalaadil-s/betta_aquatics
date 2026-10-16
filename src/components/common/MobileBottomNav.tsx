@@ -7,8 +7,12 @@ export const MobileBottomNav: React.FC = () => {
   const { wishlistCount } = useWishlist();
   const location = useLocation();
 
-  // Hide bottom nav on specific checkout or admin views to prevent UI collisions
-  if (location.pathname.startsWith('/admin') || location.pathname === '/checkout') {
+  // Hide bottom nav on specific checkout, admin, or product detail views to prevent UI collisions
+  if (
+    location.pathname.startsWith('/admin') || 
+    location.pathname === '/checkout' || 
+    location.pathname.startsWith('/product/')
+  ) {
     return null;
   }
 

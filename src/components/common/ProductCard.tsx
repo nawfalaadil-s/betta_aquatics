@@ -149,25 +149,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className={`w-full py-2.5 px-3 rounded-2xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all duration-200 ${
+            className={`w-full min-h-[44px] py-2 px-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all duration-200 select-none ${
               isOutOfStock
                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                 : isAdded
                 ? 'bg-emerald-600 text-white shadow-sm'
-                : 'bg-ocean-900 hover:bg-ocean-800 text-white shadow-sm active:scale-[0.98]'
+                : 'bg-ocean-950 hover:bg-ocean-900 active:scale-[0.98] text-white shadow-sm'
             }`}
           >
             {isAdded ? (
               <>
-                <Check className="w-4 h-4 text-emerald-200" />
+                <Check className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
                 <span>Added to Tank!</span>
               </>
             ) : isOutOfStock ? (
               <span>Out of Stock</span>
             ) : (
               <>
-                <ShoppingBag className="w-4 h-4 text-aqua-400" />
-                <span>Adopt / Add to Cart</span>
+                <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-aqua-400 shrink-0" />
+                <span className="hidden sm:inline">Adopt / Add to Cart</span>
+                <span className="sm:hidden">Add to Tank</span>
               </>
             )}
           </button>
