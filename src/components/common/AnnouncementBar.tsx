@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStoreSettings } from '../../contexts/StoreSettingsContext';
 import { useToast } from '../../contexts/ToastContext';
-import { Sparkles, X, Copy, ArrowRight } from 'lucide-react';
+import { Tag, X, Copy, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const AnnouncementBar: React.FC = () => {
@@ -24,21 +24,21 @@ export const AnnouncementBar: React.FC = () => {
   return (
     <aside 
       aria-label="Promotional announcement"
-      className="bg-gradient-to-r from-ocean-950 via-ocean-900 to-ocean-950 text-white border-b border-aqua-500/20 text-xs sm:text-sm py-2 px-3 sm:px-4 relative z-40"
+      className="bg-slate-900 text-slate-100 border-b border-slate-800 text-xs py-2 px-3 sm:px-4 relative z-40"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
         <div className="flex-1 flex items-center justify-center gap-2 sm:gap-3 text-center flex-wrap">
-          <span className="inline-flex items-center gap-1.5 font-medium text-aqua-300">
-            <Sparkles className="w-3.5 h-3.5 text-aqua-400 animate-pulse" />
-            <span className="hidden sm:inline">EXCLUSIVE OFFER:</span>
+          <span className="inline-flex items-center gap-1.5 font-semibold text-teal-400">
+            <Tag className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">OFFER:</span>
           </span>
-          <span className="text-slate-200 text-xs sm:text-sm">
+          <span className="text-slate-200 text-xs">
             {settings.announcement_text}
           </span>
           {settings.announcement_code && (
             <button
               onClick={copyCode}
-              className="inline-flex items-center gap-1 bg-aqua-500/20 hover:bg-aqua-500/30 text-aqua-300 border border-aqua-400/40 px-2 py-0.5 rounded text-xs font-mono font-semibold tracking-wide transition-colors"
+              className="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 px-2 py-0.5 rounded text-[11px] font-mono font-semibold tracking-wide transition-colors"
               title="Click to copy coupon code"
               aria-label={`Copy coupon code ${settings.announcement_code}`}
             >
@@ -49,7 +49,7 @@ export const AnnouncementBar: React.FC = () => {
           {settings.announcement_link && (
             <Link
               to={settings.announcement_link}
-              className="inline-flex items-center gap-0.5 text-xs text-aqua-400 hover:text-aqua-300 underline underline-offset-2 font-medium"
+              className="inline-flex items-center gap-0.5 text-xs text-teal-300 hover:text-teal-200 underline underline-offset-2 font-medium"
             >
               Shop Now <ArrowRight className="w-3 h-3 ml-0.5" />
             </Link>

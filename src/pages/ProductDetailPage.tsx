@@ -387,20 +387,20 @@ export const ProductDetailPage: React.FC = () => {
                   <button
                     onClick={handleAddToCart}
                     disabled={isOutOfStock}
-                    className={`flex-1 h-12 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md ${
+                    className={`flex-1 h-12 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs ${
                       isOutOfStock
                         ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                        : 'bg-ocean-900 hover:bg-ocean-800 text-white active:scale-95'
+                        : 'bg-slate-900 hover:bg-slate-800 text-white active:scale-95'
                     }`}
                   >
-                    <ShoppingBag className="w-4 h-4 text-aqua-400" />
+                    <ShoppingBag className="w-4 h-4 text-teal-400" />
                     <span>Add to Tank</span>
                   </button>
 
                   <button
                     onClick={handleBuyNow}
                     disabled={isOutOfStock}
-                    className="flex-1 h-12 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-aqua-500 to-aqua-600 hover:from-aqua-400 hover:to-aqua-500 text-ocean-950 transition-all shadow-glow-aqua active:scale-95"
+                    className="flex-1 h-12 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 text-white transition-all shadow-xs active:scale-95"
                   >
                     <span>Adopt Now</span>
                   </button>
@@ -591,15 +591,15 @@ export const ProductDetailPage: React.FC = () => {
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-ocean-950 hover:bg-ocean-900 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
+            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition-all"
           >
-            <ShoppingBag className="w-3.5 h-3.5 text-aqua-400" />
+            <ShoppingBag className="w-3.5 h-3.5 text-teal-400" />
             <span>Add to Tank</span>
           </button>
           <button
             onClick={handleBuyNow}
             disabled={isOutOfStock}
-            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-gradient-to-r from-aqua-500 to-aqua-600 hover:from-aqua-400 hover:to-aqua-500 active:scale-95 text-ocean-950 font-extrabold text-xs flex items-center justify-center gap-1 shadow-glow-aqua transition-all"
+            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-teal-600 hover:bg-teal-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-2xs transition-all"
           >
             <span>Adopt Now</span>
           </button>

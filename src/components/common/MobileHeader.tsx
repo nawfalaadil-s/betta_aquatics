@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   Menu, X, Search, ShoppingCart, Heart, 
   User, Package, ShieldCheck, HelpCircle, 
-  Phone, Sparkles, ChevronRight, Settings 
+  Phone, ChevronRight, Settings 
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
@@ -60,13 +60,13 @@ export const MobileHeader: React.FC = () => {
   const categories = mockDb.getCategories();
 
   return (
-    <div className="md:hidden sticky top-0 z-40 bg-ocean-950 text-white shadow-md border-b border-ocean-900">
+    <div className="md:hidden sticky top-0 z-40 bg-white text-slate-900 shadow-xs border-b border-slate-200">
       {/* Top Main Mobile Bar */}
       <div className="px-3.5 py-2.5 flex items-center justify-between gap-2">
         {/* Menu Drawer Toggle */}
         <button
           onClick={() => setIsDrawerOpen(true)}
-          className="p-1.5 -ml-1 text-slate-300 hover:text-white rounded-lg active:bg-ocean-900 transition-colors"
+          className="p-1.5 -ml-1 text-slate-700 hover:text-slate-900 rounded-lg active:bg-slate-100 transition-colors"
           aria-label="Open Navigation Menu"
         >
           <Menu className="w-6 h-6" />
@@ -74,19 +74,19 @@ export const MobileHeader: React.FC = () => {
 
         {/* Center Logo */}
         <Link to="/" className="flex items-center gap-1.5">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-ocean-900 to-ocean-800 border border-aqua-400/40 p-0.5 flex items-center justify-center shadow-glow-aqua">
+          <div className="w-7 h-7 rounded-lg bg-slate-900 p-0.5 flex items-center justify-center">
             <img src="/logo-fish.svg" alt="Betta Aquatics" className="w-full h-full object-contain" />
           </div>
-          <span className="font-display font-extrabold text-lg tracking-wider text-white uppercase">
-            BETTA <span className="text-aqua-400">AQUATICS</span>
+          <span className="font-display font-extrabold text-base tracking-tight text-slate-950 uppercase">
+            BETTA <span className="text-teal-600">AQUATICS</span>
           </span>
         </Link>
 
-        {/* Right Action Icons: Search, Wishlist, Cart */}
+        {/* Right Action Icons: Search, Cart */}
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className="p-2 text-slate-300 hover:text-white rounded-lg active:bg-ocean-900"
+            className="p-2 text-slate-700 hover:text-slate-950 rounded-lg active:bg-slate-100"
             aria-label="Search Store"
           >
             <Search className="w-5 h-5" />
@@ -94,12 +94,12 @@ export const MobileHeader: React.FC = () => {
 
           <Link
             to="/cart"
-            className="p-2 text-slate-300 hover:text-white rounded-lg active:bg-ocean-900 relative"
+            className="p-2 text-slate-700 hover:text-slate-950 rounded-lg active:bg-slate-100 relative"
             aria-label="Cart"
           >
             <ShoppingCart className="w-5 h-5" />
             {itemCount > 0 && (
-              <span className="absolute 1 top-1 right-1 bg-aqua-400 text-ocean-950 font-extrabold text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute top-1 right-1 bg-teal-600 text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
                 {itemCount}
               </span>
             )}
@@ -109,8 +109,8 @@ export const MobileHeader: React.FC = () => {
 
       {/* Expandable Mobile Search Bar */}
       {isSearchOpen && (
-        <div className="p-3 bg-ocean-900 border-t border-ocean-800 animate-in fade-in slide-in-from-top-1">
-          <form onSubmit={handleSearchSubmit} className="flex items-center bg-white rounded-xl overflow-hidden px-3 py-1.5 shadow-md">
+        <div className="p-3 bg-slate-50 border-t border-slate-200">
+          <form onSubmit={handleSearchSubmit} className="flex items-center bg-white rounded-xl overflow-hidden px-3 py-1.5 border border-slate-300 shadow-xs">
             <Search className="w-4 h-4 text-slate-400 shrink-0 mr-2" />
             <input
               ref={searchInputRef}
@@ -118,7 +118,7 @@ export const MobileHeader: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search Bettas, Guppies, Plants..."
-              className="w-full text-sm text-slate-900 placeholder-slate-400 outline-none bg-transparent"
+              className="w-full text-xs text-slate-900 placeholder-slate-400 outline-none bg-transparent"
             />
             {searchQuery && (
               <button
@@ -131,7 +131,7 @@ export const MobileHeader: React.FC = () => {
             )}
             <button
               type="submit"
-              className="ml-2 bg-aqua-500 text-ocean-950 font-bold text-xs px-3 py-1 rounded-lg shrink-0"
+              className="ml-2 bg-slate-900 text-white font-bold text-xs px-3 py-1 rounded-lg shrink-0"
             >
               Go
             </button>
@@ -139,7 +139,7 @@ export const MobileHeader: React.FC = () => {
 
           {/* Instant Suggestions on Mobile */}
           {suggestions.length > 0 && (
-            <div className="mt-2 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden divide-y divide-slate-100 text-slate-900">
+            <div className="mt-2 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden divide-y divide-slate-100 text-slate-900">
               {suggestions.map((p) => (
                 <Link
                   key={p.id}
@@ -148,14 +148,14 @@ export const MobileHeader: React.FC = () => {
                     setIsSearchOpen(false);
                     setSearchQuery('');
                   }}
-                  className="flex items-center gap-2.5 p-2 hover:bg-slate-50"
+                  className="flex items-center gap-2.5 p-2.5 hover:bg-slate-50"
                 >
                   <img src={p.images[0]} alt={p.name} className="w-9 h-9 rounded object-cover" />
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-semibold truncate">{p.name}</div>
                     <div className="text-[10px] text-slate-500">{p.category_name}</div>
                   </div>
-                  <div className="text-xs font-bold text-ocean-950">{formatCurrency(p.price)}</div>
+                  <div className="text-xs font-bold text-slate-900">{formatCurrency(p.price)}</div>
                 </Link>
               ))}
             </div>
@@ -163,11 +163,11 @@ export const MobileHeader: React.FC = () => {
         </div>
       )}
 
-      {/* Horizontal Scrollable Category Navigation Strip */}
-      <div className="bg-ocean-950/90 border-t border-ocean-900/60 px-2 py-2 overflow-x-auto no-scrollbar flex items-center gap-2">
+      {/* Horizontal Scrollable Category Strip */}
+      <div className="bg-white border-t border-slate-100 px-3 py-2 overflow-x-auto no-scrollbar flex items-center gap-2">
         <Link
           to="/shop"
-          className="whitespace-nowrap text-xs font-semibold px-3 py-1 rounded-full bg-ocean-800 text-slate-200 active:bg-aqua-500 active:text-ocean-950 transition-colors"
+          className="whitespace-nowrap text-xs font-semibold px-3 py-1 rounded-full bg-slate-900 text-white"
         >
           All Items
         </Link>
@@ -175,7 +175,7 @@ export const MobileHeader: React.FC = () => {
           <Link
             key={c.id}
             to={`/shop?cat=${c.id}`}
-            className="whitespace-nowrap text-xs font-medium px-3 py-1 rounded-full bg-ocean-900/60 text-slate-300 hover:text-white border border-ocean-800 active:bg-aqua-500 active:text-ocean-950 transition-colors"
+            className="whitespace-nowrap text-xs font-medium px-3 py-1 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
           >
             {c.name}
           </Link>
@@ -186,25 +186,25 @@ export const MobileHeader: React.FC = () => {
       {isDrawerOpen && (
         <div className="fixed inset-0 z-50 flex">
           <div
-            className="fixed inset-0 bg-ocean-950/70 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs"
             onClick={() => setIsDrawerOpen(false)}
           />
-          <div className="relative w-4/5 max-w-sm bg-white text-slate-900 h-full shadow-2xl flex flex-col justify-between overflow-y-auto z-10 animate-in slide-in-from-left duration-200">
+          <div className="relative w-4/5 max-w-sm bg-white text-slate-900 h-full shadow-2xl flex flex-col justify-between overflow-y-auto z-10 animate-in slide-in-from-left duration-200 border-r border-slate-200">
             {/* Drawer Header */}
             <div>
-              <div className="bg-ocean-950 text-white p-4 flex items-center justify-between border-b border-ocean-900">
+              <div className="bg-slate-900 text-white p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-ocean-900 border border-aqua-400/40 p-1 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-slate-800 p-1 flex items-center justify-center">
                     <img src="/logo-fish.svg" alt="Betta Aquatics" className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <div className="font-display font-bold text-sm">BETTA AQUATICS</div>
-                    <div className="text-[10px] text-aqua-300">Living Aquatic Jewels</div>
+                    <div className="text-[10px] text-slate-400">Live Fish & Aquarium Store</div>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsDrawerOpen(false)}
-                  className="p-1 rounded-lg text-slate-300 hover:text-white"
+                  className="p-1 rounded-lg text-slate-400 hover:text-white"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
@@ -212,7 +212,7 @@ export const MobileHeader: React.FC = () => {
               </div>
 
               {/* User Greeting Card */}
-              <div className="p-4 bg-slate-50 border-b border-slate-200/80">
+              <div className="p-4 bg-slate-50 border-b border-slate-200">
                 {user ? (
                   <div className="flex items-center justify-between">
                     <div>
@@ -222,16 +222,16 @@ export const MobileHeader: React.FC = () => {
                     </div>
                     <button
                       onClick={() => switchRole(isAdmin ? 'customer' : 'admin')}
-                      className="text-[10px] font-semibold bg-aqua-100 text-aqua-900 px-2 py-1 rounded-lg border border-aqua-200"
+                      className="text-[10px] font-semibold bg-white text-slate-800 px-2 py-1 rounded-lg border border-slate-200 shadow-2xs"
                     >
-                      {isAdmin ? 'Admin Mode' : 'Customer'}
+                      {isAdmin ? 'Admin' : 'Customer'}
                     </button>
                   </div>
                 ) : (
                   <Link
                     to="/auth"
                     onClick={() => setIsDrawerOpen(false)}
-                    className="block text-center py-2 bg-ocean-900 text-white font-bold text-xs rounded-xl"
+                    className="block text-center py-2 bg-slate-900 text-white font-bold text-xs rounded-xl"
                   >
                     Login / Create Account
                   </Link>
@@ -246,7 +246,7 @@ export const MobileHeader: React.FC = () => {
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 font-semibold text-slate-800"
                   >
-                    <span>Browse All Livestock & Tanks</span>
+                    <span>All Fish & Supplies</span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </Link>
                   <Link
@@ -262,7 +262,7 @@ export const MobileHeader: React.FC = () => {
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-700"
                   >
-                    <span>Rare Guppies & Breeding Pairs</span>
+                    <span>Exotic Guppies & Pairs</span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </Link>
                   <Link
@@ -270,7 +270,7 @@ export const MobileHeader: React.FC = () => {
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-700"
                   >
-                    <span>Aquatic Plants & Aquascaping</span>
+                    <span>Live Aquarium Plants</span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </Link>
                 </div>
@@ -281,8 +281,8 @@ export const MobileHeader: React.FC = () => {
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-700"
                   >
-                    <Package className="w-4 h-4 text-aqua-600" />
-                    <span>My Orders & Live Tracking</span>
+                    <Package className="w-4 h-4 text-slate-500" />
+                    <span>My Orders & Consignments</span>
                   </Link>
                   <Link
                     to="/account/wishlist"
@@ -297,7 +297,7 @@ export const MobileHeader: React.FC = () => {
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-700"
                   >
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <ShieldCheck className="w-4 h-4 text-teal-600" />
                     <span>Live Arrival Guarantee Guide</span>
                   </Link>
                   <Link
@@ -305,7 +305,7 @@ export const MobileHeader: React.FC = () => {
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-700"
                   >
-                    <HelpCircle className="w-4 h-4 text-sky-600" />
+                    <HelpCircle className="w-4 h-4 text-slate-500" />
                     <span>Frequently Asked Questions</span>
                   </Link>
                 </div>
@@ -318,10 +318,10 @@ export const MobileHeader: React.FC = () => {
                       setIsDrawerOpen(false);
                       switchRole('admin');
                     }}
-                    className="flex items-center gap-3 p-2.5 rounded-xl bg-amber-50 text-amber-900 font-semibold"
+                    className="flex items-center gap-3 p-2.5 rounded-xl bg-amber-50 text-amber-900 font-semibold border border-amber-200"
                   >
                     <Settings className="w-4 h-4 text-amber-700" />
-                    <span>Open Admin Management</span>
+                    <span>Open Store Admin</span>
                   </Link>
                 </div>
               </div>
@@ -333,10 +333,10 @@ export const MobileHeader: React.FC = () => {
                 href="https://wa.me/919876543210"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-600 text-white font-semibold text-xs rounded-xl shadow-sm"
+                className="flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-xs"
               >
                 <Phone className="w-4 h-4" />
-                <span>Chat On WhatsApp</span>
+                <span>Chat on WhatsApp</span>
               </a>
               {user && (
                 <button

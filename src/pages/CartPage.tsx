@@ -282,10 +282,10 @@ export const CartPage: React.FC = () => {
 
               <button
                 onClick={() => navigate('/checkout')}
-                className="w-full py-3.5 bg-gradient-to-r from-aqua-500 to-aqua-600 hover:from-aqua-400 hover:to-aqua-500 text-ocean-950 font-extrabold text-sm rounded-xl transition-all shadow-glow-aqua active:scale-95 flex items-center justify-center gap-2 mt-4"
+                className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
               >
                 <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-teal-400" />
               </button>
 
               <div className="pt-3 flex items-center justify-center gap-2 text-[11px] text-slate-400">

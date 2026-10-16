@@ -3,58 +3,58 @@ import { ShieldCheck, Wind, ThermometerSnowflake, HeartPulse } from 'lucide-reac
 
 export const TrustBadges: React.FC = () => {
   return (
-    <section className="py-14 bg-gradient-to-b from-ocean-950 via-ocean-900 to-ocean-950 text-white">
+    <section className="py-12 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs font-bold uppercase tracking-wider text-aqua-400 block mb-1">
-            Gold Standard Animal Welfare
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <span className="text-xs font-bold uppercase tracking-wider text-teal-700 block mb-1">
+            Safe Fish Transport
           </span>
-          <h2 className="text-2xl sm:text-3xl font-bold font-display mb-2">
-            Why Our Live Fish Travel Safer
+          <h2 className="text-xl sm:text-3xl font-bold font-display text-slate-900 mb-2">
+            Why Our Live Fish Arrive Healthy
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300">
-            We operate the most technologically advanced packing facility in Indian aquaculture.
+          <p className="text-xs sm:text-sm text-slate-500">
+            Dedicated quarantine and temperature-regulated transit protocols for every order across India.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-ocean-900/60 border border-ocean-800 rounded-2xl p-5 flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-aqua-500/20 border border-aqua-400/40 text-aqua-300 flex items-center justify-center mb-3 shadow-glow-aqua">
-              <Wind className="w-6 h-6" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col items-center text-center">
+            <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center mb-3">
+              <Wind className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-sm text-white mb-1.5">Medical Pure Oxygen</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Every bag is pressurized with 99.5% medical oxygen, guaranteeing 72+ hours of active respiration for the fish.
+            <h3 className="font-bold text-sm text-slate-900 mb-1">Medical Pure Oxygen</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Every shipping bag is pressurized with pure medical oxygen, providing 72+ hours of respiration.
             </p>
           </div>
 
-          <div className="bg-ocean-900/60 border border-ocean-800 rounded-2xl p-5 flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-aqua-500/20 border border-aqua-400/40 text-aqua-300 flex items-center justify-center mb-3 shadow-glow-aqua">
-              <ThermometerSnowflake className="w-6 h-6" />
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col items-center text-center">
+            <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center mb-3">
+              <ThermometerSnowflake className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-sm text-white mb-1.5">EPS Thermal Insulation</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              High-density molded thermocol crates with calibrated heating or cooling gel packs shield livestock against transit temperature swings.
+            <h3 className="font-bold text-sm text-slate-900 mb-1">Thermal Insulation</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              High-density molded crates with seasonal gel packs protect live fish from heat and cold transit swings.
             </p>
           </div>
 
-          <div className="bg-ocean-900/60 border border-ocean-800 rounded-2xl p-5 flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-aqua-500/20 border border-aqua-400/40 text-aqua-300 flex items-center justify-center mb-3 shadow-glow-aqua">
-              <HeartPulse className="w-6 h-6" />
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col items-center text-center">
+            <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center mb-3">
+              <HeartPulse className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-sm text-white mb-1.5">Stress-Coat Conditioning</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Enriched with organic Catappa tannins and slime-coat electrolytes so your Betta arrives relaxed and vibrant.
+            <h3 className="font-bold text-sm text-slate-900 mb-1">Stress-Coat Water</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Enriched with organic Indian almond tannins and electrolytes to keep Bettas calm during transit.
             </p>
           </div>
 
-          <div className="bg-ocean-900/60 border border-ocean-800 rounded-2xl p-5 flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-aqua-500/20 border border-aqua-400/40 text-aqua-300 flex items-center justify-center mb-3 shadow-glow-aqua">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col items-center text-center">
+            <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center mb-3">
+              <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-sm text-white mb-1.5">100% Live Arrival Cover</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              If any fish fails to arrive in prime health, our 2-hour unboxing policy guarantees an immediate replacement or full store credit.
+            <h3 className="font-bold text-sm text-slate-900 mb-1">Live Arrival Guarantee</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Full transit protection. If any fish does not arrive active and healthy, we issue an instant replacement or refund.
             </p>
           </div>
         </div>

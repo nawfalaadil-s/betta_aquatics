@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingBag, Eye, Sparkles, Check } from 'lucide-react';
+import { Heart, ShoppingBag, Eye, Check } from 'lucide-react';
 import { Product } from '../../lib/types';
 import { formatCurrency, calculateDiscount } from '../../lib/utils';
 import { useCart } from '../../contexts/CartContext';
@@ -47,51 +47,50 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
   };
 
   return (
-    <article className="group relative bg-white rounded-3xl border border-slate-200/80 hover:border-aqua-400/60 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col overflow-hidden h-full">
+    <article className="group relative bg-white rounded-2xl border border-slate-200 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col overflow-hidden h-full">
       {/* Product Image Frame */}
       <div className="relative aspect-[4/3] sm:aspect-square bg-slate-50 overflow-hidden">
         <Link to={`/product/${product.slug}`} className="block w-full h-full" aria-label={`View details for ${product.name}`}>
           <img
             src={product.images[0]}
-            alt={`${product.name} - ${product.strain || 'Ornamental Fish'} raised by Betta Aquatics`}
+            alt={`${product.name} - ${product.strain || 'Ornamental Fish'}`}
             loading="lazy"
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+            className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-300"
           />
         </Link>
 
         {/* Floating Specimen Badge */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
+        <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
           {product.is_unique_specimen && (
-            <span className="inline-flex items-center gap-1 bg-ocean-950/85 backdrop-blur-md text-aqua-300 border border-aqua-400/30 text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-sm">
-              <Sparkles className="w-3 h-3 text-aqua-400" />
-              <span>Exact Specimen</span>
+            <span className="inline-flex items-center gap-1 bg-slate-900 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md shadow-2xs">
+              <span>WYSIWYG 1-of-1</span>
             </span>
           )}
           {discount > 0 && !product.is_unique_specimen && (
-            <span className="inline-flex items-center bg-coral-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+            <span className="inline-flex items-center bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-2xs">
               {discount}% OFF
             </span>
           )}
         </div>
 
         {/* Wishlist & Quick View */}
-        <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
           <button
             onClick={handleWishlist}
-            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all shadow-sm backdrop-blur-md ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-2xs ${
               isWishlisted
                 ? 'bg-rose-50 text-rose-500 border border-rose-200'
-                : 'bg-white/90 hover:bg-white text-slate-500 hover:text-rose-500'
+                : 'bg-white/95 hover:bg-white text-slate-500 hover:text-rose-500 border border-slate-200'
             }`}
             aria-label={isWishlisted ? 'Remove from Wishlist' : 'Save to Wishlist'}
           >
-            <Heart className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isWishlisted ? 'fill-rose-500' : ''}`} />
+            <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-500' : ''}`} />
           </button>
 
           {onQuickView && (
             <button
               onClick={handleQuickView}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-aqua-600 flex items-center justify-center transition-all shadow-sm backdrop-blur-md opacity-0 group-hover:opacity-100 hidden sm:flex"
+              className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-600 hover:text-slate-900 flex items-center justify-center transition-all shadow-2xs border border-slate-200 opacity-0 group-hover:opacity-100 hidden sm:flex"
               aria-label="Quick View specimen"
             >
               <Eye className="w-4 h-4" />
@@ -101,28 +100,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
 
         {/* Sold out badge */}
         {isOutOfStock && (
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center z-20">
-            <span className="bg-slate-900/90 text-white font-bold text-xs uppercase tracking-wider px-3 py-1 rounded-full border border-slate-700">
-              Adopted / Out of Stock
+          <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center z-20">
+            <span className="bg-slate-900 text-white font-bold text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-md border border-slate-700">
+              Out of Stock
             </span>
           </div>
         )}
       </div>
 
       {/* Card Info */}
-      <div className="p-3.5 sm:p-4 flex flex-col flex-1 justify-between">
+      <div className="p-3 sm:p-3.5 flex flex-col flex-1 justify-between">
         <div>
           {/* Category & Strain */}
           <div className="flex items-center justify-between text-[11px] font-medium text-slate-400 mb-1">
             <span className="truncate">{product.category_name || 'Ornamental Fish'}</span>
             {product.strain && (
-              <span className="text-aqua-700 font-semibold truncate ml-1">{product.strain}</span>
+              <span className="text-slate-600 font-semibold truncate ml-1">{product.strain}</span>
             )}
           </div>
 
           {/* Title */}
-          <Link to={`/product/${product.slug}`} className="block group-hover:text-aqua-700 transition-colors">
-            <h3 className="font-semibold text-slate-900 text-xs sm:text-sm line-clamp-2 leading-snug mb-1.5 font-sans">
+          <Link to={`/product/${product.slug}`} className="block group-hover:text-teal-700 transition-colors">
+            <h3 className="font-semibold text-slate-900 text-xs sm:text-sm line-clamp-2 leading-snug mb-1 font-sans">
               {product.name}
             </h3>
           </Link>
@@ -134,9 +133,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
         </div>
 
         {/* Price & Action */}
-        <div className="pt-2.5 border-t border-slate-100 mt-auto">
-          <div className="flex items-baseline gap-2 mb-2.5">
-            <span className="text-base sm:text-lg font-bold text-ocean-950 font-display">
+        <div className="pt-2 border-t border-slate-100 mt-auto">
+          <div className="flex items-baseline gap-1.5 mb-2">
+            <span className="text-base sm:text-lg font-bold text-slate-900 font-display">
               {formatCurrency(product.price)}
             </span>
             {product.compare_at_price && product.compare_at_price > product.price && (
@@ -149,12 +148,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className={`w-full min-h-[44px] py-2 px-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all duration-200 select-none ${
+            className={`w-full min-h-[42px] py-2 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-colors select-none ${
               isOutOfStock
                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                 : isAdded
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'bg-ocean-950 hover:bg-ocean-900 active:scale-[0.98] text-white shadow-sm'
+                ? 'bg-emerald-600 text-white shadow-2xs'
+                : 'bg-slate-900 hover:bg-slate-800 text-white shadow-2xs active:scale-98'
             }`}
           >
             {isAdded ? (
@@ -166,8 +165,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
               <span>Out of Stock</span>
             ) : (
               <>
-                <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-aqua-400 shrink-0" />
-                <span className="hidden sm:inline">Adopt / Add to Cart</span>
+                <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden sm:inline">Add to Cart</span>
                 <span className="sm:hidden">Add to Tank</span>
               </>
             )}

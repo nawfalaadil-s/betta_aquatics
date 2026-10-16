@@ -498,7 +498,7 @@ export const CheckoutPage: React.FC = () => {
                 {paymentMethod === 'upi' ? (
                   <div className="space-y-4 mb-6">
                     {/* Step A: Direct Pay with UPI App */}
-                    <div className="p-4 sm:p-5 bg-gradient-to-br from-emerald-50 via-teal-50/50 to-cyan-50/30 rounded-2xl border border-emerald-200 text-xs space-y-3.5">
+                    <div className="p-4 sm:p-5 bg-emerald-50/60 rounded-2xl border border-emerald-200 text-xs space-y-3.5">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                         <div className="flex items-center gap-2 font-bold text-sm text-emerald-950">
                           <Smartphone className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -518,11 +518,11 @@ export const CheckoutPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={handleOpenUPIApp}
-                          className="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
+                          className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 active:scale-98"
                         >
-                          <Smartphone className="w-5 h-5 text-emerald-200" />
+                          <Smartphone className="w-5 h-5 text-emerald-100" />
                           <span>Pay Now via UPI App ({formatCurrency(total)})</span>
-                          <ExternalLink className="w-4 h-4 text-emerald-200" />
+                          <ExternalLink className="w-4 h-4 text-emerald-100" />
                         </button>
                       </div>
 
@@ -785,14 +785,14 @@ export const CheckoutPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isPlacingOrder}
-                  className="w-full py-4 bg-gradient-to-r from-aqua-500 to-aqua-600 hover:from-aqua-400 hover:to-aqua-500 text-ocean-950 font-black text-sm rounded-xl transition-all shadow-glow-aqua active:scale-95 flex items-center justify-center gap-2 mt-4"
+                  className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
                 >
                   {isPlacingOrder ? (
                     <span>Confirming Order...</span>
                   ) : (
                     <>
                       <span>Submit Payment Proof & Confirm Order</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-4 h-4 text-teal-400" />
                     </>
                   )}
                 </button>

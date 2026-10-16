@@ -53,14 +53,14 @@ export const AuthPage: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-ocean-950 border border-ocean-800 p-2 mx-auto flex items-center justify-center shadow-glow-aqua mb-3">
+          <div className="w-11 h-11 rounded-xl bg-slate-900 p-2 mx-auto flex items-center justify-center shadow-xs mb-3">
             <img src="/logo-fish.svg" alt="Betta Aquatics" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-2xl font-black text-ocean-950 font-display">
+          <h1 className="text-2xl font-black text-slate-900 font-display">
             BETTA AQUATICS
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            India's Premier Ornamental Fish Sanctuary
+            Live Fish & Aquarium Store
           </p>
         </div>
 

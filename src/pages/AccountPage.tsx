@@ -84,7 +84,7 @@ export const AccountPage: React.FC = () => {
         {/* Profile Card Header */}
         <div className="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 shadow-sm mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-ocean-950 text-aqua-400 border border-ocean-800 flex items-center justify-center text-xl sm:text-2xl font-bold font-display shadow-glow-aqua shrink-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xl sm:text-2xl font-bold font-display shadow-xs shrink-0">
               {profileName.charAt(0) || 'U'}
             </div>
             <div>

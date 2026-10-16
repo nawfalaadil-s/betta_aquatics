@@ -27,9 +27,9 @@ export const MobileBottomNav: React.FC = () => {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-ocean-950/95 backdrop-blur-lg border-t border-ocean-800 pb-[env(safe-area-inset-bottom,0px)] shadow-2xl"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 pb-[env(safe-area-inset-bottom,0px)] shadow-lg"
     >
-      <div className="flex items-center justify-around h-16 px-1">
+      <div className="flex items-center justify-around h-15 px-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -42,7 +42,7 @@ export const MobileBottomNav: React.FC = () => {
               key={item.label}
               to={item.path}
               className={`flex-1 flex flex-col items-center justify-center h-full min-h-[44px] min-w-[44px] transition-colors relative ${
-                isActive ? 'text-aqua-400' : 'text-slate-400 hover:text-slate-200'
+                isActive ? 'text-slate-950 font-bold' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               <div className="relative">
@@ -53,11 +53,11 @@ export const MobileBottomNav: React.FC = () => {
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] mt-1 font-medium tracking-tight ${isActive ? 'font-bold' : ''}`}>
+              <span className={`text-[10px] mt-1 tracking-tight ${isActive ? 'font-bold text-slate-900' : 'text-slate-500'}`}>
                 {item.label}
               </span>
               {isActive && (
-                <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-aqua-400 shadow-glow-aqua" />
+                <span className="absolute bottom-1 w-1 h-1 rounded-full bg-slate-900" />
               )}
             </NavLink>
           );
