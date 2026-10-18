@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { Product, Category, HomepageSection, CMSPage, MediaAsset, StoreSettings } from './types';
+import { Product, Category, HomepageSection, CMSPage, MediaAsset, StoreSettings, Order, PaymentStatus } from './types';
 import { mockDb } from './mockDatabase';
 
 /**
@@ -572,6 +572,274 @@ export async function syncAnnouncementToSupabase(announcement: {
     return true;
   } catch (err) {
     console.error('Failed to sync announcement to Supabase:', err);
+    return false;
+  }
+}
+
+/**
+ * Helper to check if a string is a valid UUID
+ */
+function isUuid(str: string | undefined | null): boolean {
+  if (!str) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+}
+
+/**
+ * Syncs a newly created order, its items, and its payment proof to Supabase PostgreSQL database
+ */
+export async function syncOrderToSupabase(order: Order): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase) return true;
+
+  try {
+    const validUserId = isUuid(order.user_id) ? order.user_id : null;
+
+    // 1. Insert order into Supabase orders table
+    const { data: insertedOrder, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        order_number: order.order_number,
+        user_id: validUserId,
+        customer_name: order.customer_name,
+        customer_email: order.customer_email,
+        customer_phone: order.customer_phone,
+        shipping_address: order.shipping_address,
+        subtotal: order.subtotal,
+        delivery_fee: order.delivery_fee,
+        packing_charge: order.packing_charge,
+        discount_amount: order.discount_amount,
+        coupon_code: order.coupon_code || null,
+        total_amount: order.total_amount,
+        payment_status: order.payment_status,
+        fulfillment_status: order.fulfillment_status,
+        notes: order.notes || null,
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+      })
+      .select('id')
+      .single();
+
+    if (orderError || !insertedOrder) {
+      console.warn('Supabase order insert notice:', orderError?.message);
+      return false;
+    }
+
+    const orderId = insertedOrder.id;
+
+    // 2. Insert order items
+    if (order.items && order.items.length > 0) {
+      const itemsPayload = order.items.map(item => ({
+        order_id: orderId,
+        product_id: isUuid(item.product_id) ? item.product_id : null,
+        product_name: item.product_name,
+        product_sku: item.product_sku || '',
+        product_image: item.product_image || '',
+        unit_price: item.unit_price,
+        quantity: item.quantity,
+        total_price: item.total_price,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(itemsPayload);
+
+      if (itemsError) {
+        console.warn('Supabase order_items insert notice:', itemsError.message);
+      }
+    }
+
+    // 3. Insert payment record
+    if (order.payment_details) {
+      const paymentPayload = {
+        order_id: orderId,
+        payment_method: order.payment_details.method,
+        upi_reference: order.payment_details.upi_reference || null,
+        proof_image_url: order.payment_details.proof_image_url || null,
+        amount: order.total_amount,
+        status: order.payment_status,
+        submitted_at: order.payment_details.submitted_at || order.created_at,
+      };
+
+      const { error: payError } = await supabase
+        .from('payments')
+        .insert(paymentPayload);
+
+      if (payError) {
+        console.warn('Supabase payments insert notice:', payError.message);
+      }
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Failed to sync order to Supabase:', err);
+    return false;
+  }
+}
+
+/**
+ * Fetches all orders from Supabase PostgreSQL database, joins order_items and payments,
+ * and merges with local mockDb orders to ensure seamless cross-device synchronization.
+ */
+export async function fetchOrdersFromSupabase(): Promise<Order[]> {
+  const localOrders = mockDb.getOrders();
+  if (!isSupabaseConfigured || !supabase) return localOrders;
+
+  try {
+    const { data: supaOrders, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (*),
+        payments (*)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error || !supaOrders) {
+      console.warn('Supabase fetch orders notice:', error?.message);
+      return localOrders;
+    }
+
+    // Map Supabase rows to our Order interface
+    const mappedSupaOrders: Order[] = supaOrders.map((row: any) => {
+      const payment = Array.isArray(row.payments) && row.payments.length > 0 ? row.payments[0] : undefined;
+      const items = Array.isArray(row.order_items) ? row.order_items.map((i: any) => ({
+        id: i.id,
+        product_id: i.product_id,
+        product_name: i.product_name,
+        product_sku: i.product_sku || '',
+        product_image: i.product_image || '',
+        unit_price: Number(i.unit_price),
+        quantity: Number(i.quantity),
+        total_price: Number(i.total_price),
+      })) : [];
+
+      return {
+        id: row.id,
+        order_number: row.order_number,
+        user_id: row.user_id || 'usr-customer',
+        customer_name: row.customer_name,
+        customer_email: row.customer_email,
+        customer_phone: row.customer_phone,
+        shipping_address: row.shipping_address,
+        items,
+        subtotal: Number(row.subtotal),
+        delivery_fee: Number(row.delivery_fee),
+        packing_charge: Number(row.packing_charge || 0),
+        discount_amount: Number(row.discount_amount || 0),
+        coupon_code: row.coupon_code || undefined,
+        total_amount: Number(row.total_amount),
+        payment_status: row.payment_status as PaymentStatus,
+        fulfillment_status: row.fulfillment_status as any,
+        payment_details: payment ? {
+          method: payment.payment_method || 'upi',
+          upi_reference: payment.upi_reference,
+          proof_image_url: payment.proof_image_url,
+          submitted_at: payment.submitted_at || row.created_at,
+          verified_at: payment.verified_at,
+          verified_by: payment.verified_by,
+          rejection_reason: payment.rejection_reason,
+        } : undefined,
+        notes: row.notes || undefined,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      };
+    });
+
+    // Merge Supabase orders with local mock orders (avoid duplicates by order_number)
+    const orderMap = new Map<string, Order>();
+    // First populate local orders
+    localOrders.forEach(o => orderMap.set(o.order_number, o));
+    // Overwrite with authoritative cloud orders
+    mappedSupaOrders.forEach(o => orderMap.set(o.order_number, o));
+
+    const merged = Array.from(orderMap.values()).sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    // Save merged list into localStorage cache so local views have latest data
+    try {
+      localStorage.setItem('ba_orders', JSON.stringify(merged));
+    } catch {
+      // ignore
+    }
+
+    return merged;
+  } catch (err) {
+    console.error('Error fetching orders from Supabase:', err);
+    return localOrders;
+  }
+}
+
+/**
+ * Updates order payment status in Supabase
+ */
+export async function updateSupabaseOrderPayment(
+  orderNumber: string,
+  paymentStatus: PaymentStatus,
+  details?: {
+    rejection_reason?: string;
+    verified_by?: string;
+  }
+): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase) return true;
+
+  try {
+    const now = new Date().toISOString();
+    const { data: updatedOrders } = await supabase
+      .from('orders')
+      .update({
+        payment_status: paymentStatus,
+        fulfillment_status: paymentStatus === 'verified' ? 'processing' : undefined,
+        updated_at: now,
+      })
+      .eq('order_number', orderNumber)
+      .select('id');
+
+    if (updatedOrders && updatedOrders.length > 0) {
+      const orderId = updatedOrders[0].id;
+      await supabase
+        .from('payments')
+        .update({
+          status: paymentStatus,
+          rejection_reason: details?.rejection_reason || null,
+          verified_at: paymentStatus === 'verified' ? now : null,
+          verified_by: details?.verified_by || null,
+        })
+        .eq('order_id', orderId);
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Failed to update order payment in Supabase:', err);
+    return false;
+  }
+}
+
+/**
+ * Updates order shipment status and tracking in Supabase
+ */
+export async function updateSupabaseOrderShipment(
+  orderNumber: string,
+  courierName: string,
+  trackingNumber: string,
+  trackingUrl: string,
+  notes?: string
+): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase) return true;
+
+  try {
+    const now = new Date().toISOString();
+    await supabase
+      .from('orders')
+      .update({
+        fulfillment_status: 'shipped',
+        notes: notes || `Shipped via ${courierName} (AWB: ${trackingNumber})`,
+        updated_at: now,
+      })
+      .eq('order_number', orderNumber);
+
+    return true;
+  } catch (err) {
+    console.error('Failed to update order shipment in Supabase:', err);
     return false;
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   Package, Truck, ArrowLeft, Copy, ExternalLink, 
@@ -11,6 +11,7 @@ import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
 import { SEO } from '../components/common/SEO';
+import { fetchOrdersFromSupabase } from '../lib/supabaseSync';
 
 export const OrderDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +22,37 @@ export const OrderDetailPage: React.FC = () => {
   const [resubmitUtr, setResubmitUtr] = useState('');
   const [resubmitProof, setResubmitProof] = useState<string | null>(null);
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      const local = mockDb.getOrderById(id);
+      if (local) setOrder(local);
+
+      fetchOrdersFromSupabase().then(orders => {
+        const found = orders.find(o => o.id === id || o.order_number === id);
+        if (found) setOrder(found);
+      });
+    }
+
+    const handleUpdate = () => {
+      if (id) {
+        fetchOrdersFromSupabase().then(orders => {
+          const found = orders.find(o => o.id === id || o.order_number === id);
+          if (found) setOrder(found);
+        });
+      }
+    };
+
+    window.addEventListener('ba_orders_updated', handleUpdate);
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'ba_orders') handleUpdate();
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('ba_orders_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, [id]);
 
   const isAuthorized = order && (
     isAdmin || 

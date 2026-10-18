@@ -710,6 +710,13 @@ export const mockDb = {
       window.dispatchEvent(new CustomEvent('ba_orders_updated'));
     }
 
+    // 4. Asynchronously sync order to Supabase cloud database
+    import('./supabaseSync').then(m => {
+      m.syncOrderToSupabase(newOrder);
+    }).catch(err => {
+      console.warn('Background Supabase order sync notice:', err);
+    });
+
     return newOrder;
   },
 
@@ -761,6 +768,13 @@ export const mockDb = {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('ba_orders_updated'));
     }
+
+    import('./supabaseSync').then(m => {
+      m.updateSupabaseOrderPayment(order.order_number, paymentStatus, details);
+    }).catch(err => {
+      console.warn('Background Supabase payment update notice:', err);
+    });
+
     return order;
   },
 
@@ -795,6 +809,13 @@ export const mockDb = {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('ba_orders_updated'));
     }
+
+    import('./supabaseSync').then(m => {
+      m.updateSupabaseOrderShipment(order.order_number, courierName, trackingNumber, trackingUrl, notes);
+    }).catch(err => {
+      console.warn('Background Supabase shipment update notice:', err);
+    });
+
     return order;
   },
 

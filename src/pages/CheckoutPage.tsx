@@ -6,7 +6,7 @@ import {
   Upload, CheckCircle2, ArrowRight, 
   Copy, Building, Lock, MessageSquare,
   Smartphone, ExternalLink, X, FileText,
-  Truck, AlertCircle
+  Truck, AlertCircle, User, UserPlus, LogIn, LogOut, Check
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -20,7 +20,7 @@ import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
 import { INDIAN_STATES, getStateFromPincode, lookupPincode } from '../lib/shipping';
 
 export const CheckoutPage: React.FC = () => {
-  const { user, addresses, addAddress } = useAuth();
+  const { user, addresses, addAddress, register, login, logout } = useAuth();
   const { 
     items, 
     itemCount,
@@ -40,6 +40,15 @@ export const CheckoutPage: React.FC = () => {
   } = useCart();
   const { settings } = useStoreSettings();
   const { showToast } = useToast();
+
+  // Authentication Gate State (when customer is not logged in)
+  const [authMode, setAuthMode] = useState<'register' | 'login'>('register');
+  const [authName, setAuthName] = useState('');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPhone, setAuthPhone] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // Selected address state: automatically select customer's default address or first saved address
   const defaultSaved = addresses.find(a => a.is_default) || addresses[0];
@@ -62,6 +71,87 @@ export const CheckoutPage: React.FC = () => {
   const [newAddrCity, setNewAddrCity] = useState('');
   const [newAddrState, setNewAddrState] = useState(shippingState || (defaultSaved ? defaultSaved.state : ''));
   const [newAddrPostalCode, setNewAddrPostalCode] = useState(shippingPincode || (defaultSaved ? defaultSaved.postal_code : ''));
+
+  // Sync new address fields when user signs in or registers
+  useEffect(() => {
+    if (user) {
+      if (!newAddrFullName && user.full_name) setNewAddrFullName(user.full_name);
+      if (!newAddrPhone && user.phone) setNewAddrPhone(user.phone);
+    }
+  }, [user]);
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+
+    if (authMode === 'register') {
+      if (!authName.trim()) {
+        setAuthError('Please enter your full name.');
+        return;
+      }
+      if (!authEmail.trim() || !authEmail.includes('@')) {
+        setAuthError('Please enter a valid email address.');
+        return;
+      }
+      const digitsOnly = authPhone.replace(/\D/g, '');
+      if (!authPhone.trim() || digitsOnly.length < 10) {
+        setAuthError('Please enter a valid 10-digit mobile number for courier notifications.');
+        return;
+      }
+      if (!authPassword || authPassword.length < 6) {
+        setAuthError('Password must be at least 6 characters long.');
+        return;
+      }
+
+      setIsSubmittingAuth(true);
+      try {
+        const res = await register(
+          authName.trim(),
+          authEmail.trim().toLowerCase(),
+          authPassword,
+          authPhone.trim()
+        );
+
+        if (res.success && res.user) {
+          showToast(`Account created! Welcome to RA Guppy, ${res.user.full_name}.`, 'success');
+          setNewAddrFullName(res.user.full_name);
+          setNewAddrPhone(res.user.phone || authPhone.trim());
+        } else {
+          setAuthError(res.message || 'Failed to create account. Please check your details.');
+        }
+      } catch (err: any) {
+        setAuthError(err.message || 'An error occurred during account creation.');
+      } finally {
+        setIsSubmittingAuth(false);
+      }
+    } else {
+      // Login mode
+      if (!authEmail.trim()) {
+        setAuthError('Please enter your registered email address.');
+        return;
+      }
+      if (!authPassword) {
+        setAuthError('Please enter your password.');
+        return;
+      }
+
+      setIsSubmittingAuth(true);
+      try {
+        const res = await login(authEmail.trim().toLowerCase(), authPassword);
+        if (res.success && res.user) {
+          showToast(`Welcome back, ${res.user.full_name}!`, 'success');
+          setNewAddrFullName(res.user.full_name);
+          if (res.user.phone) setNewAddrPhone(res.user.phone);
+        } else {
+          setAuthError(res.message || 'Invalid email or password.');
+        }
+      } catch (err: any) {
+        setAuthError(err.message || 'Login failed. Please check your credentials.');
+      } finally {
+        setIsSubmittingAuth(false);
+      }
+    }
+  };
 
   // Auto-sync initial shipping calculation on mount or when addresses load
   useEffect(() => {
@@ -268,6 +358,11 @@ export const CheckoutPage: React.FC = () => {
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!user) {
+      showToast('Please create an account or sign in above before placing your order.', 'error');
+      return;
+    }
+
     if (!isShippingCalculated || deliveryFee <= 0 || shippingError) {
       showToast('A valid delivery address is required to calculate shipping before confirming the order.', 'error');
       return;
@@ -322,10 +417,10 @@ export const CheckoutPage: React.FC = () => {
 
     setTimeout(() => {
       const newOrder = mockDb.createOrder({
-        user_id: user?.id || 'usr-customer-demo',
-        customer_name: shippingAddress.full_name,
-        customer_email: user?.email || 'customer@raguppy.com',
-        customer_phone: shippingAddress.phone,
+        user_id: user.id,
+        customer_name: shippingAddress.full_name || user.full_name,
+        customer_email: user.email,
+        customer_phone: shippingAddress.phone || user.phone || '',
         shipping_address: shippingAddress,
         items: items.map(item => ({
           id: 'item-' + Math.random().toString(36).substring(2, 9),
@@ -489,20 +584,203 @@ export const CheckoutPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Steps Column (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Step 1: Customer Contact Info */}
+              {/* Step 1: Customer Account Gate */}
               <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
                   <div className="flex items-center gap-2 font-bold text-sm text-blue-950">
-                    <span className="w-6 h-6 rounded-full bg-blue-950 text-white text-xs flex items-center justify-center font-bold">1</span>
-                    <span>Customer Details</span>
+                    <span className={`w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold ${user ? 'bg-blue-950' : 'bg-blue-600'}`}>
+                      {user ? <Check className="w-3.5 h-3.5" /> : '1'}
+                    </span>
+                    <span>{user ? 'Customer Account' : 'Account Required to Place Order'}</span>
                   </div>
-                  {user && (
-                    <span className="text-xs text-slate-500 font-medium">{user.email}</span>
+                  {user ? (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-800 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
+                      <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Verified Customer</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Create Account or Sign In</span>
+                    </span>
                   )}
                 </div>
-                <div className="text-xs text-slate-600 leading-relaxed">
-                  Consignment tracking updates and live dispatch notices will be sent to <strong>{user?.email || 'your registered email'}</strong>.
-                </div>
+
+                {user ? (
+                  <div className="space-y-2 text-xs">
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-blue-900 text-white font-bold flex items-center justify-center shrink-0">
+                          {user.full_name?.charAt(0).toUpperCase() || <User className="w-5 h-5" />}
+                        </div>
+                        <div>
+                          <div className="font-bold text-slate-900 text-sm">{user.full_name}</div>
+                          <div className="text-slate-500 font-mono text-[11px]">
+                            {user.email} {user.phone ? `• ${user.phone}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => logout()}
+                        className="text-xs text-slate-500 hover:text-red-600 font-semibold self-start sm:self-center transition-colors flex items-center gap-1"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Sign Out / Switch</span>
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-slate-500 pt-1">
+                      Consignment tracking updates and road courier dispatch notices will be sent to <strong>{user.email}</strong>.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      To safeguard live specimen shipments and ensure you receive your Professional Couriers tracking AWB, please create an account or sign in before proceeding.
+                    </p>
+
+                    {/* Tabs: Create Account vs Sign In */}
+                    <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode('register'); setAuthError(null); }}
+                        className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                          authMode === 'register'
+                            ? 'bg-white text-blue-950 shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <UserPlus className="w-4 h-4 text-blue-600" />
+                        <span>Create New Account</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode('login'); setAuthError(null); }}
+                        className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                          authMode === 'login'
+                            ? 'bg-white text-blue-950 shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <LogIn className="w-4 h-4 text-blue-600" />
+                        <span>Sign In</span>
+                      </button>
+                    </div>
+
+                    {authError && (
+                      <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+                        <span>{authError}</span>
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      {authMode === 'register' ? (
+                        <>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">Your Full Name *</label>
+                              <input
+                                type="text"
+                                value={authName}
+                                onChange={(e) => setAuthName(e.target.value)}
+                                placeholder="Enter full name"
+                                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">Mobile Phone (For Courier) *</label>
+                              <input
+                                type="tel"
+                                value={authPhone}
+                                onChange={(e) => setAuthPhone(e.target.value)}
+                                placeholder="10-digit mobile number"
+                                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address *</label>
+                              <input
+                                type="email"
+                                value={authEmail}
+                                onChange={(e) => setAuthEmail(e.target.value)}
+                                placeholder="name@example.com"
+                                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">Choose Password *</label>
+                              <input
+                                type="password"
+                                value={authPassword}
+                                onChange={(e) => setAuthPassword(e.target.value)}
+                                placeholder="Min 6 characters"
+                                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleAuthSubmit}
+                            disabled={isSubmittingAuth}
+                            className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 disabled:bg-slate-300 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 mt-2"
+                          >
+                            {isSubmittingAuth ? (
+                              <span>Creating Account...</span>
+                            ) : (
+                              <>
+                                <UserPlus className="w-4 h-4 text-red-400" />
+                                <span>Create Account & Continue to Delivery</span>
+                              </>
+                            )}
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address *</label>
+                              <input
+                                type="email"
+                                value={authEmail}
+                                onChange={(e) => setAuthEmail(e.target.value)}
+                                placeholder="name@example.com"
+                                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">Account Password *</label>
+                              <input
+                                type="password"
+                                value={authPassword}
+                                onChange={(e) => setAuthPassword(e.target.value)}
+                                placeholder="Enter your password"
+                                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleAuthSubmit}
+                            disabled={isSubmittingAuth}
+                            className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 disabled:bg-slate-300 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 mt-2"
+                          >
+                            {isSubmittingAuth ? (
+                              <span>Signing In...</span>
+                            ) : (
+                              <>
+                                <LogIn className="w-4 h-4 text-red-400" />
+                                <span>Sign In & Continue to Delivery</span>
+                              </>
+                            )}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Step 2: Shipping Address */}
@@ -512,7 +790,7 @@ export const CheckoutPage: React.FC = () => {
                     <span className="w-6 h-6 rounded-full bg-blue-950 text-white text-xs flex items-center justify-center font-bold">2</span>
                     <span>Delivery Address</span>
                   </div>
-                  {addresses.length > 0 && (
+                  {user && addresses.length > 0 && (
                     <button
                       type="button"
                       onClick={() => {
@@ -542,7 +820,17 @@ export const CheckoutPage: React.FC = () => {
                   )}
                 </div>
 
-                {!isAddingNewAddress && addresses.length > 0 ? (
+                {!user ? (
+                  <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center mx-auto">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <span className="font-bold text-slate-700 block text-xs">Delivery Address Locked</span>
+                    <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                      Please create an account or sign in in Step 1 above. Your delivery address and road courier rates will unlock immediately.
+                    </p>
+                  </div>
+                ) : !isAddingNewAddress && addresses.length > 0 ? (
                   <div className="space-y-3">
                     <p className="text-xs text-slate-500 mb-2">Select your delivery destination for this consignment:</p>
                     {addresses.map((addr) => (
@@ -776,7 +1064,7 @@ export const CheckoutPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Step 3: Manual Payment Verification Instructions */}
+                {/* Step 3: Manual Payment Verification Instructions */}
               <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
                   <div className="flex items-center gap-2 font-bold text-sm text-blue-950">
@@ -788,6 +1076,18 @@ export const CheckoutPage: React.FC = () => {
                   </span>
                 </div>
 
+                {!user ? (
+                  <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center mx-auto">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <span className="font-bold text-slate-700 block text-xs">Payment Verification Locked</span>
+                    <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                      Please create an account or sign in in Step 1 above to access UPI payment QR and upload verification proof.
+                    </p>
+                  </div>
+                ) : (
+                  <>
                 {/* Method Tabs */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   <button
@@ -1039,6 +1339,8 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                   </div>
                 )}
+                </>
+                )}
               </div>
             </div>
 
@@ -1120,10 +1422,15 @@ export const CheckoutPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={isPlacingOrder || isCalculatingShipping || !isShippingCalculated || !!shippingError}
+                  disabled={!user || isPlacingOrder || isCalculatingShipping || !isShippingCalculated || !!shippingError}
                   className="w-full py-4 bg-blue-900 hover:bg-blue-800 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
                 >
-                  {isPlacingOrder ? (
+                  {!user ? (
+                    <span className="flex items-center gap-1.5">
+                      <Lock className="w-4 h-4 text-slate-500" />
+                      <span>Create Account in Step 1 to Proceed</span>
+                    </span>
+                  ) : isPlacingOrder ? (
                     <span>Confirming Order...</span>
                   ) : isCalculatingShipping ? (
                     <span>Calculating Courier Charge...</span>

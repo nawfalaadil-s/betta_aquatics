@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   DollarSign, ShoppingBag, Clock, Package, 
@@ -7,10 +7,47 @@ import {
 } from 'lucide-react';
 import { mockDb } from '../../lib/mockDatabase';
 import { formatCurrency, formatDate } from '../../lib/utils';
+import { Order } from '../../lib/types';
+import { fetchOrdersFromSupabase } from '../../lib/supabaseSync';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 export const AdminDashboardPage: React.FC = () => {
-  const orders = mockDb.getOrders();
+  const [orders, setOrders] = useState<Order[]>(() => mockDb.getOrders());
   const products = mockDb.getProducts();
+
+  useEffect(() => {
+    fetchOrdersFromSupabase().then(setOrders);
+
+    const handleUpdate = () => {
+      fetchOrdersFromSupabase().then(setOrders);
+    };
+
+    window.addEventListener('ba_orders_updated', handleUpdate);
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'ba_orders') {
+        handleUpdate();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    let channel: any = null;
+    if (isSupabaseConfigured && supabase) {
+      channel = supabase
+        .channel('admin_dashboard_feed')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+          handleUpdate();
+        })
+        .subscribe();
+    }
+
+    return () => {
+      window.removeEventListener('ba_orders_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, []);
 
   const totalRevenue = orders
     .filter(o => o.payment_status === 'verified')

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Package, Truck, Copy, ExternalLink, ShieldCheck, 
@@ -9,14 +9,31 @@ import { useToast } from '../contexts/ToastContext';
 import { mockDb } from '../lib/mockDatabase';
 import { formatCurrency, formatDate } from '../lib/utils';
 import { Order, PaymentStatus, FulfillmentStatus } from '../lib/types';
+import { fetchOrdersFromSupabase } from '../lib/supabaseSync';
 
 export const OrdersPage: React.FC = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
 
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'shipped' | 'delivered'>('all');
+  const [allOrders, setAllOrders] = useState<Order[]>(() => mockDb.getOrders());
 
-  const allOrders = mockDb.getOrders();
+  useEffect(() => {
+    fetchOrdersFromSupabase().then(setAllOrders);
+    const handleUpdate = () => {
+      fetchOrdersFromSupabase().then(setAllOrders);
+    };
+    window.addEventListener('ba_orders_updated', handleUpdate);
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'ba_orders') handleUpdate();
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('ba_orders_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
   // Strictly isolate orders to the current authenticated customer (or all if admin)
   const userOrders = user?.role === 'admin' 
     ? allOrders 

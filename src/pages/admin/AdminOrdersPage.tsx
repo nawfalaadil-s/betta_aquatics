@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Search, Filter, CheckCircle2, AlertCircle, 
   Clock, Truck, Package, X, Copy, ExternalLink, 
   ShieldCheck, ArrowRight, Eye, ChevronDown, 
-  FileText, ZoomIn, Download, Smartphone, Check 
+  FileText, ZoomIn, Download, Smartphone, Check,
+  RefreshCw 
 } from 'lucide-react';
 import { mockDb } from '../../lib/mockDatabase';
 import { useToast } from '../../contexts/ToastContext';
@@ -11,10 +12,13 @@ import { Order, PaymentStatus, FulfillmentStatus } from '../../lib/types';
 import { formatCurrency, formatDate, buildTrackingUrl } from '../../lib/utils';
 import { COURIER_PRESETS } from '../../lib/constants';
 import { TaxInvoiceModal } from '../../components/common/TaxInvoiceModal';
+import { fetchOrdersFromSupabase } from '../../lib/supabaseSync';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 export const AdminOrdersPage: React.FC = () => {
   const { showToast } = useToast();
   const [orders, setOrders] = useState<Order[]>(() => mockDb.getOrders());
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +46,62 @@ export const AdminOrdersPage: React.FC = () => {
   // Tax invoice preview
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
+  const refreshOrders = useCallback(async (silent = false) => {
+    if (!silent) setIsSyncing(true);
+    try {
+      const mergedOrders = await fetchOrdersFromSupabase();
+      setOrders(mergedOrders);
+      if (selectedOrder) {
+        const found = mergedOrders.find(o => o.id === selectedOrder.id || o.order_number === selectedOrder.order_number);
+        if (found) setSelectedOrder(found);
+      }
+    } catch (err) {
+      console.warn('Orders refresh notice:', err);
+      setOrders(mockDb.getOrders());
+    } finally {
+      if (!silent) setIsSyncing(false);
+    }
+  }, [selectedOrder]);
+
+  // Initial load and listeners for real-time order updates
+  useEffect(() => {
+    refreshOrders(false);
+
+    const handleUpdate = () => {
+      refreshOrders(true);
+    };
+
+    window.addEventListener('ba_orders_updated', handleUpdate);
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'ba_orders') {
+        handleUpdate();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    // Supabase Realtime channel subscription
+    let channel: any = null;
+    if (isSupabaseConfigured && supabase) {
+      channel = supabase
+        .channel('admin_orders_channel')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+          handleUpdate();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
+          handleUpdate();
+        })
+        .subscribe();
+    }
+
+    return () => {
+      window.removeEventListener('ba_orders_updated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [refreshOrders]);
+
   // Keyboard Escape listener for all modals & drawers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -55,13 +115,6 @@ export const AdminOrdersPage: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [zoomedImage, isRejectModalOpen, isShipModalOpen, selectedOrder]);
-
-  const refreshOrders = () => {
-    setOrders(mockDb.getOrders());
-    if (selectedOrder) {
-      setSelectedOrder(mockDb.getOrderById(selectedOrder.id) || null);
-    }
-  };
 
   const filteredOrders = orders.filter((order) => {
     if (paymentFilter !== 'all' && order.payment_status !== paymentFilter) return false;
@@ -153,6 +206,19 @@ export const AdminOrdersPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              refreshOrders(false);
+              showToast('Syncing orders from Supabase cloud database...', 'info');
+            }}
+            disabled={isSyncing}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 text-xs font-bold transition-all disabled:opacity-50 shadow-2xs"
+            title="Fetch latest orders from Supabase database"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-blue-700 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>{isSyncing ? 'Syncing...' : 'Sync with DB'}</span>
+          </button>
           <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-red-50 text-red-700 border border-red-200">
             {orders.filter(o => o.payment_status === 'pending').length} Pending Review
           </span>
