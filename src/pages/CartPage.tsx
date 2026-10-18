@@ -7,8 +7,6 @@ import {
 import { useCart } from '../contexts/CartContext';
 import { useStoreSettings } from '../contexts/StoreSettingsContext';
 import { formatCurrency } from '../lib/utils';
-import { INDIAN_STATES } from '../lib/shipping';
-
 export const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const { 
@@ -16,14 +14,11 @@ export const CartPage: React.FC = () => {
     itemCount,
     subtotal, 
     deliveryFee, 
+    isShippingCalculated,
     packingCharge, 
     discountAmount, 
     appliedCoupon, 
     total, 
-    shippingState,
-    setShippingState,
-    shippingPincode,
-    setShippingPincode,
     shippingDetails,
     updateQuantity, 
     removeFromCart, 
@@ -78,59 +73,62 @@ export const CartPage: React.FC = () => {
           </button>
         </div>
 
-        {/* The Professional Couriers Logistics Banner */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm mb-6 space-y-2.5">
+        {/* The Professional Couriers Logistics Information Card */}
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm mb-6 space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center shrink-0">
                 <Truck className="w-5 h-5" />
               </div>
               <div>
-                <span className="font-bold text-slate-900 block text-xs">The Professional Couriers • Express Road Transport</span>
-                <span className="text-[11px] text-slate-500">Live fish packed with medical oxygen & thermal insulation. Deliveries strictly within India.</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                    The Professional Couriers • Express Road Transport
+                  </span>
+                  {isShippingCalculated && (
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
+                      Calculated
+                    </span>
+                  )}
+                </div>
+                <span className="text-[11px] text-slate-500 block mt-0.5">
+                  Live fish packed with medical oxygen & thermal insulation. Deliveries strictly within India.
+                </span>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-blue-900 shrink-0" />
-                <input
-                  type="text"
-                  maxLength={6}
-                  value={shippingPincode}
-                  onChange={(e) => setShippingPincode(e.target.value)}
-                  placeholder="PIN (e.g. 682001)"
-                  className="w-28 bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
-                  title="Enter 6-digit PIN code to auto-detect state & delivery rate"
-                />
+
+            {isShippingCalculated && (
+              <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Courier Charge</span>
+                <span className="font-mono font-extrabold text-base text-blue-950">
+                  {formatCurrency(deliveryFee)}
+                </span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <select
-                  value={shippingState}
-                  onChange={(e) => setShippingState(e.target.value)}
-                  className="bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-900 outline-none focus:border-blue-600"
-                >
-                  <option value="Kerala">Kerala</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <optgroup label="All Other Indian States">
-                    {INDIAN_STATES.filter(s => s !== 'Kerala' && s !== 'Tamil Nadu' && s !== 'Karnataka').map(st => (
-                      <option key={st} value={st}>{st}</option>
-                    ))}
-                  </optgroup>
-                </select>
+            )}
+          </div>
+
+          <div className="pt-2.5 border-t border-slate-100 text-xs">
+            {isShippingCalculated ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-600">
+                <span>
+                  Destination: <strong className="text-slate-900">{shippingDetails.state}</strong>
+                  {shippingDetails.region ? ` (${shippingDetails.region})` : ''} • Estimated Transit: <strong className="text-slate-900">{shippingDetails.estimatedDays || '2 - 3 Days'}</strong>
+                </span>
+                <span className="text-blue-900 font-medium">
+                  {shippingDetails.rateDescription}
+                </span>
               </div>
-            </div>
+            ) : (
+              <div className="flex items-center gap-2 text-slate-600 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+                <MapPin className="w-4 h-4 text-blue-900 shrink-0" />
+                <span className="font-medium text-slate-700">
+                  Enter your delivery address at checkout to calculate shipping.
+                </span>
+              </div>
+            )}
           </div>
-          <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-100 text-slate-600">
-            <span>
-              Destination: <strong>{shippingDetails.state}</strong>
-              {shippingDetails.region ? ` (${shippingDetails.region})` : ''} • Estimated Transit: <strong>{shippingDetails.estimatedDays || '2 - 3 Days'}</strong>
-            </span>
-            <span className="font-mono font-bold text-blue-950">
-              Road Delivery: {formatCurrency(deliveryFee)}
-            </span>
-          </div>
-          {shippingDetails.isBulkOrder && (
+
+          {isShippingCalculated && shippingDetails.isBulkOrder && (
             <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
               <span>Bulk Box Packing ({itemCount} pairs): 2X road courier rate applied for reinforced thermal insulated crates ({formatCurrency(deliveryFee)}).</span>
@@ -301,11 +299,17 @@ export const CartPage: React.FC = () => {
                 <div>
                   <span className="font-semibold text-slate-800 block">The Professional Couriers</span>
                   <span className="text-[11px] text-slate-500">
-                    Road Courier ({shippingDetails.state}) {shippingDetails.isBulkOrder ? '• 2X Bulk Rate' : ''}
+                    {isShippingCalculated
+                      ? `Road Courier (${shippingDetails.state}) ${shippingDetails.isBulkOrder ? '• 2X Bulk Rate' : ''}`
+                      : 'Express Road Transport'}
                   </span>
                 </div>
                 <span className="font-semibold text-slate-900">
-                  {deliveryFee === 0 ? '₹0' : formatCurrency(deliveryFee)}
+                  {isShippingCalculated ? (
+                    formatCurrency(deliveryFee)
+                  ) : (
+                    <span className="text-slate-500 font-normal italic">Calculated at checkout</span>
+                  )}
                 </span>
               </div>
 

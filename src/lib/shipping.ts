@@ -44,6 +44,7 @@ export const INDIAN_STATES = [
 ] as const;
 
 export interface ShippingCalculation {
+  isCalculated: boolean;
   baseRate: number;
   multiplier: number;
   finalFee: number;
@@ -56,7 +57,8 @@ export interface ShippingCalculation {
   isBulkOrder: boolean;
   courierName: string;
   rateDescription: string;
-  tierName: 'Kerala' | 'Tamil Nadu / Karnataka' | 'All Other States';
+  tierName?: 'Kerala' | 'Tamil Nadu / Karnataka' | 'All Other States';
+  errorMessage?: string;
 }
 
 /**
@@ -70,7 +72,7 @@ export function getStateFromPincode(pincode: string): {
   estimatedDays: string;
 } | null {
   const clean = pincode.replace(/\D/g, '').trim();
-  if (clean.length !== 6) return null;
+  if (clean.length !== 6 || clean.startsWith('0')) return null;
 
   const prefix2 = clean.substring(0, 2);
   const prefix3 = clean.substring(0, 3);
@@ -209,7 +211,8 @@ export function getStateFromPincode(pincode: string): {
     return { state: 'Bihar', region: 'Patna & Bihar', isValid: true, estimatedDays: '4 - 5 Days' };
   }
 
-  return { state: 'All Other States', region: 'Domestic Indian Delivery', isValid: true, estimatedDays: '3 - 5 Days' };
+  // Any other prefix is unassigned/non-civilian in India
+  return null;
 }
 
 /**
@@ -221,17 +224,14 @@ export async function lookupPincode(pincode: string): Promise<{
   city?: string;
   region: string;
   estimatedDays: string;
-}> {
-  const fallback = getStateFromPincode(pincode);
+  isValid: boolean;
+} | null> {
   const clean = pincode.replace(/\D/g, '').trim();
-
-  const defaultState = fallback?.state || 'Kerala';
-  const defaultRegion = fallback?.region || 'Domestic Indian Delivery';
-  const defaultDays = fallback?.estimatedDays || '3 - 5 Days';
-
-  if (clean.length !== 6) {
-    return { state: defaultState, region: defaultRegion, estimatedDays: defaultDays };
+  if (clean.length !== 6 || clean.startsWith('0')) {
+    return null;
   }
+
+  const fallback = getStateFromPincode(clean);
 
   try {
     const controller = new AbortController();
@@ -245,12 +245,14 @@ export async function lookupPincode(pincode: string): Promise<{
       const data = await res.json();
       if (Array.isArray(data) && data[0]?.Status === 'Success' && data[0]?.PostOffice?.length > 0) {
         const po = data[0].PostOffice[0];
+        const stateName = po.State || fallback?.state || 'Other State';
         return {
-          state: po.State || defaultState,
+          state: stateName,
           district: po.District,
           city: po.Name || po.Block || po.District,
-          region: `${po.District || ''}, ${po.State || defaultState}`.trim(),
-          estimatedDays: defaultDays,
+          region: `${po.District || ''}, ${stateName}`.trim(),
+          estimatedDays: fallback?.estimatedDays || '3 - 5 Days',
+          isValid: true,
         };
       }
     }
@@ -258,11 +260,16 @@ export async function lookupPincode(pincode: string): Promise<{
     // Graceful offline fallback
   }
 
-  return {
-    state: defaultState,
-    region: defaultRegion,
-    estimatedDays: defaultDays,
-  };
+  if (fallback) {
+    return {
+      state: fallback.state,
+      region: fallback.region,
+      estimatedDays: fallback.estimatedDays,
+      isValid: true,
+    };
+  }
+
+  return null;
 }
 
 /**
@@ -273,10 +280,27 @@ export async function lookupPincode(pincode: string): Promise<{
  * - If order has more than 10 pairs (total quantity > 10), cost doubles to 2X
  */
 export function calculateShipping(
-  stateOrPincode: string | undefined, 
+  stateOrPincode: string | undefined | null, 
   totalQuantity: number = 0
 ): ShippingCalculation {
-  let resolvedState = (stateOrPincode || '').trim();
+  const isBulkOrder = totalQuantity > 10;
+  const multiplier = isBulkOrder ? 2 : 1;
+
+  if (!stateOrPincode || !stateOrPincode.trim()) {
+    return {
+      isCalculated: false,
+      baseRate: 0,
+      multiplier,
+      finalFee: 0,
+      state: '',
+      totalQuantity,
+      isBulkOrder,
+      courierName: COURIER_NAME,
+      rateDescription: 'Enter your delivery address at checkout to calculate shipping.',
+    };
+  }
+
+  let resolvedState = stateOrPincode.trim();
   let pincode: string | undefined = undefined;
   let region: string | undefined = undefined;
   let estimatedDays: string | undefined = undefined;
@@ -290,6 +314,20 @@ export function calculateShipping(
       resolvedState = pinInfo.state;
       region = pinInfo.region;
       estimatedDays = pinInfo.estimatedDays;
+    } else {
+      return {
+        isCalculated: false,
+        baseRate: 0,
+        multiplier,
+        finalFee: 0,
+        state: '',
+        pincode: digitsOnly,
+        totalQuantity,
+        isBulkOrder,
+        courierName: COURIER_NAME,
+        rateDescription: 'Unrecognized PIN code. Please verify your 6-digit postal code.',
+        errorMessage: 'Invalid Indian PIN code. Please verify the 6-digit PIN code.',
+      };
     }
   }
 
@@ -314,30 +352,44 @@ export function calculateShipping(
     tierName = 'Tamil Nadu / Karnataka';
     rateDescription = s.includes('tamil') || s.includes('puducherry') ? 'Tamil Nadu: ₹120' : 'Karnataka: ₹120';
     if (!estimatedDays) estimatedDays = '2 - 3 Days';
-  } else if (!resolvedState || !resolvedState.trim()) {
-    // Default fallback to Kerala when state is not yet specified
-    baseRate = 80;
-    tierName = 'Kerala';
-    rateDescription = 'Kerala (Default Rate): ₹80';
-    if (!estimatedDays) estimatedDays = '1 - 2 Days';
   } else {
+    // Check if valid Indian state
+    const isRecognizedState = INDIAN_STATES.some(st => 
+      st.toLowerCase() === s || s.includes(st.toLowerCase())
+    ) || s.includes('state') || s.includes('india');
+
+    if (!isRecognizedState && !pincode) {
+      return {
+        isCalculated: false,
+        baseRate: 0,
+        multiplier,
+        finalFee: 0,
+        state: resolvedState,
+        totalQuantity,
+        isBulkOrder,
+        courierName: COURIER_NAME,
+        rateDescription: 'Please select a valid Indian delivery state.',
+        errorMessage: 'Unrecognized delivery state. Please select a valid state from the list.',
+      };
+    }
+
+    baseRate = 200;
+    tierName = 'All Other States';
+    rateDescription = `${resolvedState}: ₹200`;
     if (!estimatedDays) estimatedDays = '3 - 5 Days';
   }
 
-  // If order is more than 10 pairs (> 10 items), cost increases 2X for reinforced live packing
-  const isBulkOrder = totalQuantity > 10;
-  const multiplier = isBulkOrder ? 2 : 1;
   const finalFee = baseRate * multiplier;
-
   const desc = isBulkOrder
     ? `${rateDescription} • 2X Bulk Packaging applied (>10 pairs: ₹${finalFee})`
     : rateDescription;
 
   return {
+    isCalculated: true,
     baseRate,
     multiplier,
     finalFee,
-    state: resolvedState || 'Kerala',
+    state: resolvedState,
     pincode,
     region,
     estimatedDays,

@@ -6,7 +6,7 @@ import {
   Upload, CheckCircle2, ArrowRight, 
   Copy, Building, Lock, MessageSquare,
   Smartphone, ExternalLink, X, FileText,
-  Truck
+  Truck, AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -26,6 +26,7 @@ export const CheckoutPage: React.FC = () => {
     itemCount,
     subtotal, 
     deliveryFee, 
+    isShippingCalculated,
     packingCharge, 
     discountAmount, 
     appliedCoupon, 
@@ -48,13 +49,18 @@ export const CheckoutPage: React.FC = () => {
   const [isAddingNewAddress, setIsAddingNewAddress] = useState(!defaultSaved);
   const [saveNewAddress, setSaveNewAddress] = useState<boolean>(true);
 
+  // Loading & error state for shipping calculation
+  const [isCalculatingShipping, setIsCalculatingShipping] = useState<boolean>(false);
+  const [shippingError, setShippingError] = useState<string | null>(null);
+  const [pincodeValidationMessage, setPincodeValidationMessage] = useState<string | null>(null);
+
   // New address form state
   const [newAddrFullName, setNewAddrFullName] = useState(user?.full_name || '');
   const [newAddrPhone, setNewAddrPhone] = useState(user?.phone || '');
   const [newAddrStreet, setNewAddrStreet] = useState('');
   const [newAddrLandmark, setNewAddrLandmark] = useState('');
   const [newAddrCity, setNewAddrCity] = useState('');
-  const [newAddrState, setNewAddrState] = useState(shippingState || (defaultSaved ? defaultSaved.state : 'Kerala'));
+  const [newAddrState, setNewAddrState] = useState(shippingState || (defaultSaved ? defaultSaved.state : ''));
   const [newAddrPostalCode, setNewAddrPostalCode] = useState(shippingPincode || (defaultSaved ? defaultSaved.postal_code : ''));
 
   // Auto-sync initial shipping calculation on mount or when addresses load
@@ -64,11 +70,23 @@ export const CheckoutPage: React.FC = () => {
       const chosen = active || defaultSaved;
       if (chosen && !isAddingNewAddress) {
         setSelectedAddressId(chosen.id);
-        if (chosen.state) {
-          setShippingState(chosen.state);
+        const pin = (chosen.postal_code || '').trim();
+        const st = (chosen.state || '').trim();
+        if (pin.length === 6) {
+          const pinInfo = getStateFromPincode(pin);
+          if (pinInfo) {
+            setShippingPincode(pin);
+            setShippingState(pinInfo.state);
+            setShippingError(null);
+            setPincodeValidationMessage(null);
+            return;
+          }
         }
-        if (chosen.postal_code) {
-          setShippingPincode(chosen.postal_code);
+        if (st) {
+          setShippingState(st);
+          if (pin) setShippingPincode(pin);
+          setShippingError(null);
+          setPincodeValidationMessage(null);
         }
       }
     }
@@ -79,40 +97,121 @@ export const CheckoutPage: React.FC = () => {
     setIsAddingNewAddress(false);
     const matched = addresses.find(a => a.id === addrId);
     if (matched) {
-      if (matched.state) {
-        setShippingState(matched.state);
-        setNewAddrState(matched.state);
-      }
-      if (matched.postal_code) {
-        setShippingPincode(matched.postal_code);
-        setNewAddrPostalCode(matched.postal_code);
-      }
-      showToast(`Selected: ${matched.city ? matched.city + ', ' : ''}${matched.state} • Delivery charge auto-calculated!`, 'info');
+      setIsCalculatingShipping(true);
+      setShippingError(null);
+      setPincodeValidationMessage(null);
+
+      const pin = (matched.postal_code || '').trim();
+      const st = (matched.state || '').trim();
+
+      setTimeout(() => {
+        if (pin.length === 6) {
+          const pinInfo = getStateFromPincode(pin);
+          if (pinInfo) {
+            setShippingPincode(pin);
+            setShippingState(pinInfo.state);
+            setNewAddrPostalCode(pin);
+            setNewAddrState(pinInfo.state);
+            setIsCalculatingShipping(false);
+            showToast(`Selected: ${matched.city ? matched.city + ', ' : ''}${pinInfo.state} • Courier charge calculated!`, 'info');
+            return;
+          }
+        }
+
+        if (st) {
+          setShippingState(st);
+          setNewAddrState(st);
+          if (pin) {
+            setShippingPincode(pin);
+            setNewAddrPostalCode(pin);
+          }
+          setIsCalculatingShipping(false);
+          showToast(`Selected: ${matched.city ? matched.city + ', ' : ''}${st} • Courier charge calculated!`, 'info');
+          return;
+        }
+
+        setShippingError('Selected address is missing a valid Indian postal PIN or state. Please update address.');
+        setShippingPincode('');
+        setShippingState('');
+        setIsCalculatingShipping(false);
+      }, 200);
     }
   };
 
   const handlePincodeInput = (val: string) => {
     const clean = val.replace(/\D/g, '').slice(0, 6);
     setNewAddrPostalCode(clean);
-    setShippingPincode(clean);
-    if (clean.length === 6) {
-      const pinInfo = getStateFromPincode(clean);
-      if (pinInfo && pinInfo.state) {
-        setNewAddrState(pinInfo.state);
-        setShippingState(pinInfo.state);
-        showToast(`Auto-detected: ${pinInfo.state} (${pinInfo.region}) • Road Delivery rate updated!`, 'info');
+
+    // If customer modifies/clears PIN code, invalidate previous shipping calculation!
+    if (clean.length < 6) {
+      setShippingPincode('');
+      if (clean.startsWith('0')) {
+        setPincodeValidationMessage('Indian PIN codes start with digits 1-9.');
+        setShippingError('Invalid PIN code: cannot start with 0.');
+      } else if (clean.length > 0) {
+        setPincodeValidationMessage(`Enter 6 digits (${clean.length}/6 entered)`);
+        setShippingError(null);
+      } else {
+        setPincodeValidationMessage(null);
+        setShippingError(null);
       }
-      lookupPincode(clean).then(res => {
-        if (res && res.city && !newAddrCity) {
-          setNewAddrCity(res.city);
-        }
-      });
+      return;
     }
+
+    // 6 digits entered
+    setIsCalculatingShipping(true);
+    setShippingError(null);
+    setPincodeValidationMessage(null);
+
+    const pinInfo = getStateFromPincode(clean);
+    if (!pinInfo) {
+      setPincodeValidationMessage('Unrecognized Indian PIN code. Please verify.');
+      setShippingError('Unrecognized PIN code. Road delivery charge cannot be determined.');
+      setShippingPincode('');
+      setIsCalculatingShipping(false);
+      return;
+    }
+
+    setNewAddrState(pinInfo.state);
+    setShippingPincode(clean);
+    setShippingState(pinInfo.state);
+    setPincodeValidationMessage(null);
+    setShippingError(null);
+
+    lookupPincode(clean).then(res => {
+      if (res && res.city && !newAddrCity) {
+        setNewAddrCity(res.city);
+      }
+    }).finally(() => {
+      setIsCalculatingShipping(false);
+      showToast(`Auto-detected: ${pinInfo.state} (${pinInfo.region}) • Road Delivery rate updated!`, 'info');
+    });
   };
 
   const handleStateChange = (selectedState: string) => {
     setNewAddrState(selectedState);
-    setShippingState(selectedState);
+    if (!selectedState) {
+      setShippingState('');
+      setShippingError('Please select a valid delivery state.');
+      return;
+    }
+    setIsCalculatingShipping(true);
+    setShippingError(null);
+    setTimeout(() => {
+      setShippingState(selectedState);
+      setIsCalculatingShipping(false);
+      showToast(`Delivery state updated to ${selectedState}`, 'info');
+    }, 150);
+  };
+
+  const handleRetryCalculation = () => {
+    if (newAddrPostalCode && newAddrPostalCode.length === 6) {
+      handlePincodeInput(newAddrPostalCode);
+    } else if (newAddrState) {
+      handleStateChange(newAddrState);
+    } else {
+      showToast('Please enter your 6-digit PIN code or select your state', 'info');
+    }
   };
 
   // Payment method selection & submission
@@ -169,10 +268,19 @@ export const CheckoutPage: React.FC = () => {
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!isShippingCalculated || deliveryFee <= 0 || shippingError) {
+      showToast('A valid delivery address is required to calculate shipping before confirming the order.', 'error');
+      return;
+    }
+
     let shippingAddress: Address;
     if (isAddingNewAddress || selectedAddressId === 'new') {
       if (!newAddrFullName.trim() || !newAddrPhone.trim() || !newAddrStreet.trim() || !newAddrCity.trim() || !newAddrState.trim() || !newAddrPostalCode.trim()) {
         showToast('Please enter all delivery address fields (Name, Phone, Street, City, State, PIN Code)', 'error');
+        return;
+      }
+      if (newAddrPostalCode.trim().length !== 6) {
+        showToast('Please enter a valid 6-digit Indian postal PIN code', 'error');
         return;
       }
       shippingAddress = addAddress({
@@ -412,8 +520,14 @@ export const CheckoutPage: React.FC = () => {
                         setIsAddingNewAddress(next);
                         if (next) {
                           setSelectedAddressId('new');
-                          if (newAddrState) setShippingState(newAddrState);
-                          if (newAddrPostalCode) setShippingPincode(newAddrPostalCode);
+                          if (newAddrPostalCode && newAddrPostalCode.length === 6) {
+                            handlePincodeInput(newAddrPostalCode);
+                          } else if (newAddrState) {
+                            handleStateChange(newAddrState);
+                          } else {
+                            setShippingPincode('');
+                            setShippingState('');
+                          }
                         } else {
                           const active = addresses.find(a => a.id === selectedAddressId) || defaultSaved;
                           if (active) {
@@ -520,8 +634,16 @@ export const CheckoutPage: React.FC = () => {
                           value={newAddrPostalCode}
                           onChange={(e) => handlePincodeInput(e.target.value)}
                           placeholder="e.g. 682001, 560001"
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-blue-600 focus:bg-white"
+                          className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:bg-white transition-colors ${
+                            pincodeValidationMessage ? 'border-amber-400 focus:border-amber-500' : 'border-slate-300 focus:border-blue-600'
+                          }`}
                         />
+                        {pincodeValidationMessage && (
+                          <div className="text-[10px] font-medium text-amber-700 mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3 text-amber-600 shrink-0" />
+                            <span>{pincodeValidationMessage}</span>
+                          </div>
+                        )}
                       </div>
                       <div>
                         <label className="block font-semibold text-slate-700 mb-1">City / District *</label>
@@ -569,42 +691,89 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Auto-Calculated Delivery Rate Card - Always visible whether saved address or newly entered */}
-                <div className="p-3.5 bg-gradient-to-r from-blue-50/90 via-slate-50 to-indigo-50/70 border border-blue-200/90 rounded-2xl flex items-center justify-between text-xs mt-4 shadow-2xs">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-blue-900 text-white flex items-center justify-center shrink-0 shadow-xs">
-                      <Truck className="w-4.5 h-4.5 text-blue-100" />
+                {/* Delivery Calculation Rate Card */}
+                {isCalculatingShipping ? (
+                  <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-2xl flex items-center gap-3 text-xs mt-4">
+                    <div className="w-9 h-9 rounded-xl bg-blue-900 text-white flex items-center justify-center shrink-0 animate-pulse">
+                      <Truck className="w-5 h-5 animate-bounce" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-blue-950">
-                          The Professional Couriers • Express Road Transport
-                        </span>
-                        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
-                          Auto Calculated
+                    <div className="flex-1">
+                      <span className="font-bold text-blue-950 block">Calculating Road Delivery Rate...</span>
+                      <span className="text-[11px] text-slate-500">Checking delivery zoning via The Professional Couriers</span>
+                    </div>
+                    <div className="w-5 h-5 border-2 border-blue-900 border-t-transparent rounded-full animate-spin shrink-0" />
+                  </div>
+                ) : shippingError ? (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-between gap-3 text-xs mt-4">
+                    <div className="flex items-center gap-2.5">
+                      <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+                      <div>
+                        <span className="font-bold text-red-900 block">{shippingError}</span>
+                        <span className="text-[11px] text-red-700">Please enter a valid 6-digit PIN code or select your state.</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRetryCalculation}
+                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition-colors shrink-0"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : !isShippingCalculated ? (
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between text-xs mt-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center shrink-0">
+                        <Truck className="w-4.5 h-4.5" />
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-800 block">The Professional Couriers • Express Road Transport</span>
+                        <span className="text-[11px] text-slate-500">
+                          Shipping will be calculated after entering your delivery address.
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-600 block mt-0.5">
-                        Destination: <strong className="text-slate-900">{shippingDetails.state}</strong>
-                        {shippingPincode ? ` (PIN: ${shippingPincode})` : ''} • {shippingDetails.estimatedDays} • 100% Live Arrival Guarantee
+                    </div>
+                    <span className="text-xs font-semibold text-slate-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                      Pending Address
+                    </span>
+                  </div>
+                ) : (
+                  <div className="p-3.5 bg-gradient-to-r from-blue-50/90 via-slate-50 to-indigo-50/70 border border-blue-200/90 rounded-2xl flex items-center justify-between text-xs mt-4 shadow-2xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-blue-900 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <Truck className="w-4.5 h-4.5 text-blue-100" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-blue-950">
+                            The Professional Couriers • Express Road Transport
+                          </span>
+                          <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
+                            Auto Calculated
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-600 block mt-0.5">
+                          Destination: <strong className="text-slate-900">{shippingDetails.state}</strong>
+                          {shippingPincode ? ` (PIN: ${shippingPincode})` : ''} • {shippingDetails.estimatedDays} • 100% Live Arrival Guarantee
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0 pl-3">
+                      <span className="font-mono font-black text-base text-blue-950 block">
+                        {deliveryFee === 0 ? '₹0' : formatCurrency(deliveryFee)}
                       </span>
+                      {shippingDetails.isBulkOrder ? (
+                        <span className="text-[9px] text-amber-700 font-bold uppercase tracking-wider block">
+                          2X Bulk Rate ({itemCount} pairs)
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-500 font-medium block">
+                          {shippingDetails.rateDescription}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="text-right shrink-0 pl-3">
-                    <span className="font-mono font-black text-base text-blue-950 block">
-                      {deliveryFee === 0 ? '₹0' : formatCurrency(deliveryFee)}
-                    </span>
-                    {shippingDetails.isBulkOrder ? (
-                      <span className="text-[9px] text-amber-700 font-bold uppercase tracking-wider block">
-                        2X Bulk Rate ({itemCount} pairs)
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-slate-500 font-medium block">
-                        {shippingDetails.rateDescription}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Step 3: Manual Payment Verification Instructions */}
@@ -918,11 +1087,19 @@ export const CheckoutPage: React.FC = () => {
                     <div>
                       <span className="font-semibold text-slate-800 block">The Professional Couriers</span>
                       <span className="text-[11px] text-slate-500">
-                        Road Courier ({shippingDetails.state}) {shippingDetails.isBulkOrder ? '• 2X Bulk Rate applied' : ''}
+                        {isShippingCalculated 
+                          ? `Road Courier (${shippingDetails.state}) ${shippingDetails.isBulkOrder ? '• 2X Bulk Rate applied' : ''}`
+                          : 'Express Road Transport'}
                       </span>
                     </div>
                     <span className="font-semibold text-slate-900 font-mono">
-                      {deliveryFee === 0 ? '₹0' : formatCurrency(deliveryFee)}
+                      {isCalculatingShipping ? (
+                        <span className="text-slate-400 font-normal italic">Calculating...</span>
+                      ) : isShippingCalculated ? (
+                        formatCurrency(deliveryFee)
+                      ) : (
+                        <span className="text-slate-500 font-normal italic">Calculated at checkout</span>
+                      )}
                     </span>
                   </div>
 
@@ -943,11 +1120,15 @@ export const CheckoutPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={isPlacingOrder}
-                  className="w-full py-4 bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
+                  disabled={isPlacingOrder || isCalculatingShipping || !isShippingCalculated || !!shippingError}
+                  className="w-full py-4 bg-blue-900 hover:bg-blue-800 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
                 >
                   {isPlacingOrder ? (
                     <span>Confirming Order...</span>
+                  ) : isCalculatingShipping ? (
+                    <span>Calculating Courier Charge...</span>
+                  ) : !isShippingCalculated ? (
+                    <span>Enter Delivery Address to Proceed</span>
                   ) : (
                     <>
                       <span>Submit Payment Proof & Confirm Order</span>

@@ -149,6 +149,19 @@ export const ProductDetailPage: React.FC = () => {
       return;
     }
     const calculation = calculateShipping(clean, quantity);
+    if (!calculation.isCalculated) {
+      setPincodeStatus({
+        checked: true,
+        serviceable: false,
+        state: '',
+        days: '',
+        fee: 0,
+        description: calculation.rateDescription,
+      });
+      showToast(calculation.errorMessage || 'Invalid or unserviceable PIN code', 'error');
+      return;
+    }
+
     setPincodeStatus({
       checked: true,
       serviceable: true,

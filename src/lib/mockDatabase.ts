@@ -8,6 +8,7 @@ import {
   INITIAL_HOMEPAGE_SECTIONS, INITIAL_CMS_PAGES, INITIAL_COUPONS, INITIAL_BLOG_POSTS, INITIAL_MEDIA_ASSETS,
   DEFAULT_BRANDING_SETTINGS
 } from './constants';
+import { calculateShipping } from './shipping';
 
 const STORAGE_KEYS = {
   PRODUCTS: 'ba_products',
@@ -661,9 +662,30 @@ export const mockDb = {
       }
     }
 
+    // 2. Strict Server-Side Delivery & Courier Fee Revalidation
+    const totalItemCount = orderData.items.reduce((sum, item) => sum + item.quantity, 0);
+    const shippingTarget = orderData.shipping_address?.postal_code || orderData.shipping_address?.state;
+    if (!shippingTarget) {
+      throw new Error('A valid delivery address is required to calculate road courier charges.');
+    }
+    const verifiedShipping = calculateShipping(shippingTarget, totalItemCount);
+    if (!verifiedShipping.isCalculated) {
+      throw new Error(verifiedShipping.errorMessage || 'Invalid delivery location for road courier calculation.');
+    }
+    const verifiedDeliveryFee = verifiedShipping.finalFee;
+
+    // 3. Strict Server-Side Subtotal & Total Revalidation
+    const verifiedSubtotal = orderData.items.reduce((sum, item) => sum + item.total_price, 0);
+    const verifiedDiscount = orderData.discount_amount || 0;
+    const verifiedPacking = orderData.packing_charge || 0;
+    const verifiedTotal = Math.max(0, verifiedSubtotal + verifiedDeliveryFee + verifiedPacking - verifiedDiscount);
+
     const newOrderNumber = 'BA-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
     const newOrder: Order = {
       ...orderData,
+      subtotal: verifiedSubtotal,
+      delivery_fee: verifiedDeliveryFee,
+      total_amount: verifiedTotal,
       id: 'ord-' + Date.now(),
       order_number: newOrderNumber,
       created_at: new Date().toISOString(),

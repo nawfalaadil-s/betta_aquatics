@@ -10,6 +10,7 @@ interface CartContextType {
   itemCount: number;
   subtotal: number;
   deliveryFee: number;
+  isShippingCalculated: boolean;
   packingCharge: number;
   discountAmount: number;
   appliedCoupon: Coupon | null;
@@ -48,7 +49,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [shippingState, setShippingState] = useState<string>(() => {
-    return localStorage.getItem('ba_shipping_state') || 'Kerala';
+    const savedPin = localStorage.getItem('ba_shipping_pincode');
+    const savedState = localStorage.getItem('ba_shipping_state');
+    // If only state was saved as legacy default 'Kerala' without a PIN or address, start blank
+    if (!savedPin && savedState === 'Kerala') {
+      return '';
+    }
+    return savedState || '';
   });
 
   const [shippingPincode, setShippingPincodeState] = useState<string>(() => {
@@ -58,7 +65,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setShippingPincode = (pin: string) => {
     const clean = pin.replace(/\D/g, '').slice(0, 6);
     setShippingPincodeState(clean);
-    localStorage.setItem('ba_shipping_pincode', clean);
+    if (clean) {
+      localStorage.setItem('ba_shipping_pincode', clean);
+    } else {
+      localStorage.removeItem('ba_shipping_pincode');
+    }
     if (clean.length === 6) {
       const info = getStateFromPincode(clean);
       if (info && info.state) {
@@ -85,7 +96,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [items]);
 
   useEffect(() => {
-    localStorage.setItem('ba_shipping_state', shippingState);
+    if (shippingState) {
+      localStorage.setItem('ba_shipping_state', shippingState);
+    } else {
+      localStorage.removeItem('ba_shipping_state');
+    }
   }, [shippingState]);
 
   useEffect(() => {
@@ -100,11 +115,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
   // Live fish road courier calculation via The Professional Couriers (auto-calculated from PIN or State)
+  const shippingLocation = shippingPincode.length === 6 ? shippingPincode : shippingState;
   const shippingDetails = calculateShipping(
-    shippingPincode.length === 6 ? shippingPincode : shippingState, 
+    shippingLocation || undefined, 
     itemCount
   );
-  const deliveryFee = items.length === 0 ? 0 : shippingDetails.finalFee;
+  const isShippingCalculated = items.length > 0 && shippingDetails.isCalculated;
+  const deliveryFee = isShippingCalculated ? shippingDetails.finalFee : 0;
 
   // Live fish packing fee is included or nominal
   const packingCharge = 0;
@@ -124,7 +141,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const total = Math.max(0, subtotal + deliveryFee + packingCharge - discountAmount);
+  const total = Math.max(0, subtotal + (isShippingCalculated ? deliveryFee : 0) + packingCharge - discountAmount);
 
   const addToCart = (product: Product, quantity: number = 1, variant?: string): boolean => {
     // Check if unique specimen and already in cart
@@ -218,6 +235,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         itemCount,
         subtotal,
         deliveryFee,
+        isShippingCalculated,
         packingCharge,
         discountAmount,
         appliedCoupon,
