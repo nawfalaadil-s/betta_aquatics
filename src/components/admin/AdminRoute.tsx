@@ -104,7 +104,7 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ requiredPermission }) =>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-500 text-left space-y-1">
             <div className="font-bold text-slate-700">Least-Privilege Enforcement:</div>
             <p>
-              Under Betta Aquatics access controls, administrative tasks are partitioned by duty. Contact your Store Administrator if you require elevated permissions.
+              Under store access controls, administrative tasks are partitioned by duty. Contact your Store Administrator if you require elevated permissions.
             </p>
           </div>
 

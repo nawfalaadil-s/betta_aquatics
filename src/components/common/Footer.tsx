@@ -155,7 +155,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Disclaimer */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
           <div>
-            © {new Date().getFullYear()} Betta Aquatics India Pvt Ltd. All rights reserved.
+            © {new Date().getFullYear()} {brandTitle} India. All rights reserved.
           </div>
           <div className="text-xs text-slate-300 text-center sm:text-right">
             <span>Live Arrival Guarantee: Record a short video of the unopened box within 2 hours of delivery for a fast replacement or refund.</span>

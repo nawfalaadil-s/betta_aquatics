@@ -98,7 +98,7 @@ export const BrandingThemeEditor: React.FC = () => {
 
       const asset = await uploadMediaFile(file, {
         category: 'ui',
-        altText: `${form.site_name || 'Betta Aquatics'} ${directUploadTarget.replace('_', ' ')}`,
+        altText: `${form.site_name || 'Ra Guppy'} ${directUploadTarget.replace('_', ' ')}`,
       });
 
       const targetKeyMap: Record<string, keyof BrandingSettings> = {
@@ -466,7 +466,7 @@ export const BrandingThemeEditor: React.FC = () => {
                     type="text"
                     value={form.site_name}
                     onChange={(e) => handleTextChange('site_name', e.target.value)}
-                    placeholder="Betta Aquatics"
+                    placeholder="Ra Guppy"
                     className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-900 outline-none focus:border-blue-900"
                   />
                 </div>
@@ -829,7 +829,7 @@ export const BrandingThemeEditor: React.FC = () => {
                       onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.svg'; }}
                     />
                     <span className="text-xs font-semibold text-slate-800 truncate">
-                      {form.site_name || 'Betta Aquatics'} | Store
+                      {form.site_name || 'Ra Guppy'} | Store
                     </span>
                     <X className="w-3 h-3 text-slate-400 ml-auto shrink-0" />
                   </div>
@@ -918,7 +918,7 @@ export const BrandingThemeEditor: React.FC = () => {
       <ConfirmDialog
         isOpen={isResetDialogOpen}
         title="Reset Branding & Theme Colors to Defaults?"
-        message="This will restore the factory default Betta Aquatics logo (/logo-fish.svg), favicon, and default color palette (Primary Navy #1e3a8a, Secondary Red #dc2626). Your product catalog and orders will not be affected."
+        message="This will restore the factory default logo (/logo-fish.svg), favicon, and default color palette. Your product catalog and orders will not be affected."
         confirmLabel="Yes, Reset Branding"
         cancelLabel="Cancel"
         variant="warning"

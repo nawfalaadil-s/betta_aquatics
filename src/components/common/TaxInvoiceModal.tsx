@@ -3,6 +3,7 @@ import { X, Printer, Download, CheckCircle2, ShieldCheck, Building2, Phone, Mail
 import { Order } from '../../lib/types';
 import { formatCurrency, formatDate } from '../../lib/utils';
 import { BrandLogo } from './BrandLogo';
+import { useStoreSettings } from '../../contexts/StoreSettingsContext';
 
 interface TaxInvoiceModalProps {
   order: Order | null;
@@ -11,7 +12,9 @@ interface TaxInvoiceModalProps {
 }
 
 export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen, onClose }) => {
+  const { settings } = useStoreSettings();
   const printRef = useRef<HTMLDivElement>(null);
+  const brandTitle = settings.brand_name || settings.branding?.site_name || 'Ra Guppy';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -80,13 +83,13 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
                   <BrandLogo variant="invoice" className="w-full h-full" imgClassName="w-full h-full object-contain" />
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-blue-950 uppercase">
-                  BETTA <span className="text-red-600">AQUATICS</span>
+                  {brandTitle}
                 </h1>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug">
                 Unit 402, 100ft Road, Indiranagar, Bengaluru, Karnataka, PIN: 560038<br />
                 <strong>GSTIN:</strong> 29AABCB1234F1Z5 &bull; <strong>State Code:</strong> 29 (Karnataka)<br />
-                <strong>Email:</strong> orders@bettaaquatics.in &bull; <strong>WhatsApp:</strong> +91 98450 12345
+                <strong>Email:</strong> {settings.contact_email || 'orders@raguppy.com'} &bull; <strong>WhatsApp:</strong> {settings.whatsapp_number || settings.contact_phone || '+91 98450 12345'}
               </p>
             </div>
 
@@ -241,7 +244,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
                 <span className="font-serif italic font-bold text-blue-950 text-base">Anand R. (Founder & Lead Aquarist)</span>
               </div>
               <div className="text-[10px] text-slate-400 border-t border-slate-300 pt-1">
-                Authorized Signatory for Betta Aquatics
+                Authorized Signatory for {brandTitle}
               </div>
             </div>
           </div>

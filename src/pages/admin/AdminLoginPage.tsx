@@ -57,8 +57,8 @@ export const AdminLoginPage: React.FC = () => {
   return (
     <div className="bg-slate-900 min-h-screen py-10 sm:py-16 flex items-center justify-center px-4">
       <SEO 
-        title="Admin Portal Login | Betta Aquatics Management" 
-        description="Secure administrator access for Betta Aquatics operations and live consignment management."
+        title={`Admin Portal Login | ${brandTitle} Management`} 
+        description={`Secure administrator access for ${brandTitle} operations and live consignment management.`} 
       />
 
       <div className="max-w-md w-full">
@@ -216,7 +216,7 @@ export const AdminLoginPage: React.FC = () => {
 
         {/* Security Footer Notice */}
         <div className="mt-6 text-center text-[10px] text-slate-500 space-y-1">
-          <p>Protected by Betta Aquatics Enterprise Row-Level Security (RLS).</p>
+          <p>Protected by {brandTitle} Enterprise Row-Level Security (RLS).</p>
           <p>Public registration is disabled on this endpoint.</p>
         </div>
       </div>

@@ -882,11 +882,11 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
     views_count: 1420,
     published_at: '2026-03-15T09:00:00Z',
     updated_at: '2026-03-20T11:30:00Z',
-    meta_title: 'Acclimating Show-Grade Betta Fish After Shipping | Betta Aquatics',
+    meta_title: 'Acclimating Show-Grade Ornamental Fish After Shipping | Ra Guppy',
     meta_description: 'Prevent temperature shock and fin clamp with our veterinarian-approved drip acclimation protocol for live Betta splendens shipments.',
     content_html: `
       <h2>The Critical First 120 Minutes</h2>
-      <p>When your Betta Aquatics insulated thermocol crate arrives, your specimen has traveled under high-purity medical oxygen. While our double-walled bags maintain stable dissolved oxygen, the physical chemistry inside the bag changes gradually as the fish respires.</p>
+      <p>When your insulated thermocol crate arrives, your specimen has traveled under high-purity medical oxygen. While our double-walled bags maintain stable dissolved oxygen, the physical chemistry inside the bag changes gradually as the fish respires.</p>
       
       <p>Opening the bag introduces fresh atmospheric air, which causes ammonia in the water to convert quickly into toxic free ammonia (NH3) as pH rises. <strong>Therefore, speed and precision are critical once the shipping seal is broken.</strong></p>
 
@@ -928,7 +928,7 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
     views_count: 2180,
     published_at: '2026-03-22T14:00:00Z',
     updated_at: '2026-03-24T08:15:00Z',
-    meta_title: 'Betta Genetics Explained: Halfmoon, Alien & Dragonscale | Betta Aquatics',
+    meta_title: 'Betta Genetics Explained: Halfmoon, Alien & Dragonscale | Ra Guppy',
     meta_description: 'Explore the fascinating scientific genetics behind Betta splendens fin spreads, iridescent dragonscale layering, and complex Alien hybrids.',
     content_html: `
       <h2>The 180-Degree Halfmoon Standard</h2>
@@ -966,7 +966,7 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
     views_count: 980,
     published_at: '2026-03-28T16:30:00Z',
     updated_at: '2026-04-01T10:00:00Z',
-    meta_title: 'Best Live Plants for Betta Fish Aquariums | Betta Aquatics Guide',
+    meta_title: 'Best Live Plants for Betta Fish Aquariums | Ra Guppy Guide',
     meta_description: 'Anubias, Java Fern, and Amazon Swords: Learn which aquarium plants are best for Betta splendens tanks with low light and zero CO2.',
     content_html: `
       <h2>Why Real Plants Beat Artificial Decor</h2>
@@ -1055,7 +1055,7 @@ export const INITIAL_MEDIA_ASSETS: MediaAsset[] = [
     id: 'med-04',
     filename: 'logo-fish.svg',
     url: '/logo-fish.svg',
-    alt_text: 'Betta Aquatics brand emblem with stylized Siamese fighting fish icon',
+    alt_text: 'Brand emblem with stylized fish icon',
     file_size_bytes: 4200,
     mime_type: 'image/svg+xml',
     category: 'ui',
@@ -1065,7 +1065,7 @@ export const INITIAL_MEDIA_ASSETS: MediaAsset[] = [
     id: 'med-04b',
     filename: 'logo.jpeg',
     url: '/logo.jpeg',
-    alt_text: 'Betta Aquatics custom primary logo',
+    alt_text: 'Ra Guppy custom primary logo',
     file_size_bytes: 111539,
     mime_type: 'image/jpeg',
     category: 'ui',

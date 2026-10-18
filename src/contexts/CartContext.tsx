@@ -3,7 +3,7 @@ import { CartItem, Product, Coupon } from '../lib/types';
 import { useStoreSettings } from './StoreSettingsContext';
 import { useToast } from './ToastContext';
 import { mockDb } from '../lib/mockDatabase';
-import { calculateShipping, ShippingCalculation } from '../lib/shipping';
+import { calculateShipping, ShippingCalculation, getStateFromPincode } from '../lib/shipping';
 
 interface CartContextType {
   items: CartItem[];
@@ -16,6 +16,8 @@ interface CartContextType {
   total: number;
   shippingState: string;
   setShippingState: (state: string) => void;
+  shippingPincode: string;
+  setShippingPincode: (pincode: string) => void;
   shippingDetails: ShippingCalculation;
   freeShippingRemaining: number;
   freeShippingProgress: number;
@@ -49,6 +51,23 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return localStorage.getItem('ba_shipping_state') || 'Kerala';
   });
 
+  const [shippingPincode, setShippingPincodeState] = useState<string>(() => {
+    return localStorage.getItem('ba_shipping_pincode') || '';
+  });
+
+  const setShippingPincode = (pin: string) => {
+    const clean = pin.replace(/\D/g, '').slice(0, 6);
+    setShippingPincodeState(clean);
+    localStorage.setItem('ba_shipping_pincode', clean);
+    if (clean.length === 6) {
+      const info = getStateFromPincode(clean);
+      if (info && info.state) {
+        setShippingState(info.state);
+        localStorage.setItem('ba_shipping_state', info.state);
+      }
+    }
+  };
+
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(() => {
     const saved = localStorage.getItem('ba_applied_coupon');
     if (saved) {
@@ -80,8 +99,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
-  // Live fish road courier calculation via The Professional Couriers
-  const shippingDetails = calculateShipping(shippingState, itemCount);
+  // Live fish road courier calculation via The Professional Couriers (auto-calculated from PIN or State)
+  const shippingDetails = calculateShipping(
+    shippingPincode.length === 6 ? shippingPincode : shippingState, 
+    itemCount
+  );
   const deliveryFee = items.length === 0 ? 0 : shippingDetails.finalFee;
 
   // Live fish packing fee is included or nominal
@@ -202,6 +224,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         total,
         shippingState,
         setShippingState,
+        shippingPincode,
+        setShippingPincode,
         shippingDetails,
         freeShippingRemaining,
         freeShippingProgress,

@@ -22,6 +22,8 @@ export const CartPage: React.FC = () => {
     total, 
     shippingState,
     setShippingState,
+    shippingPincode,
+    setShippingPincode,
     shippingDetails,
     updateQuantity, 
     removeFromCart, 
@@ -88,19 +90,45 @@ export const CartPage: React.FC = () => {
                 <span className="text-[11px] text-slate-500">Live fish packed with medical oxygen & thermal insulation. Deliveries strictly within India.</span>
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[11px] text-slate-600 font-semibold">Delivery State:</span>
-              <select
-                value={shippingState}
-                onChange={(e) => setShippingState(e.target.value)}
-                className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 outline-none focus:border-blue-600"
-              >
-                <option value="Kerala">Kerala (₹80)</option>
-                <option value="Tamil Nadu">Tamil Nadu (₹120)</option>
-                <option value="Karnataka">Karnataka (₹120)</option>
-                <option value="Other States">All Other States (₹200)</option>
-              </select>
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-blue-900 shrink-0" />
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={shippingPincode}
+                  onChange={(e) => setShippingPincode(e.target.value)}
+                  placeholder="PIN (e.g. 682001)"
+                  className="w-28 bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+                  title="Enter 6-digit PIN code to auto-detect state & delivery rate"
+                />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={shippingState}
+                  onChange={(e) => setShippingState(e.target.value)}
+                  className="bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-900 outline-none focus:border-blue-600"
+                >
+                  <option value="Kerala">Kerala (₹80)</option>
+                  <option value="Tamil Nadu">Tamil Nadu (₹120)</option>
+                  <option value="Karnataka">Karnataka (₹120)</option>
+                  <optgroup label="All Other Indian States (₹200)">
+                    {INDIAN_STATES.filter(s => s !== 'Kerala' && s !== 'Tamil Nadu' && s !== 'Karnataka').map(st => (
+                      <option key={st} value={st}>{st} (₹200)</option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
             </div>
+          </div>
+          <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-100 text-slate-600">
+            <span>
+              Destination: <strong>{shippingDetails.state}</strong>
+              {shippingDetails.region ? ` (${shippingDetails.region})` : ''} • Estimated Transit: <strong>{shippingDetails.estimatedDays || '2 - 3 Days'}</strong>
+            </span>
+            <span className="font-mono font-bold text-blue-950">
+              Road Delivery: {formatCurrency(deliveryFee)}
+            </span>
           </div>
           {shippingDetails.isBulkOrder && (
             <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-center gap-2 font-medium">

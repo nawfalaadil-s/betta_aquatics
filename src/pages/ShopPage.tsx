@@ -10,8 +10,11 @@ import { QuickViewModal } from '../components/common/QuickViewModal';
 import { SEO } from '../components/common/SEO';
 import { Product, Category } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
+import { useStoreSettings } from '../contexts/StoreSettingsContext';
 
 export const ShopPage: React.FC = () => {
+  const { settings } = useStoreSettings();
+  const brandTitle = settings.brand_name || 'Ra Guppy';
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParam = searchParams.get('q') || '';
   const categoryParam = searchParams.get('cat') || searchParams.get('category') || 'all';
@@ -136,12 +139,12 @@ export const ShopPage: React.FC = () => {
   const currentSubcategoryName = currentSubcategory?.name;
 
   const seoTitle = queryParam 
-    ? `Search "${queryParam}" | Betta Aquatics` 
+    ? `Search "${queryParam}" | ${brandTitle}` 
     : selectedSubcategory !== 'all' && currentSubcategoryName
-    ? `${currentSubcategoryName} - ${currentCategoryName} | Betta Aquatics`
+    ? `${currentSubcategoryName} - ${currentCategoryName} | ${brandTitle}`
     : `${currentCategoryName} | Buy Live Ornamental Fish Online India`;
 
-  const seoDescription = `Browse authentic ${currentCategoryName.toLowerCase()} at Betta Aquatics. Hand-conditioned specimens shipped safely via The Professional Couriers with 100% live arrival guarantee across India.`;
+  const seoDescription = `Browse authentic ${currentCategoryName.toLowerCase()} at ${brandTitle}. Hand-conditioned specimens shipped safely via The Professional Couriers with 100% live arrival guarantee across India.`;
 
   const hasActiveFilters = 
     selectedCategory !== 'all' || 

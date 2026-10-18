@@ -339,7 +339,7 @@ export const AdminCMSPage: React.FC = () => {
         slug: cleanSlug,
         title: pageTitle.trim(),
         content_html: pageContent,
-        meta_title: pageMetaTitle.trim() || `${pageTitle.trim()} | Betta Aquatics India`,
+        meta_title: pageMetaTitle.trim() || pageTitle.trim(),
         meta_description: pageMetaDesc.trim() || `Official guide: ${pageTitle.trim()}`,
         is_published: pageStatus,
         updated_at: new Date().toISOString(),
@@ -1396,7 +1396,7 @@ export const AdminCMSPage: React.FC = () => {
                     type="text"
                     value={pageMetaTitle}
                     onChange={(e) => setPageMetaTitle(e.target.value)}
-                    placeholder="Page Title | Betta Aquatics India"
+                    placeholder="Page Title | Store Brand"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                   />
                 </div>

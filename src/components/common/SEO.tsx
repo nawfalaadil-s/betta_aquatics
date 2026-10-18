@@ -26,10 +26,16 @@ export const SEO: React.FC<SEOProps> = ({
   const tagline = currentSettings.tagline || 'Pure Strain Guppies, Bettas & Aquatic Sanctuary';
 
   const defaultDesc = `${brandName} is India's premier ornamental fish sanctuary. Hand-conditioned pure strain guppies, show Bettas, and healthy live plants with guaranteed live arrival.`;
-  const metaDesc = description || defaultDesc;
+  const metaDesc = (description || defaultDesc)
+    .replace(/Betta Aquatics India/gi, brandName)
+    .replace(/Betta Aquatics/gi, brandName);
 
-  const fullTitle = title 
-    ? (title.toLowerCase().includes(brandName.toLowerCase()) ? title : `${title} | ${brandName}`)
+  const sanitizedTitle = (title || '')
+    .replace(/Betta Aquatics India/gi, brandName)
+    .replace(/Betta Aquatics/gi, brandName);
+
+  const fullTitle = sanitizedTitle 
+    ? (sanitizedTitle.toLowerCase().includes(brandName.toLowerCase()) ? sanitizedTitle : `${sanitizedTitle} | ${brandName}`)
     : `${brandName} — ${tagline}`;
 
   useEffect(() => {

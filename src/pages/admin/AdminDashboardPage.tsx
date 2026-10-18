@@ -158,7 +158,7 @@ export const AdminDashboardPage: React.FC = () => {
             <h2 className="text-base font-bold text-slate-900 font-display">
               Recent Orders & Live Shipments
             </h2>
-            <p className="text-xs text-slate-500">Latest orders placed on Betta Aquatics</p>
+            <p className="text-xs text-slate-500">Latest orders placed across the store</p>
           </div>
           <Link to="/admin/orders" className="text-xs text-blue-700 hover:underline font-bold inline-flex items-center gap-1">
             <span>View All</span>

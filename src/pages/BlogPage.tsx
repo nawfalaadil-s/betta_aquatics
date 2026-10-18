@@ -48,8 +48,8 @@ export const BlogPage: React.FC = () => {
   return (
     <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
       <SEO 
-        title="Betta Fish Care Guides, Genetics & Breeding Journal | Betta Aquatics" 
-        description="Comprehensive guides written by marine biologists on Betta splendens acclimation, fin genetics, planted nano tanks, and breeding trophy lines."
+        title="Ornamental Fish Care Guides, Genetics & Breeding Journal" 
+        description="Comprehensive guides on fish acclimation, genetics, planted nano tanks, and breeding trophy lines."
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -289,7 +289,7 @@ export const BlogPage: React.FC = () => {
 
             {subscribed ? (
               <div className="p-3 bg-blue-900/60 rounded-2xl border border-blue-500 text-white font-bold text-xs inline-block">
-                ✓ Thank you! You are now subscribed to the Betta Aquatics newsletter.
+                ✓ Thank you! You are now subscribed to our newsletter.
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto pt-2">

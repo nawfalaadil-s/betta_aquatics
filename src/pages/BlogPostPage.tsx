@@ -41,7 +41,7 @@ export const BlogPostPage: React.FC = () => {
   if (!post) {
     return (
       <div className="bg-slate-50 min-h-screen py-16 text-center">
-        <SEO title="Article Not Found | Betta Aquatics" description="The requested guide could not be located." />
+        <SEO title="Article Not Found" description="The requested guide could not be located." />
         <div className="max-w-md mx-auto bg-white rounded-3xl p-8 border border-slate-200">
           <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <h1 className="text-xl font-bold text-slate-900 mb-2">Guide Not Found</h1>
@@ -68,7 +68,8 @@ export const BlogPostPage: React.FC = () => {
   };
 
   const handleShareWhatsApp = () => {
-    const text = encodeURIComponent(`Read "${post.title}" on Betta Aquatics: ${window.location.href}`);
+    const brandName = branding.site_name || 'Ra Guppy';
+    const text = encodeURIComponent(`Read "${post.title}" on ${brandName}: ${window.location.href}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
@@ -88,10 +89,10 @@ export const BlogPostPage: React.FC = () => {
     }],
     publisher: {
       '@type': 'Organization',
-      name: branding.site_name || 'Betta Aquatics India',
+      name: branding.site_name || 'Ra Guppy',
       logo: {
         '@type': 'ImageObject',
-        url: branding.logo_url?.startsWith('http') ? branding.logo_url : `https://bettaaquatics.in${branding.logo_url || '/logo-fish.svg'}`,
+        url: branding.logo_url?.startsWith('http') ? branding.logo_url : branding.logo_url || '/logo-fish.svg',
       }
     },
     mainEntityOfPage: {
@@ -103,7 +104,7 @@ export const BlogPostPage: React.FC = () => {
   return (
     <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
       <SEO 
-        title={post.meta_title || `${post.title} | Betta Aquatics Care Journal`}
+        title={post.meta_title || `${post.title} | ${branding.site_name || 'Ra Guppy'} Care Journal`}
         description={post.meta_description || post.excerpt}
         ogImage={post.featured_image}
         ogType="article"
@@ -212,11 +213,11 @@ export const BlogPostPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
               <strong className="text-xs font-bold uppercase tracking-wider text-blue-900">
-                Official Betta Aquatics Quality Protocol
+                Official {branding.site_name || 'Ra Guppy'} Quality Protocol
               </strong>
             </div>
             <p className="text-xs text-slate-700 leading-relaxed">
-              Every Betta dispatched from our Bengaluru facility is individually inspected by our biological team, conditioned for 72 hours under zero-stress water parameters, and packed with pharmaceutical-grade oxygen in temperature-controlled EPS thermocol containers.
+              Every specimen dispatched from our facility is individually inspected by our biological team, conditioned for 72 hours under zero-stress water parameters, and packed with pharmaceutical-grade oxygen in temperature-controlled EPS thermocol containers.
             </p>
           </div>
 

@@ -722,7 +722,7 @@ export const AdminOrdersPage: React.FC = () => {
                       </div>
                     )}
                     <div className="flex justify-between">
-                      <span>Air Express Freight:</span>
+                      <span>Road Courier Delivery:</span>
                       <span className="font-semibold text-slate-900">{formatCurrency(selectedOrder.delivery_fee)}</span>
                     </div>
                     <div className="pt-2 border-t border-slate-300 flex justify-between font-bold text-xs text-slate-900">
@@ -882,7 +882,7 @@ export const AdminOrdersPage: React.FC = () => {
 
               <div>
                 <label htmlFor="tracking-number-input" className="block font-semibold text-slate-700 mb-1">
-                  AWB / Air Tracking Number *
+                  The Professional Couriers Consignment / Tracking Number *
                 </label>
                 <input
                   id="tracking-number-input"
@@ -891,7 +891,7 @@ export const AdminOrdersPage: React.FC = () => {
                   aria-required="true"
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
-                  placeholder="e.g. BLUEDART-98472918"
+                  placeholder="e.g. TPC-98472918 or Consignment No."
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-blue-600 focus-visible:ring-2 focus-visible:ring-blue-900"
                 />
               </div>

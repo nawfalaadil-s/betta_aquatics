@@ -15,11 +15,15 @@ import { StarRating } from '../components/common/StarRating';
 import { ProductCard } from '../components/common/ProductCard';
 import { SEO } from '../components/common/SEO';
 import { Product } from '../lib/types';
+import { calculateShipping } from '../lib/shipping';
+import { useStoreSettings } from '../contexts/StoreSettingsContext';
 
 export const ProductDetailPage: React.FC = () => {
+  const { settings } = useStoreSettings();
+  const brandTitle = settings.brand_name || 'Ra Guppy';
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, setShippingPincode } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { showToast } = useToast();
   const [product, setProduct] = useState<Product | undefined>(() => mockDb.getProductBySlug(slug || ''));
@@ -64,7 +68,11 @@ export const ProductDetailPage: React.FC = () => {
   const [pincodeStatus, setPincodeStatus] = useState<{
     checked: boolean;
     serviceable: boolean;
+    state: string;
+    region?: string;
     days: string;
+    fee: number;
+    description: string;
   } | null>(null);
 
   // Review Form state
@@ -101,18 +109,18 @@ export const ProductDetailPage: React.FC = () => {
     sku: product.sku,
     brand: {
       '@type': 'Brand',
-      name: 'Betta Aquatics',
+      name: brandTitle,
     },
     offers: {
       '@type': 'Offer',
-      url: `https://bettaaquatics.in/product/${product.slug}`,
+      url: window.location.href,
       priceCurrency: 'INR',
       price: product.price,
       itemCondition: 'https://schema.org/NewCondition',
       availability: product.stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       seller: {
         '@type': 'Organization',
-        name: 'Betta Aquatics',
+        name: brandTitle,
       },
     },
     aggregateRating: {
@@ -135,16 +143,23 @@ export const ProductDetailPage: React.FC = () => {
 
   const handleCheckPincode = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pincode || pincode.trim().length !== 6) {
+    const clean = pincode.trim().replace(/\D/g, '');
+    if (clean.length !== 6) {
       showToast('Please enter a valid 6-digit Indian PIN code', 'error');
       return;
     }
-    const res = mockDb.checkPincodeServiceability(pincode);
+    const calculation = calculateShipping(clean, quantity);
     setPincodeStatus({
       checked: true,
-      serviceable: res.serviceable,
-      days: res.estimatedDays,
+      serviceable: true,
+      state: calculation.state,
+      region: calculation.region,
+      days: calculation.estimatedDays || '2 - 3 Days',
+      fee: calculation.finalFee,
+      description: calculation.rateDescription,
     });
+    setShippingPincode(clean);
+    showToast(`Delivery to ${calculation.state}: ₹${calculation.finalFee} via The Professional Couriers`, 'success');
   };
 
   const handleReviewSubmit = (e: React.FormEvent) => {
@@ -282,7 +297,7 @@ export const ProductDetailPage: React.FC = () => {
                 <>
                   <img
                     src={productImages[activeMediaIndex] || productImages[0]}
-                    alt={`${product.name} - ${product.strain || 'Live Fish'} available at Betta Aquatics`}
+                    alt={`${product.name} - ${product.strain || 'Live Fish'} available at ${brandTitle}`}
                     className="w-full h-full object-cover object-center cursor-zoom-in"
                     onClick={() => {
                       setLightboxIndex(activeMediaIndex);
@@ -621,9 +636,20 @@ export const ProductDetailPage: React.FC = () => {
                 </form>
 
                 {pincodeStatus && (
-                  <div className="mt-2.5 text-xs text-blue-800 flex items-center gap-1.5 font-medium">
-                    <Check className="w-4 h-4 text-blue-600 shrink-0" />
-                    <span>The Professional Couriers Road Delivery: Estimated <strong>{pincodeStatus.days}</strong></span>
+                  <div className="mt-2.5 p-3 bg-blue-50/80 border border-blue-200 rounded-2xl text-xs text-blue-950 space-y-1.5">
+                    <div className="flex items-center justify-between font-bold">
+                      <div className="flex items-center gap-1.5">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>The Professional Couriers Express Road</span>
+                      </div>
+                      <span className="font-mono text-xs font-extrabold text-blue-900 bg-white px-2 py-0.5 rounded-lg border border-blue-200 shadow-2xs">
+                        ₹{pincodeStatus.fee}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-600 flex flex-wrap justify-between items-center gap-1 pt-0.5 border-t border-blue-100">
+                      <span>Destination: <strong>{pincodeStatus.state}</strong> {pincodeStatus.region ? `(${pincodeStatus.region})` : ''}</span>
+                      <span>Transit: <strong>{pincodeStatus.days}</strong></span>
+                    </div>
                   </div>
                 )}
               </div>

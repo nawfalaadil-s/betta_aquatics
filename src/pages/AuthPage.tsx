@@ -96,8 +96,8 @@ export const AuthPage: React.FC = () => {
   return (
     <div className="bg-slate-50 min-h-screen py-10 sm:py-16 flex items-center justify-center px-4">
       <SEO 
-        title="Customer Sign In & Account Registration | Betta Aquatics" 
-        description="Access your Betta Aquatics customer account, view live fish consignments, and manage delivery addresses." 
+        title={`Customer Sign In & Account Registration | ${brandTitle}`} 
+        description={`Access your ${brandTitle} customer account, view live fish consignments, and manage delivery addresses.`} 
       />
 
       <div className="max-w-md w-full">
@@ -258,7 +258,7 @@ export const AuthPage: React.FC = () => {
 
           {/* Quick Info */}
           <div className="pt-2 text-center text-[11px] text-slate-500 border-t border-slate-100">
-            By continuing, you agree to Betta Aquatics' Terms of Service & Live Arrival Guarantee Policy.
+            By continuing, you agree to {brandTitle}'s Terms of Service & Live Arrival Guarantee Policy.
           </div>
         </div>
 

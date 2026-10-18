@@ -224,7 +224,7 @@ export const AdminCategoriesPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
-      <SEO title="Category & Subcategory Hierarchy | Betta Aquatics Admin" description="Manage hierarchical categories, subcategories, display sequence, and storefront appearance." />
+      <SEO title="Category & Subcategory Hierarchy | Admin" description="Manage hierarchical categories, subcategories, display sequence, and storefront appearance." />
 
       {/* Header Bar */}
       <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">

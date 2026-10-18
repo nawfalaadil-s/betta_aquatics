@@ -82,7 +82,7 @@ export const AccountPage: React.FC = () => {
     return (
       <div className="bg-slate-50 min-h-screen py-16 px-4">
         <SEO 
-          title="Sign In | Betta Aquatics" 
+          title="Sign In" 
           description="Sign in to view your account, orders, and addresses." 
         />
         <div className="max-w-md mx-auto bg-white rounded-3xl p-8 border border-slate-200 shadow-sm text-center">
@@ -91,7 +91,7 @@ export const AccountPage: React.FC = () => {
           </div>
           <h1 className="text-xl font-bold text-slate-900 font-display">Sign In Required</h1>
           <p className="text-sm text-slate-600 mt-2 mb-6">
-            Please sign in to your Betta Aquatics account to view your consignments, delivery addresses, and GST tax invoices.
+            Please sign in to your account to view your consignments, delivery addresses, and GST tax invoices.
           </p>
           <div className="flex flex-col gap-3">
             <Link
@@ -115,8 +115,8 @@ export const AccountPage: React.FC = () => {
   return (
     <div className="bg-slate-50 min-h-screen py-6 sm:py-10 pb-24 md:pb-12">
       <SEO 
-        title="My Account & Billing | Betta Aquatics" 
-        description="Manage your Betta Aquatics profile, saved addresses, consignment orders, and GST tax invoices." 
+        title="My Account & Billing" 
+        description="Manage your profile, saved addresses, consignment orders, and GST tax invoices." 
       />
 
       <div className="max-w-5xl mx-auto px-4">

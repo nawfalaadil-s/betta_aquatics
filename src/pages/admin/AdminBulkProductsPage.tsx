@@ -349,7 +349,7 @@ export const AdminBulkProductsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-16">
-      <SEO title="Bulk Product & CSV Management | Betta Aquatics Admin" description="Bulk upload, CSV import, upsert, bulk editing, and safe deletion for ornamental fish catalog." />
+      <SEO title="Bulk Product & CSV Management | Admin" description="Bulk upload, CSV import, upsert, bulk editing, and safe deletion for ornamental fish catalog." />
 
       {/* Header Bar */}
       <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">

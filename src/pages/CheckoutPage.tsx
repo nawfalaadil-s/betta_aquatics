@@ -5,7 +5,8 @@ import {
   ShieldCheck, QrCode, 
   Upload, CheckCircle2, ArrowRight, 
   Copy, Building, Lock, MessageSquare,
-  Smartphone, ExternalLink, X, FileText
+  Smartphone, ExternalLink, X, FileText,
+  Truck
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -16,7 +17,7 @@ import { Address, Order } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
 import { SEO } from '../components/common/SEO';
 import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
-import { INDIAN_STATES } from '../lib/shipping';
+import { INDIAN_STATES, getStateFromPincode, lookupPincode } from '../lib/shipping';
 
 export const CheckoutPage: React.FC = () => {
   const { user, addresses, addAddress } = useAuth();
@@ -31,6 +32,8 @@ export const CheckoutPage: React.FC = () => {
     total, 
     shippingState,
     setShippingState,
+    shippingPincode,
+    setShippingPincode,
     shippingDetails,
     clearCart 
   } = useCart();
@@ -50,14 +53,45 @@ export const CheckoutPage: React.FC = () => {
   const [newAddrLandmark, setNewAddrLandmark] = useState('');
   const [newAddrCity, setNewAddrCity] = useState('');
   const [newAddrState, setNewAddrState] = useState(shippingState || 'Kerala');
-  const [newAddrPostalCode, setNewAddrPostalCode] = useState('');
+  const [newAddrPostalCode, setNewAddrPostalCode] = useState(shippingPincode || '');
 
   const handleSelectSavedAddress = (addrId: string) => {
     setSelectedAddressId(addrId);
     const matched = addresses.find(a => a.id === addrId);
-    if (matched && matched.state) {
-      setShippingState(matched.state);
+    if (matched) {
+      if (matched.state) {
+        setShippingState(matched.state);
+        setNewAddrState(matched.state);
+      }
+      if (matched.postal_code) {
+        setShippingPincode(matched.postal_code);
+        setNewAddrPostalCode(matched.postal_code);
+      }
     }
+  };
+
+  const handlePincodeInput = (val: string) => {
+    const clean = val.replace(/\D/g, '').slice(0, 6);
+    setNewAddrPostalCode(clean);
+    setShippingPincode(clean);
+    if (clean.length === 6) {
+      const pinInfo = getStateFromPincode(clean);
+      if (pinInfo && pinInfo.state) {
+        setNewAddrState(pinInfo.state);
+        setShippingState(pinInfo.state);
+        showToast(`Auto-detected: ${pinInfo.state} (${pinInfo.region}) • Road Delivery rate updated!`, 'info');
+      }
+      lookupPincode(clean).then(res => {
+        if (res && res.city && !newAddrCity) {
+          setNewAddrCity(res.city);
+        }
+      });
+    }
+  };
+
+  const handleStateChange = (selectedState: string) => {
+    setNewAddrState(selectedState);
+    setShippingState(selectedState);
   };
 
   // Payment method selection & submission
@@ -74,7 +108,7 @@ export const CheckoutPage: React.FC = () => {
   if (items.length === 0 && !placedOrderNumber) {
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center">
-        <SEO title="Checkout | Betta Aquatics" description="Complete your live fish order securely." />
+        <SEO title="Checkout" description="Complete your live fish order securely." />
         <h2 className="text-xl font-bold text-slate-800 mb-2">No Items in Cart</h2>
         <p className="text-xs sm:text-sm text-slate-500 mb-4">Please add live fish or aquarium products to proceed with checkout.</p>
         <Link to="/shop" className="px-5 py-2.5 bg-blue-900 text-white rounded-xl text-xs font-bold hover:bg-blue-800 transition-colors">
@@ -85,7 +119,7 @@ export const CheckoutPage: React.FC = () => {
   }
 
   // Generate UPI URI
-  const upiUri = `upi://pay?pa=${encodeURIComponent(settings.upi_id)}&pn=${encodeURIComponent(settings.upi_payee_name)}&am=${total}&cu=INR&tn=${encodeURIComponent('Betta Aquatics Order')}`;
+  const upiUri = `upi://pay?pa=${encodeURIComponent(settings.upi_id)}&pn=${encodeURIComponent(settings.upi_payee_name)}&am=${total}&cu=INR&tn=${encodeURIComponent('Ra Guppy Order')}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(upiUri)}`;
 
   const handleCopyUPI = () => {
@@ -161,7 +195,7 @@ export const CheckoutPage: React.FC = () => {
       const newOrder = mockDb.createOrder({
         user_id: user?.id || 'usr-customer-demo',
         customer_name: shippingAddress.full_name,
-        customer_email: user?.email || 'customer@bettaaquatics.in',
+        customer_email: user?.email || 'customer@raguppy.com',
         customer_phone: shippingAddress.phone,
         shipping_address: shippingAddress,
         items: items.map(item => ({
@@ -213,7 +247,7 @@ export const CheckoutPage: React.FC = () => {
   if (placedOrderNumber) {
     return (
       <div className="bg-slate-50 min-h-screen py-12 sm:py-16">
-        <SEO title={`Order ${placedOrderNumber} Confirmed | Betta Aquatics`} description="Thank you for your order. Our team will verify your payment and prepare your insulated live fish consignment." />
+        <SEO title={`Order ${placedOrderNumber} Confirmed`} description="Thank you for your order. Our team will verify your payment and prepare your insulated live fish consignment." />
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-xl">
             <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto mb-4">
@@ -305,8 +339,8 @@ export const CheckoutPage: React.FC = () => {
   return (
     <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
       <SEO 
-        title="Secure Checkout & Payment | Betta Aquatics" 
-        description="Finalize your Betta Aquatics live fish order. Safe insulated packaging, verified manual UPI payment, and live arrival guarantee." 
+        title="Secure Checkout & Payment" 
+        description="Finalize your live fish order. Safe insulated packaging, verified manual UPI payment, and live arrival guarantee." 
       />
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6 flex items-center justify-between">
@@ -449,26 +483,38 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">City *</label>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block font-semibold text-slate-700">PIN Code *</label>
+                          <span className="text-[10px] text-blue-900 font-bold">Auto-detects State</span>
+                        </div>
+                        <input
+                          type="text"
+                          required
+                          maxLength={6}
+                          value={newAddrPostalCode}
+                          onChange={(e) => handlePincodeInput(e.target.value)}
+                          placeholder="e.g. 682001, 560001"
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-blue-600 focus:bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold text-slate-700 mb-1">City / District *</label>
                         <input
                           type="text"
                           required
                           value={newAddrCity}
                           onChange={(e) => setNewAddrCity(e.target.value)}
-                          placeholder="City / Town"
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
+                          placeholder="City / District"
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                         />
                       </div>
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">State (India Only) *</label>
+                        <label className="block font-semibold text-slate-700 mb-1">Delivery State (India Only) *</label>
                         <select
                           required
                           value={newAddrState}
-                          onChange={(e) => {
-                            setNewAddrState(e.target.value);
-                            setShippingState(e.target.value);
-                          }}
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500"
+                          onChange={(e) => handleStateChange(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                         >
                           <option value="">Select Delivery State</option>
                           <option value="Kerala">Kerala (₹80)</option>
@@ -481,17 +527,42 @@ export const CheckoutPage: React.FC = () => {
                           </optgroup>
                         </select>
                       </div>
-                      <div>
-                        <label className="block font-semibold text-slate-700 mb-1">PIN Code *</label>
-                        <input
-                          type="text"
-                          required
-                          maxLength={6}
-                          value={newAddrPostalCode}
-                          onChange={(e) => setNewAddrPostalCode(e.target.value)}
-                          placeholder="6-digit PIN code"
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
-                        />
+                    </div>
+
+                    {/* Auto-Calculated Delivery Rate Indicator Card */}
+                    <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50/50 border border-blue-200/80 rounded-2xl flex items-center justify-between text-xs mt-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-blue-900 text-white flex items-center justify-center shrink-0">
+                          <Truck className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-blue-950">
+                              The Professional Couriers • {shippingDetails.rateDescription}
+                            </span>
+                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
+                              Auto Calculated
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-slate-600 block mt-0.5">
+                            {shippingDetails.region ? `${shippingDetails.region} • ` : ''}
+                            Express Road Transport with 100% Live Arrival Guarantee
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0 pl-2">
+                        <span className="font-mono font-extrabold text-sm text-blue-950 block">
+                          {formatCurrency(deliveryFee)}
+                        </span>
+                        {shippingDetails.isBulkOrder ? (
+                          <span className="text-[9px] text-amber-700 font-bold uppercase tracking-wider block">
+                            2X Bulk ({itemCount} pairs)
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-slate-500 font-medium block">
+                            Standard Road
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
