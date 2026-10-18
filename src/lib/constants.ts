@@ -1284,81 +1284,90 @@ export const INITIAL_HOMEPAGE_SECTIONS: HomepageSection[] = [
     id: 'sec-hero',
     type: 'hero',
     title: 'Experience Living Jewels of the Aquatic World',
-    subtitle: 'Champion-lineage Halfmoons, rare Galaxy Plakats, and pure-strain livebearers. Shipped directly to your doorstep with guaranteed live arrival.',
+    subtitle: 'Champion-lineage pure-strain guppy trios and rare exotic show guppies. Shipped safely across India with 100% Live Arrival Guarantee.',
     is_active: true,
     display_order: 1,
     config: {
-      ctaPrimary: 'Shop Bettas',
-      ctaPrimaryLink: '/shop?category=betta-fish',
-      ctaSecondary: 'Explore All Collections',
-      ctaSecondaryLink: '/shop',
-      backgroundImage: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1600&q=85',
-      badge: 'Certified Live Arrival Guarantee'
+      ctaPrimary: 'Explore Rare Strains',
+      cta_text: 'Explore Rare Strains',
+      ctaPrimaryLink: '/shop',
+      cta_link: '/shop',
+      ctaSecondary: 'Live Stock Video',
+      secondary_cta_text: 'Live Stock Video',
+      ctaSecondaryLink: '/live-stock',
+      secondary_cta_link: '/live-stock',
+      backgroundImage: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2000&q=85',
+      background_image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2000&q=85',
+      badge: 'Certified Live Arrival Guarantee',
+      badge_text: 'Certified Live Arrival Guarantee'
     }
   },
   {
     id: 'sec-categories',
     type: 'categories',
-    title: 'Explore By Category',
-    subtitle: 'Browse through our specialized captive-bred varieties and planted tank supplies',
+    title: 'Shop By Pure Strain Bloodline',
+    subtitle: 'Certified healthy pedigree genetics with comprehensive live arrival warranty.',
     is_active: true,
     display_order: 2,
-    config: {}
+    config: {
+      viewAllLink: '/shop',
+    }
   },
   {
     id: 'sec-flash-deal',
     type: 'flash_deal',
-    title: 'Deal of the Day: Show Specimens',
-    subtitle: 'Limited single-specimen drops ending soon. Exact fish pictured is what arrives.',
+    title: 'Show Specimen Flash Drops',
+    subtitle: 'Strictly conditioned live specimens prepared for direct road courier dispatch.',
     is_active: true,
     display_order: 3,
     config: {
-      endTimeHours: 18,
-      bannerText: 'Limited Stock - 1 Piece Each'
+      endTimeHours: 12,
+      bannerText: 'Direct Road Dispatch',
     }
   },
   {
     id: 'sec-specimen-showcase',
     type: 'specimen_showcase',
-    title: 'Featured Living Specimens',
-    subtitle: 'Hand-picked champion line Bettas ready for immediate express dispatch',
+    title: 'Living Consignment Gallery',
+    subtitle: 'Hand-picked champion lineage ready for immediate express booking across India.',
     is_active: true,
     display_order: 4,
     config: {
-      filterCategory: 'cat-betta'
+      ctaLink: '/shop',
+      filterCategory: '9ebb7d17-8998-46b7-8e97-46a0812f7a80',
     }
   },
   {
     id: 'sec-guppies',
     type: 'curated_collection',
     title: 'Imported Guppy Trios & Breeding Pairs',
-    subtitle: 'Vibrant genetics and conditioned pairs for hobbyists and breeders',
+    subtitle: 'Vibrant genetics and conditioned pairs for hobbyists and breeders across India.',
     is_active: true,
     display_order: 5,
     config: {
-      filterCategory: 'cat-guppy'
+      filterCategory: '9ebb7d17-8998-46b7-8e97-46a0812f7a80'
     }
   },
   {
     id: 'sec-breeder-story',
     type: 'breeder_story',
-    title: 'Meet The Breeder: Raised with Respect & Care',
-    subtitle: 'Behind every vibrant living specimen is Anand, our head aquarist.',
+    title: 'Our Breeding & Quarantine Standards',
+    subtitle: 'Three generations of selective breeding, 21-day quarantine protocols, and safe road dispatch.',
     is_active: true,
     display_order: 6,
     config: {
-      breederName: 'Anand R.',
-      experienceYears: '9+ Years',
-      whatsapp: '+91 98450 12345',
-      specimensBred: '14,000+',
-      satisfaction: '99.4%'
+      quote: '"We are hobbyists first, breeders second, and sellers last."',
+      breederName: 'Ra Guppy Master Team',
+      experienceYears: '9+ Years Experience',
+      whatsapp: '+91 98765 43210',
+      facilityImage: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=1200&q=80',
     }
   },
   {
     id: 'sec-care-guide',
     type: 'care_guide',
     title: 'Master Aquarium Care Guides',
-    subtitle: 'Everything you need to know about water chemistry, acclimation, and feeding',
+    subtitle: 'Everything you need to know about water chemistry, acclimation, and feeding.',
     is_active: true,
     display_order: 7,
     config: {}
@@ -1366,28 +1375,28 @@ export const INITIAL_HOMEPAGE_SECTIONS: HomepageSection[] = [
   {
     id: 'sec-trust',
     type: 'trust_badges',
-    title: 'Why Shop With Betta Aquatics?',
-    subtitle: 'Uncompromising dedication to fish welfare and safe transit',
-    is_active: true,
-    display_order: 7,
-    config: {}
-  },
-  {
-    id: 'sec-testimonials',
-    type: 'testimonials',
-    title: 'Loved By Over 12,000 Aquarists Across India',
-    subtitle: 'See what our verified buyers say about our packing and fish vitality',
+    title: 'Why Hobbyists Choose Ra Guppy',
+    subtitle: 'Built on trust, bio-security, and unmatched specimen quality.',
     is_active: true,
     display_order: 8,
     config: {}
   },
   {
-    id: 'sec-newsletter',
-    type: 'newsletter',
-    title: 'Join The VIP Betta Club',
-    subtitle: 'Be the first to know when rare wild hybrids and master show bettas are listed.',
+    id: 'sec-testimonials',
+    type: 'testimonials',
+    title: 'Customer Feedback & Unboxing Stories',
+    subtitle: 'Read genuine reviews from fishkeepers across India on our safe packaging and fish vitality.',
     is_active: true,
     display_order: 9,
+    config: {}
+  },
+  {
+    id: 'sec-newsletter',
+    type: 'newsletter',
+    title: 'Join The VIP Fish Club',
+    subtitle: 'Be the first to know when rare wild hybrids and master show specimens are listed.',
+    is_active: true,
+    display_order: 10,
     config: {}
   }
 ];
@@ -1397,18 +1406,26 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
     id: 'page-shipping',
     slug: 'shipping-acclimation',
     title: 'Live Fish Shipping & Acclimation Guide',
-    meta_title: 'Live Fish Shipping & Acclimation Guide | Betta Aquatics',
+    meta_title: 'Live Fish Shipping & Acclimation Guide | Ra Guppy',
     meta_description: 'Step-by-step float and drip acclimation guide and Live Arrival Guarantee policy for ornamental fish.',
     is_published: true,
     updated_at: '2026-03-20T10:00:00Z',
     content_html: `
       <h2>100% Live Arrival Guarantee (DOA Policy)</h2>
-      <p>At Betta Aquatics, every fish is conditioned for 72 hours before dispatch. We pack using heavy-gauge medical bags with pure medical oxygen, insulated EPS thermal thermocol boxes, and heat/cooling packs calibrated to transit weather.</p>
+      <p>At Ra Guppy, every fish is conditioned for 72 hours before dispatch. We pack using heavy-gauge medical bags with pure medical oxygen, insulated EPS thermal thermocol boxes, and heat/cooling packs calibrated to transit weather.</p>
       
+      <h3>State-Wise Road Courier Delivery Rates:</h3>
+      <ul>
+        <li><strong>Kerala:</strong> ₹80 (Up to 10 pairs)</li>
+        <li><strong>Tamil Nadu & Karnataka:</strong> ₹120 (Up to 10 pairs)</li>
+        <li><strong>All Other Indian States:</strong> ₹200 (Up to 10 pairs)</li>
+        <li><em>Orders over 10 pairs: 2X courier charge for heavy dual-crate packaging.</em></li>
+      </ul>
+
       <h3>How Our Live Arrival Guarantee Works:</h3>
       <ul>
         <li>In the unlikely event of Dead-on-Arrival (DOA), notify our team within <strong>2 hours of package delivery</strong>.</li>
-        <li>Provide an uncut 30-second unboxing video showing the sealed shipping bag with fish inside.</li>
+        <li>Provide an uncut 30-second unboxing video showing the shipping label and unopened bag.</li>
         <li>Once verified, we provide an immediate 100% store credit or free specimen replacement.</li>
       </ul>
 
@@ -1425,20 +1442,20 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
   {
     id: 'page-about',
     slug: 'about-us',
-    title: 'About Betta Aquatics',
-    meta_title: 'About Us | Betta Aquatics India',
-    meta_description: 'Learn about India\'s premier specialized betta breeding sanctuary and ornamental fish boutique.',
+    title: 'About Ra Guppy',
+    meta_title: 'About Us | Ra Guppy India',
+    meta_description: 'Learn about India\'s premier specialized guppy and betta breeding sanctuary.',
     is_published: true,
     updated_at: '2026-03-20T10:00:00Z',
     content_html: `
       <h2>Ethical Aquaculture & Passion for Living Jewels</h2>
-      <p>Founded in 2021 by competitive aquascapers and biological researchers, <strong>Betta Aquatics</strong> was born out of a single mission: to revolutionize how ornamental fish are bred, conditioned, and transported in India.</p>
-      <p>Unlike commercial high-density wholesale farms, our indoor biosecure facility maintains individual high-filtration barracks for every show Betta. Each fish receives balanced live and specialized feeds, pristine water conditions, and daily flare training to develop full 180-degree finnage.</p>
+      <p>Founded by passionate aquatic breeders and biological researchers, <strong>Ra Guppy</strong> was born out of a single mission: to provide the highest-grade pure strain Guppies, championship Bettas, and exotic freshwater specimens across India.</p>
+      <p>Unlike commercial high-density wholesale farms, our indoor biosecure facility maintains individual high-filtration barracks and softwater conditioning for every specimen. Each fish receives balanced live feeds, pristine water conditions, and daily health checks.</p>
       <h3>Our Standards:</h3>
       <ul>
-        <li><strong>True-to-Specimen Transparency:</strong> For unique specimens, the fish you view in our photos and high-resolution videos is the exact fish you receive.</li>
+        <li><strong>True-to-Specimen Transparency:</strong> For unique specimens, the fish you view in our photos and videos is the exact fish you receive.</li>
         <li><strong>Medical Grade Packing:</strong> Medical oxygenated bags with stress-coat conditioners and temperature-controlled insulated shipping boxes.</li>
-        <li><strong>Post-Purchase Mentorship:</strong> Direct WhatsApp support with aquarium specialists for water parameters and health checks.</li>
+        <li><strong>Direct Surface Transport:</strong> Fast, safe road transit via The Professional Couriers.</li>
       </ul>
     `
   },
@@ -1446,23 +1463,58 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
     id: 'page-faq',
     slug: 'faq',
     title: 'Frequently Asked Questions',
-    meta_title: 'Frequently Asked Questions | Betta Aquatics',
+    meta_title: 'Frequently Asked Questions | Ra Guppy',
     meta_description: 'Answers to your common questions regarding orders, payment verification, shipping, and fish health.',
     is_published: true,
     updated_at: '2026-03-20T10:00:00Z',
     content_html: `
       <h2>Ordering & Delivery Questions</h2>
       <h4>How long does delivery take?</h4>
-      <p>We ship live ornamental fish strictly across India using specialized surface road transport via The Professional Couriers. With customized double-bagged oxygen packaging and thermal insulated boxes, shipments arrive safely within 2 to 4 days backed by our 100% Live Arrival Guarantee.</p>
+      <p>We ship live ornamental fish strictly across India using specialized surface road transport via The Professional Couriers. Shipments arrive safely within 2 to 4 days backed by our 100% Live Arrival Guarantee.</p>
 
-      <h4>Why do you use Manual UPI and Bank Transfer verification?</h4>
-      <p>Because live fish require individual health inspection before order approval, manual verification prevents accidental automated double-booking of single unique specimens and eliminates high gateway surcharge costs, allowing us to pass savings onto customers.</p>
+      <h4>What are the delivery charges?</h4>
+      <p>Kerala: ₹80 | Tamil Nadu & Karnataka: ₹120 | All other Indian states: ₹200. Orders above 10 pairs are charged 2X due to heavy dual-box packing.</p>
 
       <h4>What payment methods are supported?</h4>
-      <p>We support all UPI Apps (Google Pay, PhonePe, Paytm, BHIM) and Direct Bank Transfer (IMPS/NEFT). You can simply scan the custom QR code at checkout and submit your 12-digit UTR reference ID.</p>
-
-      <h4>Can two male Bettas be housed together?</h4>
-      <p>No. Male Betta splendens are territorial and must always be housed in separate individual aquariums (minimum recommended size: 3 to 5 gallons with gentle filtration and natural live plants).</p>
+      <p>We support all UPI Apps (Google Pay, PhonePe, Paytm, BHIM) and Direct Bank Transfer. You can simply scan the custom QR code at checkout and submit your 12-digit UTR reference ID.</p>
+    `
+  },
+  {
+    id: 'page-shipping-policy',
+    slug: 'shipping-policy',
+    title: 'Shipping Policy & Road Courier Rates',
+    meta_title: 'Shipping Policy & Delivery Rates | Ra Guppy',
+    meta_description: 'State-wise road courier delivery charges by The Professional Couriers across India for live fish consignments.',
+    is_published: true,
+    updated_at: '2026-03-20T10:00:00Z',
+    content_html: `
+      <h2>Reliable Road Courier Logistics across India</h2>
+      <p>Live fish are delicate living animals requiring specialized transit. Ra Guppy partners exclusively with <strong>The Professional Couriers</strong> surface express road network to ensure safe, temperature-stable delivery across India.</p>
+      <h3>State-Wise Delivery Rates:</h3>
+      <ul>
+        <li><strong>Kerala:</strong> ₹80 (Flat rate for up to 10 pairs)</li>
+        <li><strong>Tamil Nadu & Karnataka:</strong> ₹120 (Flat rate for up to 10 pairs)</li>
+        <li><strong>All Other Indian States:</strong> ₹200 (Flat rate for up to 10 pairs)</li>
+        <li><em>Orders exceeding 10 pairs: 2X shipping rate for heavy double insulated packing.</em></li>
+      </ul>
+    `
+  },
+  {
+    id: 'page-doa',
+    slug: 'doa-policy',
+    title: 'Live Arrival Guarantee & Dead-On-Arrival (DOA) Policy',
+    meta_title: 'Live Arrival Guarantee & DOA Policy | Ra Guppy',
+    meta_description: 'Complete details on our 100% Live Arrival Guarantee and Dead-On-Arrival unboxing policy.',
+    is_published: true,
+    updated_at: '2026-03-20T10:00:00Z',
+    content_html: `
+      <h2>100% Live Arrival Guarantee</h2>
+      <p>Every single consignment shipped via our road courier service is fully covered by our comprehensive Live Arrival Guarantee.</p>
+      <h3>Claiming DOA Coverage:</h3>
+      <ul>
+        <li>Notification must be submitted via WhatsApp within 2 hours of package delivery timestamp from The Professional Couriers.</li>
+        <li>Include a continuous, unedited 30-second unboxing video clearly displaying the intact shipping label and unbroken inner plastic seal.</li>
+      </ul>
     `
   }
 ];

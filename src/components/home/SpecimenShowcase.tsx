@@ -11,30 +11,37 @@ interface SpecimenShowcaseProps {
 }
 
 const STRAIN_TABS = [
-  { id: 'all', label: 'All Bettas' },
-  { id: 'Halfmoon', label: 'Halfmoon' },
-  { id: 'Plakat', label: 'Koi Plakat' },
-  { id: 'Crowntail', label: 'Crowntail' },
+  { id: 'all', label: 'All Guppies & Fish' },
+  { id: 'Half Moon', label: 'Half Moon' },
   { id: 'Dumbo', label: 'Dumbo Ear' },
+  { id: 'Albino', label: 'Albino / AFR' },
+  { id: 'Blue', label: 'Blue / Mosaic' },
 ];
 
 export const SpecimenShowcase: React.FC<SpecimenShowcaseProps> = ({ section, onQuickView }) => {
   const [activeTab, setActiveTab] = useState('all');
   const allProducts = mockDb.getProducts();
 
-  const targetCategory = section?.config?.filterCategory || 'cat-betta';
-  const categoryProducts = allProducts.filter((p) => p.category_id === targetCategory);
+  const targetCategory = section?.config?.filterCategory || section?.config?.category;
+  let pool = targetCategory ? allProducts.filter((p) => p.category_id === targetCategory) : [];
+  if (pool.length === 0) {
+    const fishProducts = allProducts.filter((p) => p.strain);
+    pool = fishProducts.length > 0 ? fishProducts : allProducts;
+  }
 
-  const title = section?.title || 'Bettas by Variety & Tail Type';
-  const subtitle = section?.subtitle || 'Select a strain to filter our Bangalore quarantined live inventory.';
-  const ctaLink = section?.config?.ctaLink || `/shop?cat=${targetCategory}`;
+  const title = section?.title || 'Guppies by Strain & Lineage Variety';
+  const subtitle = section?.subtitle || 'Select a strain to filter our quarantined live inventory across India.';
+  const ctaLink = section?.config?.ctaLink || section?.config?.cta_link || '/shop';
 
-  const filtered = categoryProducts.filter((p) => {
+  const filtered = pool.filter((p) => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'Dumbo') return p.strain?.includes('Dumbo');
-    if (activeTab === 'Plakat') return p.strain?.includes('Plakat');
-    return p.strain?.toLowerCase().includes(activeTab.toLowerCase());
+    const search = activeTab.toLowerCase();
+    return (
+      (p.strain && p.strain.toLowerCase().includes(search)) ||
+      (p.name && p.name.toLowerCase().includes(search))
+    );
   });
+  const displayed = filtered.length > 0 ? filtered : pool;
 
   return (
     <section className="py-12 bg-slate-50 border-b border-slate-200">
@@ -71,7 +78,7 @@ export const SpecimenShowcase: React.FC<SpecimenShowcaseProps> = ({ section, onQ
 
         {/* Product Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-          {filtered.slice(0, 8).map((product) => (
+          {displayed.slice(0, 8).map((product) => (
             <ProductCard key={product.id} product={product} onQuickView={onQuickView} />
           ))}
         </div>
@@ -82,7 +89,7 @@ export const SpecimenShowcase: React.FC<SpecimenShowcaseProps> = ({ section, onQ
             to={ctaLink}
             className="btn-primary"
           >
-            <span>Explore All {categoryProducts.length} Specimens</span>
+            <span>Explore All {pool.length} Specimens</span>
             <ArrowRight className="w-4 h-4 text-white" />
           </Link>
         </div>

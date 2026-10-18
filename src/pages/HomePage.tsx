@@ -7,6 +7,7 @@ import { BreederStory } from '../components/home/BreederStory';
 import { CareGuideSection } from '../components/home/CareGuideSection';
 import { TrustBadges } from '../components/home/TrustBadges';
 import { ReviewCarousel } from '../components/home/ReviewCarousel';
+import { NewsletterSection } from '../components/home/NewsletterSection';
 import { QuickViewModal } from '../components/common/QuickViewModal';
 import { SEO } from '../components/common/SEO';
 import { Product, HomepageSection } from '../lib/types';
@@ -58,6 +59,8 @@ export const HomePage: React.FC = () => {
         return <CareGuideSection key={sec.id} section={sec} />;
       case 'testimonials':
         return <ReviewCarousel key={sec.id} section={sec} />;
+      case 'newsletter':
+        return <NewsletterSection key={sec.id} section={sec} />;
       default:
         return null;
     }

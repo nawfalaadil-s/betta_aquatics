@@ -9,15 +9,15 @@ interface HeroCarouselProps {
 
 export const HeroCarousel: React.FC<HeroCarouselProps> = ({ section }) => {
   const config = section?.config || {};
-  const badge = config.badge || 'Bangalore Quarantine Facility • Pan-India Delivery';
+  const badge = config.badge || config.badge_text || 'Bangalore Quarantine Facility • Pan-India Delivery';
   const title = section?.title || 'Hand-Raised Bettas & Ornamental Fish, Delivered Safely to Your Door.';
   const subtitle = section?.subtitle || 'You get the exact fish shown in our photos. Each Betta is raised in clean planted tanks and shipped safely overnight in warm oxygen bags.';
-  const ctaPrimary = config.ctaPrimary || 'Shop Show Bettas';
-  const ctaPrimaryLink = config.ctaPrimaryLink || '/shop?cat=cat-betta';
-  const ctaSecondary = config.ctaSecondary || 'View All Fish & Plants';
-  const ctaSecondaryLink = config.ctaSecondaryLink || '/shop';
-  const image = config.backgroundImage || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1000&q=80';
-  const video = config.backgroundVideo || '';
+  const ctaPrimary = config.ctaPrimary || config.cta_text || 'Explore Rare Strains';
+  const ctaPrimaryLink = config.ctaPrimaryLink || config.cta_link || '/shop';
+  const ctaSecondary = config.ctaSecondary || config.secondary_cta_text || 'Live Stock Video';
+  const ctaSecondaryLink = config.ctaSecondaryLink || config.secondary_cta_link || '/live-stock';
+  const image = config.backgroundImage || config.background_image || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1000&q=80';
+  const video = config.backgroundVideo || config.background_video || '';
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);

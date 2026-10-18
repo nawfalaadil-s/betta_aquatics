@@ -8,11 +8,14 @@ interface BreederStoryProps {
 
 export const BreederStory: React.FC<BreederStoryProps> = ({ section }) => {
   const config = section?.config || {};
-  const quote = config.quote || '"We are hobbyists first, breeders second, and sellers last."';
-  const tag = section?.subtitle || 'Direct From Hobbyist Breeders';
-  const description = config.description || 'We started Betta Aquatics to put fish care first. Every Betta lives in its own planted tank with warm, clean water and good food until it heads to your home.';
-  const whatsapp = config.whatsapp || '+91 98450 12345';
-  const whatsappClean = whatsapp.replace(/[^0-9]/g, '');
+  const quote = config.quote || section?.title || '"We are hobbyists first, breeders second, and sellers last."';
+  const tag = section?.subtitle || config.subtitle || 'Direct From Hobbyist Breeders';
+  const description = config.description || 'We started Ra Guppy to put fish care first. Every Guppy strain lives in conditioned tanks with pristine water chemistry, biological filtration, and live micro-nutrition until safely dispatched to your home.';
+  const rawWhatsapp = config.whatsapp || config.whatsapp_number || '+91 98765 43210';
+  const whatsappClean = rawWhatsapp.replace(/[^0-9]/g, '');
+  const facilityImage = config.facilityImage || config.image_url || config.facility_image || "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=1200&q=80";
+  const experienceYears = config.experienceYears || config.experience_years || '9+ Years Experience';
+  const facilityLocation = config.facilityLocation || config.location || 'Kerala & Tamil Nadu Hatcheries';
 
   return (
     <section className="py-14 bg-slate-50 border-b border-slate-200">
@@ -22,17 +25,17 @@ export const BreederStory: React.FC<BreederStoryProps> = ({ section }) => {
           <div className="lg:col-span-5 relative">
             <div className="aspect-[4/3] sm:aspect-square rounded-3xl overflow-hidden shadow-sm border border-slate-200 bg-white relative">
               <img
-                src={config.facilityImage || "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80"}
-                alt="Aquarist caring for Betta fish in natural planted tanks"
+                src={facilityImage}
+                alt="Aquarist caring for pedigree Guppy strains in natural planted biotope tanks"
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-              <div className="absolute bottom-3 left-3 right-3 bg-slate-900 p-3 rounded-2xl border border-slate-800 text-white shadow-sm">
+              <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur-xs p-3 rounded-2xl border border-slate-800 text-white shadow-sm">
                 <span className="text-xs font-bold tracking-wide text-white block">
-                  Bengaluru Facility ({config.experienceYears || '9+ Years Experience'})
+                  {facilityLocation} ({experienceYears})
                 </span>
                 <p className="text-xs text-slate-300 mt-0.5">
-                  Individual filtered tanks with natural Catappa leaf tannins.
+                  Natural planted biotope tanks with optimal minerals and bio-filtration.
                 </p>
               </div>
             </div>
@@ -44,7 +47,7 @@ export const BreederStory: React.FC<BreederStoryProps> = ({ section }) => {
               </div>
               <div className="text-xs">
                 <strong className="block text-slate-900 font-bold">Ethical Fishkeeping</strong>
-                <span className="text-slate-600 text-xs">Conditioned with live food</span>
+                <span className="text-slate-600 text-xs">Conditioned with live moina & micro-nutrition</span>
               </div>
             </div>
           </div>
@@ -68,10 +71,10 @@ export const BreederStory: React.FC<BreederStoryProps> = ({ section }) => {
               <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
                 <div className="flex items-center gap-2 font-bold text-slate-900 mb-1">
                   <CheckCircle2 className="w-4 h-4 text-blue-900 shrink-0" />
-                  <span>WYSIWYG: Exact Fish Pictured</span>
+                  <span>WYSIWYG: Exact Bloodline Strain</span>
                 </div>
                 <p className="text-slate-600 leading-relaxed text-xs">
-                  The photograph you see is the exact live specimen packaged for you.
+                  High-pedigree breeding pairs & trios inspected for genetic purity and vitality.
                 </p>
               </div>
 
@@ -81,7 +84,7 @@ export const BreederStory: React.FC<BreederStoryProps> = ({ section }) => {
                   <span>Pure Medical Oxygen Packing</span>
                 </div>
                 <p className="text-slate-600 leading-relaxed text-xs">
-                  Sealed with pure oxygen to ensure your fish arrives swimming and active.
+                  Double bagged with medical oxygen & temperature insulation via Professional Couriers.
                 </p>
               </div>
             </div>
@@ -89,7 +92,7 @@ export const BreederStory: React.FC<BreederStoryProps> = ({ section }) => {
             {/* Direct WhatsApp Callout */}
             <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
               <a
-                href="https://wa.me/919876543210"
+                href={`https://wa.me/${whatsappClean || '919876543210'}`}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-primary"
