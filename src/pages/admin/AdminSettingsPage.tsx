@@ -22,9 +22,9 @@ export const AdminSettingsPage: React.FC = () => {
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateSettings(form);
+    await updateSettings(form);
     showToast('Store settings updated and applied across the storefront!', 'success');
   };
 

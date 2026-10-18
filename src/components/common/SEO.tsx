@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useBranding } from '../../contexts/BrandingContext';
 
 interface SEOProps {
   title?: string;
@@ -12,16 +13,24 @@ interface SEOProps {
 
 export const SEO: React.FC<SEOProps> = ({
   title,
-  description = "Betta Aquatics is India's premier ornamental fish sanctuary. Hand-conditioned show Bettas, rare guppies, and healthy live plants with guaranteed live arrival.",
+  description,
   canonical,
   ogImage = 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80',
   ogType = 'website',
   jsonLd,
-  keywords = ['betta fish online', 'buy betta fish india', 'halfmoon betta', 'guppies online', 'aquarium plants india', 'live fish delivery'],
+  keywords = ['guppy fish online', 'buy betta fish india', 'pure strain guppy pairs', 'aquarium plants india', 'live fish delivery'],
 }) => {
+  const { activeSettings, branding } = useBranding();
+  const currentSettings = activeSettings || branding;
+  const brandName = currentSettings.site_name || 'Ra Guppy';
+  const tagline = currentSettings.tagline || 'Pure Strain Guppies, Bettas & Aquatic Sanctuary';
+
+  const defaultDesc = `${brandName} is India's premier ornamental fish sanctuary. Hand-conditioned pure strain guppies, show Bettas, and healthy live plants with guaranteed live arrival.`;
+  const metaDesc = description || defaultDesc;
+
   const fullTitle = title 
-    ? `${title} | Betta Aquatics` 
-    : 'Betta Aquatics — Pure Strain Ornamental Fish & Aquarium Plants';
+    ? (title.toLowerCase().includes(brandName.toLowerCase()) ? title : `${title} | ${brandName}`)
+    : `${brandName} — ${tagline}`;
 
   useEffect(() => {
     // 1. Update Document Title
@@ -39,16 +48,16 @@ export const SEO: React.FC<SEOProps> = ({
     };
 
     // 2. Set Meta Descriptions & Keywords
-    setMeta('name', 'description', description);
+    setMeta('name', 'description', metaDesc);
     setMeta('name', 'keywords', keywords.join(', '));
     setMeta('name', 'robots', 'index, follow');
 
     // 3. Open Graph Tags
     setMeta('property', 'og:title', fullTitle);
-    setMeta('property', 'og:description', description);
+    setMeta('property', 'og:description', metaDesc);
     setMeta('property', 'og:image', ogImage);
     setMeta('property', 'og:type', ogType);
-    setMeta('property', 'og:site_name', 'Betta Aquatics');
+    setMeta('property', 'og:site_name', brandName);
     if (canonical) {
       setMeta('property', 'og:url', canonical);
     }
@@ -56,7 +65,7 @@ export const SEO: React.FC<SEOProps> = ({
     // 4. Twitter Cards
     setMeta('name', 'twitter:card', 'summary_large_image');
     setMeta('name', 'twitter:title', fullTitle);
-    setMeta('name', 'twitter:description', description);
+    setMeta('name', 'twitter:description', metaDesc);
     setMeta('name', 'twitter:image', ogImage);
 
     // 5. Canonical Link

@@ -1268,12 +1268,12 @@ export const INITIAL_STORE_SETTINGS: StoreSettings = {
 };
 
 export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
-  logo_url: '/logo-fish.svg',
-  mobile_logo_url: '',
-  footer_logo_url: '',
+  logo_url: '/logo.jpeg',
+  mobile_logo_url: '/logo.jpeg',
+  footer_logo_url: '/logo.jpeg',
   favicon_url: '/favicon.svg',
-  site_name: 'Betta Aquatics',
-  tagline: 'Pure Strain Ornamental Fish & Aquarium Supplies',
+  site_name: 'Ra Guppy',
+  tagline: 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary',
   primary_color: '#1e3a8a',
   secondary_color: '#dc2626',
   accent_color: '#0284c7',

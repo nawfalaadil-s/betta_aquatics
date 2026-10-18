@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import { Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useBranding } from '../../contexts/BrandingContext';
 import { useToast } from '../../contexts/ToastContext';
 import { SEO } from '../../components/common/SEO';
 import { BrandLogo } from '../../components/common/BrandLogo';
@@ -11,6 +12,11 @@ export const AdminLoginPage: React.FC = () => {
   const location = useLocation();
   const { adminLogin, isAdmin, isMockMode, user, logout } = useAuth();
   const { showToast } = useToast();
+  const { activeSettings, branding } = useBranding();
+  const currentSettings = activeSettings || branding;
+  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandParts = brandTitle.trim().split(/\s+/);
+  const firstWord = brandParts[0] || 'RA';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,12 +64,12 @@ export const AdminLoginPage: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-white p-2.5 mx-auto flex items-center justify-center shadow-lg mb-3 border border-slate-200 overflow-hidden shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-black mx-auto flex items-center justify-center shadow-lg mb-3 border border-slate-700 overflow-hidden shrink-0">
             <BrandLogo variant="auth" className="w-full h-full" imgClassName="w-full h-full object-contain" />
           </div>
           <div className="flex items-center justify-center gap-1.5">
             <span className="font-display font-black text-2xl tracking-wider text-white uppercase">
-              BETTA <span className="text-red-500">ADMIN</span>
+              {firstWord} <span className="text-red-500">ADMIN</span>
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1 font-mono">

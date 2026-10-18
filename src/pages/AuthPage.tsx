@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Lock, Mail, User, Phone, ArrowRight, AlertCircle, X, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useBranding } from '../contexts/BrandingContext';
 import { useToast } from '../contexts/ToastContext';
 import { SEO } from '../components/common/SEO';
 import { BrandLogo } from '../components/common/BrandLogo';
@@ -11,6 +12,12 @@ export const AuthPage: React.FC = () => {
   const location = useLocation();
   const { login, register, requestPasswordReset } = useAuth();
   const { showToast } = useToast();
+  const { activeSettings, branding } = useBranding();
+  const currentSettings = activeSettings || branding;
+  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandParts = brandTitle.trim().split(/\s+/);
+  const firstWord = brandParts[0] || 'RA';
+  const restWords = brandParts.slice(1).join(' ');
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -91,11 +98,11 @@ export const AuthPage: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-blue-900 p-2 mx-auto flex items-center justify-center shadow-md mb-3 overflow-hidden shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-black mx-auto flex items-center justify-center shadow-md mb-3 overflow-hidden shrink-0">
             <BrandLogo variant="auth" className="w-full h-full" imgClassName="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 font-display uppercase tracking-wide">
-            BETTA <span className="text-red-600">AQUATICS</span>
+            {firstWord} {restWords && <span className="text-red-600">{restWords}</span>}
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Customer Sanctuary & Account Access

@@ -11,6 +11,7 @@ import { useWishlist } from '../../contexts/WishlistContext';
 import { formatCurrency } from '../../lib/utils';
 import { mockDb } from '../../lib/mockDatabase';
 import { Product, Category } from '../../lib/types';
+import { useBranding } from '../../contexts/BrandingContext';
 import { BrandLogo } from './BrandLogo';
 
 export const Navbar: React.FC = () => {
@@ -18,6 +19,12 @@ export const Navbar: React.FC = () => {
   const { user, isAdmin, logout } = useAuth();
   const { itemCount, subtotal } = useCart();
   const { wishlistCount } = useWishlist();
+  const { activeSettings, branding } = useBranding();
+  const currentSettings = activeSettings || branding;
+  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandParts = brandTitle.trim().split(/\s+/);
+  const firstWord = brandParts[0] || 'RA';
+  const restWords = brandParts.slice(1).join(' ');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Product[]>([]);
@@ -119,15 +126,15 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-6">
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="w-9 h-9 rounded-xl bg-blue-900 p-1 flex items-center justify-center shadow-xs overflow-hidden shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center shadow-xs overflow-hidden shrink-0">
             <BrandLogo variant="header" className="w-full h-full" imgClassName="w-full h-full object-contain" />
           </div>
           <div>
-            <span className="font-display font-extrabold text-xl tracking-tight text-blue-900 uppercase">
-              BETTA <span className="text-red-600">AQUATICS</span>
+            <span className="font-display font-extrabold text-xl tracking-tight text-slate-900 uppercase">
+              {firstWord} {restWords && <span className="text-red-600">{restWords}</span>}
             </span>
             <span className="block text-xs tracking-wide text-slate-600 font-medium">
-              Live Fish & Aquarium Store
+              {currentSettings.tagline || 'Pure Strain Guppies & Bettas'}
             </span>
           </div>
         </Link>

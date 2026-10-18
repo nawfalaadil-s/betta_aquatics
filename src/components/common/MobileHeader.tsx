@@ -21,6 +21,10 @@ export const MobileHeader: React.FC = () => {
   const { wishlistCount } = useWishlist();
   const { activeSettings, branding } = useBranding();
   const currentSettings = activeSettings || branding;
+  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandParts = brandTitle.trim().split(/\s+/);
+  const firstWord = brandParts[0] || 'RA';
+  const restWords = brandParts.slice(1).join(' ');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -78,11 +82,11 @@ export const MobileHeader: React.FC = () => {
 
         {/* Center Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-blue-900 p-0.5 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
+          <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
             <BrandLogo variant="mobile" className="w-full h-full" imgClassName="w-full h-full object-contain" />
           </div>
-          <span className="font-display font-extrabold text-base tracking-tight text-blue-900 uppercase">
-            BETTA <span className="text-red-600">AQUATICS</span>
+          <span className="font-display font-extrabold text-base tracking-tight text-slate-900 uppercase">
+            {firstWord} {restWords && <span className="text-red-600">{restWords}</span>}
           </span>
         </Link>
 
@@ -200,13 +204,15 @@ export const MobileHeader: React.FC = () => {
             {/* Drawer Header */}
             <div>
               <div className="bg-slate-900 text-white p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-blue-900 p-0.5 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
                     <BrandLogo variant="mobile" className="w-full h-full" imgClassName="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <div className="font-display font-bold text-sm">{currentSettings.site_name || 'BETTA AQUATICS'}</div>
-                    <div className="text-xs text-slate-400">{currentSettings.tagline || 'Live Fish & Aquarium Store'}</div>
+                    <div className="font-display font-bold text-sm text-white uppercase tracking-tight">
+                      {firstWord} {restWords && <span className="text-red-500">{restWords}</span>}
+                    </div>
+                    <div className="text-xs text-slate-400">{currentSettings.tagline || 'Pure Strain Guppies & Bettas'}</div>
                   </div>
                 </div>
                 <button

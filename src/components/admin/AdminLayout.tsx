@@ -7,6 +7,7 @@ import {
   FileSpreadsheet, FolderTree, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useBranding } from '../../contexts/BrandingContext';
 import { mockDb } from '../../lib/mockDatabase';
 import { AdminPermission, ROLE_LABELS } from '../../lib/permissions';
 import { BrandLogo } from '../common/BrandLogo';
@@ -23,6 +24,13 @@ export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, hasPermission, logout } = useAuth();
+  const { activeSettings, branding } = useBranding();
+  const currentSettings = activeSettings || branding;
+  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandParts = brandTitle.trim().split(/\s+/);
+  const firstWord = brandParts[0] || 'RA';
+  const restWords = brandParts.slice(1).join(' ');
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
   const mobileDrawerRef = useRef<HTMLDivElement | null>(null);
@@ -119,12 +127,12 @@ export const AdminLayout: React.FC = () => {
           </button>
 
           <Link to="/admin" className="flex items-center gap-2.5 focus-visible:ring-2 focus-visible:ring-blue-900 rounded-xl p-1 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-950 p-1.5 flex items-center justify-center shadow-xs overflow-hidden shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center shadow-xs overflow-hidden shrink-0">
               <BrandLogo variant="admin" className="w-full h-full" imgClassName="w-full h-full object-contain" />
             </div>
             <div>
-              <span className="font-display font-extrabold text-sm sm:text-base tracking-wider text-blue-950 uppercase">
-                BETTA <span className="text-red-600">ADMIN</span>
+              <span className="font-display font-extrabold text-sm sm:text-base tracking-wider text-slate-900 uppercase">
+                {firstWord} <span className="text-red-600">ADMIN</span>
               </span>
               <span className="block text-[9px] uppercase tracking-widest text-slate-500 font-mono -mt-0.5">
                 Operations & Management
@@ -166,13 +174,13 @@ export const AdminLayout: React.FC = () => {
         >
           <div className="space-y-4">
             {/* Top Sidebar Brand Showcase (Strict Source of Truth from CMS) */}
-            <div className="p-3 bg-gradient-to-br from-slate-50 to-blue-50/50 rounded-2xl border border-slate-200/80 flex items-center gap-3 overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-white p-1.5 border border-slate-200 flex items-center justify-center shadow-2xs shrink-0 overflow-hidden">
+            <div className="p-3 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl border border-slate-200/80 flex items-center gap-3 overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center shadow-xs shrink-0 overflow-hidden">
                 <BrandLogo variant="admin" className="w-full h-full" imgClassName="w-full h-full object-contain" />
               </div>
               <div className="min-w-0 flex-1">
                 <span className="font-display font-black text-xs text-slate-900 uppercase tracking-tight block truncate">
-                  Betta Aquatics
+                  {brandTitle}
                 </span>
                 <span className="text-[10px] text-blue-700 font-semibold block uppercase tracking-wider font-mono">
                   Primary Brand

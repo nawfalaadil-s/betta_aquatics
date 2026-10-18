@@ -2,10 +2,18 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Truck, Sparkles, Send, Phone, Mail, Award, Check } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
+import { useBranding } from '../../contexts/BrandingContext';
 import { BrandLogo } from './BrandLogo';
 
 export const Footer: React.FC = () => {
   const { showToast } = useToast();
+  const { activeSettings, branding } = useBranding();
+  const currentSettings = activeSettings || branding;
+  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandParts = brandTitle.trim().split(/\s+/);
+  const firstWord = brandParts[0] || 'RA';
+  const restWords = brandParts.slice(1).join(' ');
+
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -59,12 +67,12 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 py-10 border-b border-slate-800">
           {/* Brand Col */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-xl bg-blue-900 p-1 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
                 <BrandLogo variant="footer" className="w-full h-full" imgClassName="w-full h-full object-contain" />
               </div>
-              <span className="font-display font-extrabold text-lg text-white tracking-tight">
-                BETTA <span className="text-red-600">AQUATICS</span>
+              <span className="font-display font-extrabold text-lg text-white tracking-tight uppercase">
+                {firstWord} {restWords && <span className="text-red-500">{restWords}</span>}
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed mb-4 max-w-sm font-normal">

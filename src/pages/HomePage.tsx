@@ -54,25 +54,28 @@ export const HomePage: React.FC = () => {
     }
   };
 
+  const currentBrand = branding.site_name || 'Ra Guppy';
+  const currentTagline = branding.tagline || 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary';
+
   // Schema.org Structured Data for WebSite & Organization
   const homepageSchema = [
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'Betta Aquatics',
-      url: 'https://bettaaquatics.in/',
+      name: currentBrand,
+      url: typeof window !== 'undefined' ? window.location.origin : 'https://raguppies.vercel.app',
       potentialAction: {
         '@type': 'SearchAction',
-        target: 'https://bettaaquatics.in/shop?q={search_term_string}',
+        target: `${typeof window !== 'undefined' ? window.location.origin : ''}/shop?q={search_term_string}`,
         'query-input': 'required name=search_term_string',
       },
     },
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: branding.site_name || 'Betta Aquatics',
-      url: typeof window !== 'undefined' ? window.location.origin : 'https://bettaaquatics.in/',
-      logo: branding.logo_url?.startsWith('http') ? branding.logo_url : `https://bettaaquatics.in${branding.logo_url || '/logo.jpeg'}`,
+      name: currentBrand,
+      url: typeof window !== 'undefined' ? window.location.origin : 'https://raguppies.vercel.app',
+      logo: branding.logo_url?.startsWith('http') ? branding.logo_url : `${typeof window !== 'undefined' ? window.location.origin : ''}${branding.logo_url || '/logo.jpeg'}`,
       contactPoint: {
         '@type': 'ContactPoint',
         telephone: '+91-98765-43210',
@@ -81,7 +84,6 @@ export const HomePage: React.FC = () => {
         availableLanguage: ['English', 'Hindi'],
       },
       sameAs: [
-        'https://instagram.com/bettaaquatics',
         'https://wa.me/919876543210',
       ],
     },
@@ -91,18 +93,17 @@ export const HomePage: React.FC = () => {
     <div className="bg-slate-50 min-h-screen">
       {/* Homepage SEO Meta & JSON-LD */}
       <SEO
-        title="Betta Aquatics — Pure Strain Ornamental Fish & Aquarium Plants"
-        description="India's premier ornamental fish sanctuary. Buy show-grade Halfmoon Bettas, Galaxy Koi Plakats, pure strain guppies, and aquatic plants with 100% Live Arrival Guarantee."
-        canonical="https://bettaaquatics.in/"
+        title={`${currentBrand} — ${currentTagline}`}
+        description="India's premier ornamental fish sanctuary. Buy pure-strain guppy pairs, champion Bettas, and live aquatic plants with 100% Live Arrival Guarantee."
+        canonical={typeof window !== 'undefined' ? window.location.origin : 'https://raguppies.vercel.app'}
         jsonLd={homepageSchema}
         keywords={[
-          'betta fish online india',
+          'guppy fish online india',
+          'pure strain guppy pairs',
           'buy betta fish bangalore',
           'halfmoon betta price',
-          'koi plakat betta',
-          'live aquarium plants online',
-          'guppy breeding pairs',
-          'betta aquatics'
+          'live aquatic plants online',
+          'ra guppy'
         ]}
       />
 

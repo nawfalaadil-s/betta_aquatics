@@ -63,7 +63,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     finalSrc = `${logoSrc}${sep === '?' ? '?v=' : '&v='}${currentSettings.version}`;
   }
 
-  const accessibleAlt = alt || currentSettings.site_name || 'Betta Aquatics';
+  const accessibleAlt = alt || currentSettings.site_name || 'Ra Guppy';
 
   return (
     <div className={`inline-flex items-center gap-2.5 max-w-full ${className}`}>
@@ -79,7 +79,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       </div>
       {showText && (
         <span className={`truncate ${textClassName}`}>
-          {currentSettings.site_name || 'Betta Aquatics'}
+          {currentSettings.site_name || 'Ra Guppy'}
         </span>
       )}
     </div>

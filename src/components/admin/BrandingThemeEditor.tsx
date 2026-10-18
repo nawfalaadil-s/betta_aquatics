@@ -702,19 +702,19 @@ export const BrandingThemeEditor: React.FC = () => {
                 <span className="text-[10px] uppercase font-bold text-slate-400">Desktop Header Simulation</span>
                 <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-slate-50 p-1 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
                       <img
-                        src={form.logo_url || '/logo-fish.svg'}
+                        src={form.logo_url || '/logo.jpeg'}
                         alt=""
                         className="w-full h-full object-contain"
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/logo-fish.svg'; }}
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/logo.jpeg'; }}
                       />
                     </div>
                     <div>
                       <div className="font-extrabold text-slate-900 text-xs font-display">
-                        {form.site_name || 'Betta Aquatics'}
+                        {form.site_name || 'Ra Guppy'}
                       </div>
-                      <div className="text-[9px] text-slate-400">Live Specimen Sanctuary</div>
+                      <div className="text-[9px] text-slate-400">{form.tagline || 'Pure Strain Guppies & Bettas'}</div>
                     </div>
                   </div>
 
@@ -741,17 +741,17 @@ export const BrandingThemeEditor: React.FC = () => {
                 <span className="text-[10px] uppercase font-bold text-slate-400">Admin Sidebar & Header Preview</span>
                 <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 shadow-xs flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-blue-950 p-1.5 border border-blue-900/60 flex items-center justify-center shadow-xs overflow-hidden shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center shadow-xs overflow-hidden shrink-0">
                       <img
-                        src={form.logo_url || '/logo-fish.svg'}
+                        src={form.logo_url || '/logo.jpeg'}
                         alt=""
                         className="w-full h-full object-contain"
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/logo-fish.svg'; }}
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/logo.jpeg'; }}
                       />
                     </div>
                     <div>
                       <div className="font-extrabold text-white text-xs tracking-wider uppercase font-display">
-                        BETTA <span className="text-red-500">ADMIN</span>
+                        {(form.site_name || 'RA GUPPY').split(' ')[0]} <span className="text-red-500">ADMIN</span>
                       </div>
                       <div className="text-[9px] text-slate-400 font-mono">Single Source of Truth</div>
                     </div>
