@@ -21,8 +21,9 @@ dist-ssr
 # Test & Browser MCP scratch files
 .playwright-mcp/
 
-# Raw media source archives (assets are served from public/videos)
-Products Video/
+# Raw media source archives (assets are served from public/videos & public/product_image)
+/Products Video/
+/product_image/
 
 # Editor directories and files
 .vscode/*
