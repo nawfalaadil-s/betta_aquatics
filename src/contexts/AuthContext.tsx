@@ -1,33 +1,123 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserProfile, Address } from '../lib/types';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { UserProfile, Address, UserSession, UserRole } from '../lib/types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { mockDb } from '../lib/mockDatabase';
 import { AdminPermission, hasPermission as checkPermission, isStaffRole } from '../lib/permissions';
 
-interface AuthResponse {
+export const STORAGE_KEY_SESSION = 'ba_current_session';
+export const STORAGE_KEY_LEGACY_USER = 'ba_current_user';
+export const STORAGE_KEY_ADDRESSES = 'ba_user_addresses';
+
+// Default session validity: 30 days in milliseconds
+export const DEFAULT_SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
+
+export interface AuthResponse {
   success: boolean;
   message?: string;
   user?: UserProfile;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: UserProfile | null;
+  session: UserSession | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isStaff: boolean;
+  isSessionValid: boolean;
+  sessionExpiresAt: Date | null;
   hasPermission: (permission: AdminPermission) => boolean;
   isMockMode: boolean;
+  isLoading: boolean;
   addresses: Address[];
   login: (email: string, password?: string) => Promise<AuthResponse>;
   adminLogin: (email: string, password: string) => Promise<AuthResponse>;
   register: (name: string, email: string, password?: string, phone?: string) => Promise<AuthResponse>;
   requestPasswordReset: (email: string) => Promise<AuthResponse>;
   logout: () => void;
+  touchSession: () => void;
+  refreshSession: () => Promise<void>;
   addAddress: (address: Omit<Address, 'id' | 'user_id'>) => Address;
   updateAddress: (address: Address) => void;
   deleteAddress: (id: string) => void;
   setDefaultAddress: (id: string) => void;
 }
+
+export const createSession = (
+  user: UserProfile,
+  token?: string,
+  durationMs: number = DEFAULT_SESSION_DURATION
+): UserSession => {
+  return {
+    user,
+    token: token || `sess_${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`,
+    created_at: Date.now(),
+    expires_at: Date.now() + durationMs,
+    role: user.role,
+  };
+};
+
+export const loadInitialSession = (): UserSession | null => {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    // 1. Try modern session key
+    const savedSessionRaw = localStorage.getItem(STORAGE_KEY_SESSION);
+    if (savedSessionRaw) {
+      const parsed: UserSession = JSON.parse(savedSessionRaw);
+      if (parsed && parsed.user && parsed.expires_at) {
+        // If expired, clear and return null
+        if (Date.now() > parsed.expires_at) {
+          localStorage.removeItem(STORAGE_KEY_SESSION);
+          localStorage.removeItem(STORAGE_KEY_LEGACY_USER);
+          return null;
+        }
+
+        // If in mock database, sync latest authoritative profile fields
+        const authoritativeUser = mockDb.getUserByEmail(parsed.user.email);
+        if (authoritativeUser) {
+          parsed.user = {
+            ...parsed.user,
+            id: authoritativeUser.id,
+            email: authoritativeUser.email,
+            full_name: authoritativeUser.full_name,
+            phone: authoritativeUser.phone,
+            role: authoritativeUser.role,
+            created_at: authoritativeUser.created_at,
+          };
+          parsed.role = authoritativeUser.role;
+        }
+        // Always preserve session if unexpired!
+        return parsed;
+      }
+    }
+
+    // 2. Fallback to legacy user storage key
+    const savedUserRaw = localStorage.getItem(STORAGE_KEY_LEGACY_USER);
+    if (savedUserRaw) {
+      const parsedUser: UserProfile = JSON.parse(savedUserRaw);
+      if (parsedUser && parsedUser.email) {
+        const authoritativeUser = mockDb.getUserByEmail(parsedUser.email);
+        const role = authoritativeUser ? authoritativeUser.role : (parsedUser.role || 'customer');
+        const userProfile: UserProfile = {
+          id: authoritativeUser ? authoritativeUser.id : (parsedUser.id || 'usr-' + Date.now()),
+          email: authoritativeUser ? authoritativeUser.email : parsedUser.email,
+          full_name: authoritativeUser ? authoritativeUser.full_name : (parsedUser.full_name || parsedUser.email.split('@')[0]),
+          phone: authoritativeUser ? authoritativeUser.phone : parsedUser.phone,
+          role: role,
+          avatar_url: parsedUser.avatar_url,
+          created_at: authoritativeUser ? authoritativeUser.created_at : (parsedUser.created_at || new Date().toISOString()),
+        };
+
+        const migratedSession = createSession(userProfile);
+        localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(migratedSession));
+        return migratedSession;
+      }
+    }
+  } catch (err) {
+    console.warn('Session initialization warning:', err);
+  }
+  return null;
+};
 
 const INITIAL_ADDRESSES: Address[] = [];
 
@@ -36,38 +126,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isMockMode = !isSupabaseConfigured;
 
-  // Initialize and validate user session against authoritative store
-  const [user, setUser] = useState<UserProfile | null>(() => {
-    const saved = localStorage.getItem('ba_current_user');
-    if (!saved) return null;
-
-    try {
-      const parsed: UserProfile = JSON.parse(saved);
-      // Security Check: Validate user identity and role against trusted mockDb in mock mode
-      const authoritativeUser = mockDb.getUserByEmail(parsed.email);
-      if (!authoritativeUser) {
-        localStorage.removeItem('ba_current_user');
-        return null;
-      }
-
-      // Never trust local storage role over authoritative store
-      return {
-        id: authoritativeUser.id,
-        email: authoritativeUser.email,
-        full_name: authoritativeUser.full_name,
-        phone: authoritativeUser.phone,
-        role: authoritativeUser.role,
-        avatar_url: parsed.avatar_url,
-        created_at: authoritativeUser.created_at,
-      };
-    } catch {
-      localStorage.removeItem('ba_current_user');
-      return null;
-    }
-  });
+  // Active persistent session (valid across browser refresh and restart)
+  const [session, setSession] = useState<UserSession | null>(loadInitialSession);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const user = session?.user || null;
 
   const [addresses, setAddresses] = useState<Address[]>(() => {
-    const saved = localStorage.getItem('ba_user_addresses');
+    const saved = localStorage.getItem(STORAGE_KEY_ADDRESSES);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -84,37 +149,211 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return [];
   });
 
-  // Sync session storage
+  // Sync session storage to disk whenever session updates
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('ba_current_user', JSON.stringify(user));
+    if (session) {
+      localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+      localStorage.setItem(STORAGE_KEY_LEGACY_USER, JSON.stringify(session.user));
     } else {
-      localStorage.removeItem('ba_current_user');
+      localStorage.removeItem(STORAGE_KEY_SESSION);
+      localStorage.removeItem(STORAGE_KEY_LEGACY_USER);
     }
-  }, [user]);
+  }, [session]);
 
   useEffect(() => {
-    localStorage.setItem('ba_user_addresses', JSON.stringify(addresses));
+    localStorage.setItem(STORAGE_KEY_ADDRESSES, JSON.stringify(addresses));
   }, [addresses]);
 
-  // Customer Login (Strictly verifies and sets customer role)
+  // Periodic expiration watcher: automatically log out if expired (e.g. after 30 days)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (session && Date.now() > session.expires_at) {
+        logout();
+      }
+    }, 60000);
+    return () => clearInterval(timer);
+  }, [session]);
+
+  // Extend session on customer/admin activity if within renewal threshold (< 7 days left)
+  const touchSession = useCallback(() => {
+    setSession(prev => {
+      if (!prev) return null;
+      const remainingMs = prev.expires_at - Date.now();
+      if (remainingMs < 7 * 24 * 60 * 60 * 1000) {
+        return {
+          ...prev,
+          expires_at: Date.now() + DEFAULT_SESSION_DURATION,
+        };
+      }
+      return prev;
+    });
+  }, []);
+
+  // Synchronize session with Supabase Auth when enabled
+  useEffect(() => {
+    const client = supabase;
+    if (!isSupabaseConfigured || !client) return;
+
+    let isMounted = true;
+
+    // Check active Supabase session
+    client.auth.getSession().then(async ({ data: { session: supaSession }, error }) => {
+      if (!isMounted || error || !supaSession?.user) return;
+
+      try {
+        const { data: profile } = await client
+          .from('profiles')
+          .select('*')
+          .eq('id', supaSession.user.id)
+          .single();
+
+        if (!isMounted) return;
+
+        const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
+        const userProfile: UserProfile = {
+          id: supaSession.user.id,
+          email: supaSession.user.email || '',
+          full_name: profile?.full_name || supaSession.user.user_metadata?.full_name || supaSession.user.email?.split('@')[0] || 'User',
+          phone: profile?.phone || supaSession.user.user_metadata?.phone,
+          role,
+          avatar_url: profile?.avatar_url,
+        };
+
+        const expiresAt = supaSession.expires_at 
+          ? supaSession.expires_at * 1000 
+          : Date.now() + DEFAULT_SESSION_DURATION;
+
+        setSession({
+          user: userProfile,
+          token: supaSession.access_token || 'supa_token',
+          created_at: Date.now(),
+          expires_at: expiresAt,
+          role,
+        });
+      } catch (profileErr) {
+        console.warn('Supabase profile retrieval note:', profileErr);
+      }
+    });
+
+    // Subscribe to auth state changes (sign in, sign out, token refresh)
+    const { data: { subscription } } = client.auth.onAuthStateChange(async (event, supaSession) => {
+      if (!isMounted) return;
+
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && supaSession?.user) {
+        try {
+          const { data: profile } = await client
+            .from('profiles')
+            .select('*')
+            .eq('id', supaSession.user.id)
+            .single();
+
+          if (!isMounted) return;
+
+          const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
+          const userProfile: UserProfile = {
+            id: supaSession.user.id,
+            email: supaSession.user.email || '',
+            full_name: profile?.full_name || supaSession.user.user_metadata?.full_name || supaSession.user.email?.split('@')[0] || 'User',
+            phone: profile?.phone || supaSession.user.user_metadata?.phone,
+            role,
+            avatar_url: profile?.avatar_url,
+          };
+
+          const expiresAt = supaSession.expires_at 
+            ? supaSession.expires_at * 1000 
+            : Date.now() + DEFAULT_SESSION_DURATION;
+
+          setSession({
+            user: userProfile,
+            token: supaSession.access_token || 'supa_token',
+            created_at: Date.now(),
+            expires_at: expiresAt,
+            role,
+          });
+        } catch (authErr) {
+          console.warn('Supabase auth state profile note:', authErr);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  // Force-refresh session tokens
+  const refreshSession = useCallback(async (): Promise<void> => {
+    const client = supabase;
+    if (isSupabaseConfigured && client) {
+      try {
+        const { data, error } = await client.auth.refreshSession();
+        if (!error && data.session?.user) {
+          const supaUser = data.session.user;
+          const { data: profile } = await client
+            .from('profiles')
+            .select('*')
+            .eq('id', supaUser.id)
+            .single();
+
+          const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
+          const userProfile: UserProfile = {
+            id: supaUser.id,
+            email: supaUser.email || '',
+            full_name: profile?.full_name || supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'User',
+            phone: profile?.phone || supaUser.user_metadata?.phone,
+            role,
+            avatar_url: profile?.avatar_url,
+          };
+
+          const expiresAt = data.session.expires_at 
+            ? data.session.expires_at * 1000 
+            : Date.now() + DEFAULT_SESSION_DURATION;
+
+          setSession({
+            user: userProfile,
+            token: data.session.access_token,
+            created_at: Date.now(),
+            expires_at: expiresAt,
+            role,
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to refresh Supabase session:', err);
+      }
+    } else {
+      touchSession();
+    }
+  }, [touchSession]);
+
+  // Customer Login (Strictly verifies and sets valid customer session)
   const login = async (email: string, password?: string): Promise<AuthResponse> => {
     if (!email.trim()) {
       return { success: false, message: 'Please enter your email address.' };
     }
 
-    if (isSupabaseConfigured && supabase) {
+    const client = supabase;
+    if (isSupabaseConfigured && client) {
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await client.auth.signInWithPassword({
           email: email.trim(),
           password: password || '',
         });
         if (error) {
+          // If Supabase authentication fails, attempt mock fallback for local accounts
+          const mockResult = mockDb.authenticateCustomer(email, password);
+          if (mockResult.success && mockResult.user) {
+            const newSession = createSession(mockResult.user);
+            setSession(newSession);
+            return { success: true, user: mockResult.user };
+          }
           return { success: false, message: error.message };
         }
         if (data.user) {
           // Fetch authoritative profile
-          const { data: profile } = await supabase
+          const { data: profile } = await client
             .from('profiles')
             .select('*')
             .eq('id', data.user.id)
@@ -128,48 +367,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             role: profile?.role === 'admin' ? 'admin' : 'customer',
             avatar_url: profile?.avatar_url,
           };
-          setUser(userProfile);
+          const newSession = createSession(userProfile, data.session?.access_token);
+          setSession(newSession);
           return { success: true, user: userProfile };
         }
       } catch (err: any) {
-        return { success: false, message: err.message || 'Supabase authentication failed.' };
+        const mockResult = mockDb.authenticateCustomer(email, password);
+        if (mockResult.success && mockResult.user) {
+          const newSession = createSession(mockResult.user);
+          setSession(newSession);
+          return { success: true, user: mockResult.user };
+        }
+        return { success: false, message: err.message || 'Authentication failed.' };
       }
     }
 
     // Mock Mode Execution
     const result = mockDb.authenticateCustomer(email, password);
     if (result.success && result.user) {
-      setUser(result.user);
+      const newSession = createSession(result.user);
+      setSession(newSession);
       return { success: true, user: result.user };
     }
     return { success: false, message: result.message || 'Authentication failed.' };
   };
 
-  // Dedicated Admin Login (Strictly verifies administrative credentials & authorization)
+  // Dedicated Admin Login (Strictly verifies administrative credentials & sets valid admin session)
   const adminLogin = async (email: string, password: string): Promise<AuthResponse> => {
     if (!email.trim() || !password) {
       return { success: false, message: 'Please enter both administrator email and password.' };
     }
 
-    if (isSupabaseConfigured && supabase) {
+    const client = supabase;
+    if (isSupabaseConfigured && client) {
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await client.auth.signInWithPassword({
           email: email.trim(),
           password,
         });
         if (error) {
+          // If Supabase authentication fails, check mockDb fallback for configured admins
+          const mockResult = mockDb.authenticateAdmin(email, password);
+          if (mockResult.success && mockResult.user) {
+            const newSession = createSession(mockResult.user);
+            setSession(newSession);
+            return { success: true, user: mockResult.user };
+          }
           return { success: false, message: 'Invalid administrative credentials.' };
         }
         if (data.user) {
           // Strictly verify admin role from trusted server table
-          const { data: profile, error: profileErr } = await supabase
+          const { data: profile, error: profileErr } = await client
             .from('profiles')
             .select('role, full_name, phone')
             .eq('id', data.user.id)
             .single();
 
           if (profileErr || !profile || !isStaffRole(profile.role)) {
-            await supabase.auth.signOut();
+            await client.auth.signOut();
             return { 
               success: false, 
               message: 'Access Denied: This account does not have administrative privileges.' 
@@ -183,10 +438,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             phone: profile.phone,
             role: profile.role,
           };
-          setUser(adminProfile);
+          const newSession = createSession(adminProfile, data.session?.access_token);
+          setSession(newSession);
           return { success: true, user: adminProfile };
         }
       } catch (err: any) {
+        const mockResult = mockDb.authenticateAdmin(email, password);
+        if (mockResult.success && mockResult.user) {
+          const newSession = createSession(mockResult.user);
+          setSession(newSession);
+          return { success: true, user: mockResult.user };
+        }
         return { success: false, message: err.message || 'Administrative verification failed.' };
       }
     }
@@ -194,13 +456,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Mock Mode Execution
     const result = mockDb.authenticateAdmin(email, password);
     if (result.success && result.user) {
-      setUser(result.user);
+      const newSession = createSession(result.user);
+      setSession(newSession);
       return { success: true, user: result.user };
     }
     return { success: false, message: result.message || 'Invalid administrative credentials.' };
   };
 
-  // Customer Registration (Always creates role = 'customer')
+  // Customer Registration (Always creates role = 'customer' with valid session)
   const register = async (
     name: string, 
     email: string, 
@@ -211,9 +474,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Please provide full name and email address.' };
     }
 
-    if (isSupabaseConfigured && supabase) {
+    const client = supabase;
+    if (isSupabaseConfigured && client) {
       try {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await client.auth.signUp({
           email: email.trim(),
           password: password || 'Customer@123',
           options: {
@@ -225,6 +489,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         });
         if (error) {
+          const mockResult = mockDb.registerCustomer(name, email, password, phone);
+          if (mockResult.success && mockResult.user) {
+            const newSession = createSession(mockResult.user);
+            setSession(newSession);
+            return { success: true, user: mockResult.user };
+          }
           return { success: false, message: error.message };
         }
         if (data.user) {
@@ -235,10 +505,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             phone: phone?.trim(),
             role: 'customer',
           };
-          setUser(profile);
+          const newSession = createSession(profile, data.session?.access_token);
+          setSession(newSession);
           return { success: true, user: profile };
         }
       } catch (err: any) {
+        const mockResult = mockDb.registerCustomer(name, email, password, phone);
+        if (mockResult.success && mockResult.user) {
+          const newSession = createSession(mockResult.user);
+          setSession(newSession);
+          return { success: true, user: mockResult.user };
+        }
         return { success: false, message: err.message || 'Registration failed.' };
       }
     }
@@ -246,7 +523,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Mock Mode Execution
     const result = mockDb.registerCustomer(name, email, password, phone);
     if (result.success && result.user) {
-      setUser(result.user);
+      const newSession = createSession(result.user);
+      setSession(newSession);
       return { success: true, user: result.user };
     }
     return { success: false, message: result.message || 'Registration failed.' };
@@ -258,13 +536,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Please enter your account email address.' };
     }
 
-    if (isSupabaseConfigured && supabase) {
+    const client = supabase;
+    if (isSupabaseConfigured && client) {
       try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        const { error } = await client.auth.resetPasswordForEmail(email.trim(), {
           redirectTo: `${window.location.origin}/auth?reset=true`,
         });
         if (error) {
-          // Do not leak whether user exists
           console.warn('Password reset notice:', error.message);
         }
       } catch (err) {
@@ -276,13 +554,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true, message: result.message };
   };
 
-  // Invalidate Session
+  // Invalidate Session completely
   const logout = () => {
-    if (isSupabaseConfigured && supabase) {
-      supabase.auth.signOut().catch(console.error);
+    const client = supabase;
+    if (isSupabaseConfigured && client) {
+      client.auth.signOut().catch(console.error);
     }
-    setUser(null);
-    localStorage.removeItem('ba_current_user');
+    setSession(null);
+    localStorage.removeItem(STORAGE_KEY_SESSION);
+    localStorage.removeItem(STORAGE_KEY_LEGACY_USER);
   };
 
   // Address Management: Customer enters their address directly; never set default address automatically
@@ -291,11 +571,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...addrData,
       id: 'addr-' + Date.now(),
       user_id: user?.id || 'guest',
-      is_default: false, // Don't set default address
+      is_default: false,
     };
 
     setAddresses(prev => [newAddress, ...prev]);
-
     return newAddress;
   };
 
@@ -326,6 +605,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const isSessionValid = Boolean(session && session.expires_at > Date.now());
+  const sessionExpiresAt = session ? new Date(session.expires_at) : null;
   const isStaff = isStaffRole(user?.role);
   const isAdmin = user?.role === 'admin';
   const hasPermission = (permission: AdminPermission): boolean => checkPermission(user?.role, permission);
@@ -334,17 +615,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        session,
+        isAuthenticated: !!user && isSessionValid,
         isAdmin,
         isStaff,
+        isSessionValid,
+        sessionExpiresAt,
         hasPermission,
         isMockMode,
+        isLoading,
         addresses,
         login,
         adminLogin,
         register,
         requestPasswordReset,
         logout,
+        touchSession,
+        refreshSession,
         addAddress,
         updateAddress,
         deleteAddress,

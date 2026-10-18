@@ -16,6 +16,14 @@ export interface UserProfile {
   created_at?: string;
 }
 
+export interface UserSession {
+  user: UserProfile;
+  token: string;
+  created_at: number;
+  expires_at: number;
+  role: UserRole;
+}
+
 export interface Address {
   id: string;
   user_id: string;

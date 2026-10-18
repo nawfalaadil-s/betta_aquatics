@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import { Lock, Mail, User, Phone, ArrowRight, AlertCircle, X, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useBranding } from '../contexts/BrandingContext';
@@ -10,7 +10,7 @@ import { BrandLogo } from '../components/common/BrandLogo';
 export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, requestPasswordReset } = useAuth();
+  const { login, register, requestPasswordReset, isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const { activeSettings, branding } = useBranding();
   const currentSettings = activeSettings || branding;
@@ -33,6 +33,11 @@ export const AuthPage: React.FC = () => {
   const [resetSent, setResetSent] = useState(false);
 
   const from = (location.state as any)?.from?.pathname || '/account';
+
+  // If already authenticated, redirect to intended target or account
+  if (isAuthenticated) {
+    return <Navigate to={from} replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

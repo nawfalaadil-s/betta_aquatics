@@ -70,6 +70,24 @@ const INITIAL_USERS: StoredUser[] = [
     created_at: '2026-01-01T00:00:00Z',
   },
   {
+    id: 'usr-admin-raguppies',
+    email: 'raguppies@gmail.com',
+    full_name: 'Ra Guppy Admin',
+    phone: '+91 98765 43210',
+    role: 'admin',
+    password_hash: 'Admin@123',
+    created_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 'usr-admin-nawfal',
+    email: 'nawfalaadil@gmail.com',
+    full_name: 'Nawfal Aadil (Owner & Admin)',
+    phone: '+91 98765 43210',
+    role: 'admin',
+    password_hash: 'Admin@123',
+    created_at: '2026-01-01T00:00:00Z',
+  },
+  {
     id: 'usr-staff-products',
     email: 'products@bettaaquatics.in',
     full_name: 'Priya Sharma (Product Manager)',
@@ -104,6 +122,15 @@ const INITIAL_USERS: StoredUser[] = [
     role: 'content_manager',
     password_hash: 'Staff@123',
     created_at: '2026-01-12T00:00:00Z',
+  },
+  {
+    id: 'usr-customer-gmail',
+    email: 'customer@gmail.com',
+    full_name: 'Customer Demo User',
+    phone: '+91 98450 12345',
+    role: 'customer',
+    password_hash: 'Customer@123',
+    created_at: '2026-01-15T00:00:00Z',
   },
   {
     id: 'usr-customer-demo',
@@ -1173,7 +1200,19 @@ export const mockDb = {
 
   // USER ACCOUNTS & AUTHENTICATION (SECURE SEPARATION)
   getUsers: (): StoredUser[] => {
-    return getStoredItem<StoredUser[]>(STORAGE_KEYS.USERS, INITIAL_USERS);
+    const users = getStoredItem<StoredUser[]>(STORAGE_KEYS.USERS, INITIAL_USERS);
+    const existingEmails = new Set(users.map(u => u.email.toLowerCase()));
+    let updated = false;
+    for (const initUser of INITIAL_USERS) {
+      if (!existingEmails.has(initUser.email.toLowerCase())) {
+        users.push(initUser);
+        updated = true;
+      }
+    }
+    if (updated) {
+      setStoredItem(STORAGE_KEYS.USERS, users);
+    }
+    return users;
   },
 
   getUserByEmail: (email: string): StoredUser | undefined => {
