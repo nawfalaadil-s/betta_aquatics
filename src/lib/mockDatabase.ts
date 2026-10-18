@@ -56,7 +56,7 @@ export interface StoredUser {
   full_name: string;
   phone?: string;
   role: UserRole;
-  password_hash: string;
+  password_hash?: string;
   created_at: string;
 }
 
@@ -1336,7 +1336,6 @@ export const mockDb = {
 
     if (existing) {
       if (name.trim()) existing.full_name = name.trim();
-      if (password) existing.password_hash = password;
       if (phone?.trim()) existing.phone = phone.trim();
       if (customId) existing.id = customId;
       setStoredItem(STORAGE_KEYS.USERS, users);
@@ -1357,7 +1356,8 @@ export const mockDb = {
       full_name: name.trim(),
       phone: phone?.trim() || '+91 99999 00000',
       role: 'customer', // Non-negotiable: Public registration is always customer role
-      password_hash: password || 'Customer@123',
+      // Avoid plaintext password storage in client storage
+      password_hash: undefined,
       created_at: new Date().toISOString(),
     };
     users.push(newUser);

@@ -10,7 +10,7 @@ import { BrandLogo } from '../components/common/BrandLogo';
 export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, requestPasswordReset, isAuthenticated } = useAuth();
+  const { login, register, requestPasswordReset, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { showToast } = useToast();
   const { activeSettings, branding } = useBranding();
   const currentSettings = activeSettings || branding;
@@ -34,6 +34,18 @@ export const AuthPage: React.FC = () => {
 
   const from = (location.state as any)?.from?.pathname || '/account';
 
+  // If auth is still hydrating from Supabase, show loader to prevent form flash
+  if (isAuthLoading) {
+    return (
+      <div className="bg-slate-50 min-h-screen py-10 sm:py-16 flex items-center justify-center px-4">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-blue-900 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-medium text-slate-500">Checking customer session...</p>
+        </div>
+      </div>
+    );
+  }
+
   // If already authenticated, redirect to intended target or account
   if (isAuthenticated) {
     return <Navigate to={from} replace />;
@@ -44,14 +56,16 @@ export const AuthPage: React.FC = () => {
     setErrorMessage('');
     setIsLoading(true);
 
+    const cleanEmail = email.trim().toLowerCase();
+
     if (mode === 'login') {
-      if (!email.trim() || !password) {
+      if (!cleanEmail || !password) {
         setErrorMessage('Please provide both your account email and password.');
         setIsLoading(false);
         return;
       }
 
-      const res = await login(email, password);
+      const res = await login(cleanEmail, password);
       setIsLoading(false);
 
       if (res.success) {
@@ -62,13 +76,22 @@ export const AuthPage: React.FC = () => {
         showToast(res.message || 'Login failed', 'error');
       }
     } else {
-      if (!name.trim() || !email.trim() || !password) {
+      const cleanName = name.trim();
+      const cleanPhone = phone.trim();
+
+      if (!cleanName || !cleanEmail || !password) {
         setErrorMessage('Please complete all required fields.');
         setIsLoading(false);
         return;
       }
 
-      const res = await register(name, email, password, phone);
+      if (password.length < 6) {
+        setErrorMessage('Password must be at least 6 characters long.');
+        setIsLoading(false);
+        return;
+      }
+
+      const res = await register(cleanName, cleanEmail, password, cleanPhone);
       setIsLoading(false);
 
       if (res.success) {
@@ -83,12 +106,13 @@ export const AuthPage: React.FC = () => {
 
   const handlePasswordResetSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!resetEmail.trim()) {
+    const cleanResetEmail = resetEmail.trim().toLowerCase();
+    if (!cleanResetEmail) {
       showToast('Please enter your email address.', 'error');
       return;
     }
 
-    const res = await requestPasswordReset(resetEmail);
+    const res = await requestPasswordReset(cleanResetEmail);
     setResetSent(true);
     showToast(res.message || 'Password reset request processed.', 'info');
   };

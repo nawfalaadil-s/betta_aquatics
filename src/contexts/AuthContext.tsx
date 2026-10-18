@@ -72,19 +72,21 @@ export const loadInitialSession = (): UserSession | null => {
           return null;
         }
 
-        // If in mock database, sync latest authoritative profile fields
-        const authoritativeUser = mockDb.getUserByEmail(parsed.user.email);
-        if (authoritativeUser) {
-          parsed.user = {
-            ...parsed.user,
-            id: authoritativeUser.id,
-            email: authoritativeUser.email,
-            full_name: authoritativeUser.full_name,
-            phone: authoritativeUser.phone,
-            role: authoritativeUser.role,
-            created_at: authoritativeUser.created_at,
-          };
-          parsed.role = authoritativeUser.role;
+        // Only sync from mockDb if Supabase is NOT configured (pure mock mode)
+        if (!isSupabaseConfigured) {
+          const authoritativeUser = mockDb.getUserByEmail(parsed.user.email);
+          if (authoritativeUser) {
+            parsed.user = {
+              ...parsed.user,
+              id: authoritativeUser.id,
+              email: authoritativeUser.email,
+              full_name: authoritativeUser.full_name,
+              phone: authoritativeUser.phone,
+              role: authoritativeUser.role,
+              created_at: authoritativeUser.created_at,
+            };
+            parsed.role = authoritativeUser.role;
+          }
         }
         // Always preserve session if unexpired!
         return parsed;
@@ -96,16 +98,31 @@ export const loadInitialSession = (): UserSession | null => {
     if (savedUserRaw) {
       const parsedUser: UserProfile = JSON.parse(savedUserRaw);
       if (parsedUser && parsedUser.email) {
-        const authoritativeUser = mockDb.getUserByEmail(parsedUser.email);
-        const role = authoritativeUser ? authoritativeUser.role : (parsedUser.role || 'customer');
+        let role = parsedUser.role || 'customer';
+        let id = parsedUser.id || 'usr-' + Date.now();
+        let full_name = parsedUser.full_name || parsedUser.email.split('@')[0];
+        let phone = parsedUser.phone;
+        let created_at = parsedUser.created_at || new Date().toISOString();
+
+        if (!isSupabaseConfigured) {
+          const authoritativeUser = mockDb.getUserByEmail(parsedUser.email);
+          if (authoritativeUser) {
+            role = authoritativeUser.role;
+            id = authoritativeUser.id;
+            full_name = authoritativeUser.full_name;
+            phone = authoritativeUser.phone;
+            created_at = authoritativeUser.created_at;
+          }
+        }
+
         const userProfile: UserProfile = {
-          id: authoritativeUser ? authoritativeUser.id : (parsedUser.id || 'usr-' + Date.now()),
-          email: authoritativeUser ? authoritativeUser.email : parsedUser.email,
-          full_name: authoritativeUser ? authoritativeUser.full_name : (parsedUser.full_name || parsedUser.email.split('@')[0]),
-          phone: authoritativeUser ? authoritativeUser.phone : parsedUser.phone,
-          role: role,
+          id,
+          email: parsedUser.email,
+          full_name,
+          phone,
+          role,
           avatar_url: parsedUser.avatar_url,
-          created_at: authoritativeUser ? authoritativeUser.created_at : (parsedUser.created_at || new Date().toISOString()),
+          created_at,
         };
 
         const migratedSession = createSession(userProfile);
@@ -128,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Active persistent session (valid across browser refresh and restart)
   const [session, setSession] = useState<UserSession | null>(loadInitialSession);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(isSupabaseConfigured);
   const user = session?.user || null;
 
   const [addresses, setAddresses] = useState<Address[]>(() => {
@@ -192,27 +209,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Synchronize session with Supabase Auth when enabled
   useEffect(() => {
     const client = supabase;
-    if (!isSupabaseConfigured || !client) return;
+    if (!isSupabaseConfigured || !client) {
+      setIsLoading(false);
+      return;
+    }
 
     let isMounted = true;
 
     // Check active Supabase session
     client.auth.getSession().then(async ({ data: { session: supaSession }, error }) => {
-      if (!isMounted || error || !supaSession?.user) return;
+      if (!isMounted) return;
 
       try {
+        if (error || !supaSession?.user) {
+          // If Supabase has no active session, clear local Supabase session if expired/revoked
+          if (!supaSession) {
+            setSession(prev => {
+              if (prev && prev.token && prev.token !== 'mock_token' && !prev.token.startsWith('sess_')) {
+                return null;
+              }
+              return prev;
+            });
+          }
+          return;
+        }
+
         const { data: profile } = await client
           .from('profiles')
           .select('*')
           .eq('id', supaSession.user.id)
-          .single();
+          .maybeSingle();
 
         if (!isMounted) return;
 
         const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
         const userProfile: UserProfile = {
           id: supaSession.user.id,
-          email: supaSession.user.email || '',
+          email: (supaSession.user.email || '').trim().toLowerCase(),
           full_name: profile?.full_name || supaSession.user.user_metadata?.full_name || supaSession.user.email?.split('@')[0] || 'User',
           phone: profile?.phone || supaSession.user.user_metadata?.phone,
           role,
@@ -232,6 +265,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       } catch (profileErr) {
         console.warn('Supabase profile retrieval note:', profileErr);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     });
 
@@ -239,7 +276,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = client.auth.onAuthStateChange(async (event, supaSession) => {
       if (!isMounted) return;
 
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && supaSession?.user) {
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && supaSession?.user) {
         try {
           const { data: profile } = await client
             .from('profiles')
@@ -252,7 +289,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
           const userProfile: UserProfile = {
             id: supaSession.user.id,
-            email: supaSession.user.email || '',
+            email: (supaSession.user.email || '').trim().toLowerCase(),
             full_name: profile?.full_name || supaSession.user.user_metadata?.full_name || supaSession.user.email?.split('@')[0] || 'User',
             phone: profile?.phone || supaSession.user.user_metadata?.phone,
             role,
@@ -272,9 +309,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         } catch (authErr) {
           console.warn('Supabase auth state profile note:', authErr);
+        } finally {
+          if (isMounted) {
+            setIsLoading(false);
+          }
         }
       } else if (event === 'SIGNED_OUT') {
         setSession(null);
+        setIsLoading(false);
       }
     });
 
@@ -301,7 +343,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
           const userProfile: UserProfile = {
             id: supaUser.id,
-            email: supaUser.email || '',
+            email: (supaUser.email || '').trim().toLowerCase(),
             full_name: profile?.full_name || supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'User',
             phone: profile?.phone || supaUser.user_metadata?.phone,
             role,
@@ -333,9 +375,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!email.trim()) {
       return { success: false, message: 'Please enter your email address.' };
     }
+    if (!password) {
+      return { success: false, message: 'Please enter your password.' };
+    }
 
     const cleanEmail = email.trim().toLowerCase();
-    const cleanPassword = password || '';
+    const cleanPassword = password;
 
     const client = supabase;
     if (isSupabaseConfigured && client) {
@@ -344,17 +389,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: cleanEmail,
           password: cleanPassword,
         });
+
         if (error) {
-          // If Supabase authentication fails, attempt mock fallback for local accounts
-          const mockResult = mockDb.authenticateCustomer(cleanEmail, cleanPassword);
-          if (mockResult.success && mockResult.user) {
-            const newSession = createSession(mockResult.user);
-            setSession(newSession);
-            return { success: true, user: mockResult.user };
+          const errMsg = error.message.toLowerCase();
+          if (errMsg.includes('invalid login credentials')) {
+            return { 
+              success: false, 
+              message: 'Invalid email address or password. Please verify your credentials and try again.' 
+            };
+          }
+          if (errMsg.includes('email not confirmed')) {
+            return { 
+              success: false, 
+              message: 'Your email address has not been confirmed yet. Please check your inbox.' 
+            };
           }
           return { success: false, message: error.message };
         }
-        if (data.user) {
+
+        if (data.user && data.session) {
           // Fetch authoritative profile without throwing PGRST116
           let userProfile: UserProfile;
           try {
@@ -367,7 +420,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
             userProfile = {
               id: data.user.id,
-              email: data.user.email || cleanEmail,
+              email: data.user.email ? data.user.email.toLowerCase() : cleanEmail,
               full_name: profile?.full_name || data.user.user_metadata?.full_name || cleanEmail.split('@')[0],
               phone: profile?.phone || data.user.user_metadata?.phone,
               role,
@@ -388,32 +441,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } catch (pErr) {
             userProfile = {
               id: data.user.id,
-              email: data.user.email || cleanEmail,
+              email: data.user.email ? data.user.email.toLowerCase() : cleanEmail,
               full_name: data.user.user_metadata?.full_name || cleanEmail.split('@')[0],
               phone: data.user.user_metadata?.phone,
               role: 'customer',
             };
           }
 
-          // Sync into mockDb for instant offline/fallback access
-          mockDb.registerCustomer(userProfile.full_name, cleanEmail, cleanPassword, userProfile.phone, userProfile.id);
+          // Sync into mockDb without plaintext password for offline fallback
+          mockDb.registerCustomer(userProfile.full_name, cleanEmail, undefined, userProfile.phone, userProfile.id);
 
-          const newSession = createSession(userProfile, data.session?.access_token);
+          const expiresAt = data.session.expires_at 
+            ? data.session.expires_at * 1000 
+            : Date.now() + DEFAULT_SESSION_DURATION;
+
+          const newSession: UserSession = {
+            user: userProfile,
+            token: data.session.access_token,
+            created_at: Date.now(),
+            expires_at: expiresAt,
+            role: userProfile.role,
+          };
+
           setSession(newSession);
           return { success: true, user: userProfile };
         }
+
+        return { success: false, message: 'Unable to authenticate. Please try again.' };
       } catch (err: any) {
-        const mockResult = mockDb.authenticateCustomer(cleanEmail, cleanPassword);
-        if (mockResult.success && mockResult.user) {
-          const newSession = createSession(mockResult.user);
-          setSession(newSession);
-          return { success: true, user: mockResult.user };
-        }
         return { success: false, message: err.message || 'Authentication failed.' };
       }
     }
 
-    // Mock Mode Execution
+    // Mock Mode Execution (when Supabase is not configured)
     const result = mockDb.authenticateCustomer(cleanEmail, cleanPassword);
     if (result.success && result.user) {
       const newSession = createSession(result.user);
@@ -429,16 +489,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Please enter both administrator email and password.' };
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password;
+
     const client = supabase;
     if (isSupabaseConfigured && client) {
       try {
         const { data, error } = await client.auth.signInWithPassword({
-          email: email.trim(),
-          password,
+          email: cleanEmail,
+          password: cleanPassword,
         });
+
         if (error) {
           // If Supabase authentication fails, check mockDb fallback for configured admins
-          const mockResult = mockDb.authenticateAdmin(email, password);
+          const mockResult = mockDb.authenticateAdmin(cleanEmail, cleanPassword);
           if (mockResult.success && mockResult.user) {
             const newSession = createSession(mockResult.user);
             setSession(newSession);
@@ -446,13 +510,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           return { success: false, message: 'Invalid administrative credentials.' };
         }
-        if (data.user) {
+
+        if (data.user && data.session) {
           // Strictly verify admin role from trusted server table
           const { data: profile, error: profileErr } = await client
             .from('profiles')
             .select('role, full_name, phone')
             .eq('id', data.user.id)
-            .single();
+            .maybeSingle();
 
           if (profileErr || !profile || !isStaffRole(profile.role)) {
             await client.auth.signOut();
@@ -464,28 +529,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           const adminProfile: UserProfile = {
             id: data.user.id,
-            email: data.user.email || email,
-            full_name: profile.full_name,
+            email: data.user.email ? data.user.email.toLowerCase() : cleanEmail,
+            full_name: profile.full_name || 'Store Admin',
             phone: profile.phone,
             role: profile.role,
           };
-          const newSession = createSession(adminProfile, data.session?.access_token);
+
+          const expiresAt = data.session.expires_at 
+            ? data.session.expires_at * 1000 
+            : Date.now() + DEFAULT_SESSION_DURATION;
+
+          const newSession: UserSession = {
+            user: adminProfile,
+            token: data.session.access_token,
+            created_at: Date.now(),
+            expires_at: expiresAt,
+            role: adminProfile.role,
+          };
+
           setSession(newSession);
           return { success: true, user: adminProfile };
         }
       } catch (err: any) {
-        const mockResult = mockDb.authenticateAdmin(email, password);
-        if (mockResult.success && mockResult.user) {
-          const newSession = createSession(mockResult.user);
-          setSession(newSession);
-          return { success: true, user: mockResult.user };
-        }
         return { success: false, message: err.message || 'Administrative verification failed.' };
       }
     }
 
     // Mock Mode Execution
-    const result = mockDb.authenticateAdmin(email, password);
+    const result = mockDb.authenticateAdmin(cleanEmail, cleanPassword);
     if (result.success && result.user) {
       const newSession = createSession(result.user);
       setSession(newSession);
@@ -506,7 +577,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const cleanPassword = password || 'Customer@123';
+    const cleanPassword = password?.trim() || '';
+    if (!cleanPassword || cleanPassword.length < 6) {
+      return { success: false, message: 'Password must be at least 6 characters long.' };
+    }
+
     const cleanName = name.trim();
     const cleanPhone = phone?.trim();
 
@@ -524,19 +599,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }
         });
+
         if (error) {
-          const mockResult = mockDb.registerCustomer(cleanName, cleanEmail, cleanPassword, cleanPhone);
-          if (mockResult.success && mockResult.user) {
-            const newSession = createSession(mockResult.user);
-            setSession(newSession);
-            return { success: true, user: mockResult.user };
+          if (error.message.includes('already registered') || error.message.includes('unique constraint') || (error as any).status === 422) {
+            return { 
+              success: false, 
+              message: 'An account with this email address already exists. Please log in or use password reset.' 
+            };
           }
           return { success: false, message: error.message };
         }
-        if (data.user) {
+
+        // CRITICAL SUPABASE CHECK:
+        // When email confirmation is enabled or user exists, Supabase returns user with empty identities: []
+        if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+          return {
+            success: false,
+            message: 'An account with this email address already exists. Please log in or use password reset.',
+          };
+        }
+
+        if (data?.user) {
+          let activeSession = data.session;
+          // If signUp didn't return an active session, sign in directly to obtain authoritative tokens
+          if (!activeSession) {
+            const signInRes = await client.auth.signInWithPassword({
+              email: cleanEmail,
+              password: cleanPassword,
+            });
+            if (signInRes.data?.session) {
+              activeSession = signInRes.data.session;
+            }
+          }
+
           const profile: UserProfile = {
             id: data.user.id,
-            email: data.user.email || cleanEmail,
+            email: cleanEmail,
             full_name: cleanName,
             phone: cleanPhone,
             role: 'customer',
@@ -556,25 +654,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.warn('Profile sync notice:', profileUpsertErr);
           }
 
-          // Sync into mockDb with Supabase ID so offline/fallback login always finds the account
-          mockDb.registerCustomer(cleanName, cleanEmail, cleanPassword, cleanPhone, data.user.id);
+          // Sync into mockDb with Supabase ID without plaintext password
+          mockDb.registerCustomer(cleanName, cleanEmail, undefined, cleanPhone, data.user.id);
 
-          const newSession = createSession(profile, data.session?.access_token);
+          const expiresAt = activeSession?.expires_at
+            ? activeSession.expires_at * 1000
+            : Date.now() + DEFAULT_SESSION_DURATION;
+
+          const newSession: UserSession = {
+            user: profile,
+            token: activeSession?.access_token || 'supa_token',
+            created_at: Date.now(),
+            expires_at: expiresAt,
+            role: 'customer',
+          };
+
           setSession(newSession);
           return { success: true, user: profile };
         }
+
+        return { success: false, message: 'Could not create account. Please try again.' };
       } catch (err: any) {
-        const mockResult = mockDb.registerCustomer(cleanName, cleanEmail, cleanPassword, cleanPhone);
-        if (mockResult.success && mockResult.user) {
-          const newSession = createSession(mockResult.user);
-          setSession(newSession);
-          return { success: true, user: mockResult.user };
-        }
         return { success: false, message: err.message || 'Registration failed.' };
       }
     }
 
-    // Mock Mode Execution
+    // Mock Mode Execution (when Supabase is not configured)
     const result = mockDb.registerCustomer(cleanName, cleanEmail, cleanPassword, cleanPhone);
     if (result.success && result.user) {
       const newSession = createSession(result.user);

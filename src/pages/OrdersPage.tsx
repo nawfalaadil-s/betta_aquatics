@@ -12,7 +12,7 @@ import { Order, PaymentStatus, FulfillmentStatus } from '../lib/types';
 import { fetchOrdersFromSupabase } from '../lib/supabaseSync';
 
 export const OrdersPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const { showToast } = useToast();
 
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'shipped' | 'delivered'>('all');
@@ -143,7 +143,12 @@ export const OrdersPage: React.FC = () => {
         </div>
 
         {/* Orders List */}
-        {!user ? (
+        {isAuthLoading ? (
+          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+            <div className="w-10 h-10 border-4 border-blue-900 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-sm font-medium text-slate-500">Loading your consignments...</p>
+          </div>
+        ) : !user ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
             <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <h2 className="text-base font-bold text-slate-800 mb-1">Sign In to View Your Consignments</h2>

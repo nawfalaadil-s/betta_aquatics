@@ -20,6 +20,8 @@ dist-ssr
 
 # Test & Browser MCP scratch files
 .playwright-mcp/
+test-results/
+playwright-report/
 
 # Raw media source archives (assets are served from public/videos & public/product_image)
 /Products Video/

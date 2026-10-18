@@ -16,7 +16,7 @@ import { Order } from '../lib/types';
 import { getStateFromPincode } from '../lib/shipping';
 
 export const AccountPage: React.FC = () => {
-  const { user, isAdmin, addresses, addAddress, deleteAddress, logout } = useAuth();
+  const { user, isAdmin, addresses, addAddress, deleteAddress, logout, isLoading: isAuthLoading } = useAuth();
   const { showToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<'orders' | 'billing' | 'addresses' | 'profile'>('orders');
@@ -93,6 +93,18 @@ export const AccountPage: React.FC = () => {
     setIsEditingProfile(false);
     showToast('Profile and dispatch preferences updated successfully!', 'success');
   };
+
+  if (isAuthLoading) {
+    return (
+      <div className="bg-slate-50 min-h-screen py-16 px-4 flex items-center justify-center">
+        <SEO title="Loading Account" description="Verifying customer session..." />
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-blue-900 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-medium text-slate-500">Verifying customer session...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
