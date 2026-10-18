@@ -1,0 +1,700 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary "Promotional announcement" [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]: "OFFER:"
+          - generic [ref=e12]: ✨ 10% OFF on all Show Bettas! Use coupon AQUA10 at checkout | Free Live Oxygen Packing on orders above ₹1999
+          - button "Copy coupon code AQUA10" [ref=e13] [cursor=pointer]:
+            - generic [ref=e14]: AQUA10
+          - link "Shop Now" [ref=e18] [cursor=pointer]:
+            - /url: /shop?category=betta-fish
+        - button "Dismiss announcement" [ref=e21] [cursor=pointer]
+    - banner [ref=e25]:
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - generic [ref=e29]: Bengaluru Quarantine Facility • Daily Live Dispatches
+          - generic [ref=e32]: •
+          - generic [ref=e33]: Overnight Air Cargo with 100% Live Arrival Guarantee
+        - generic [ref=e38]:
+          - 'link "WhatsApp: +91 98765 43210" [ref=e39] [cursor=pointer]':
+            - /url: https://wa.me/919876543210
+          - generic [ref=e43]: •
+          - button [ref=e44] [cursor=pointer]:
+            - text: "Role:"
+            - strong [ref=e45]: Customer
+      - generic [ref=e46]:
+        - link "Betta Aquatics BETTA AQUATICS Live Fish & Aquarium Store" [ref=e47] [cursor=pointer]:
+          - /url: /
+          - img "Betta Aquatics" [ref=e49]
+          - generic [ref=e50]:
+            - generic [ref=e51]: BETTA AQUATICS
+            - generic [ref=e52]: Live Fish & Aquarium Store
+        - generic [ref=e54]:
+          - textbox "Search Bettas, Guppies, Live Plants, Tank Supplies..." [ref=e59]
+          - button "Search" [ref=e60] [cursor=pointer]
+        - generic [ref=e61]:
+          - link "Wishlist" [ref=e62] [cursor=pointer]:
+            - /url: /account/wishlist
+            - generic [ref=e65]: "2"
+          - button "Hi, Rahul My Account" [ref=e67] [cursor=pointer]:
+            - generic [ref=e72]:
+              - generic [ref=e73]: Hi, Rahul
+              - generic [ref=e74]: My Account
+          - link "Cart with 0 items" [ref=e78] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=e85]: Cart
+      - navigation [ref=e86]:
+        - generic [ref=e87]:
+          - link "All Fish & Supplies" [ref=e88] [cursor=pointer]:
+            - /url: /shop
+          - link "Show Bettas" [ref=e89] [cursor=pointer]:
+            - /url: /shop?cat=cat-betta
+          - link "Exotic Guppies" [ref=e92] [cursor=pointer]:
+            - /url: /shop?cat=cat-guppy
+          - link "Breeding Pairs" [ref=e93] [cursor=pointer]:
+            - /url: /shop?cat=cat-pairs
+          - link "Aquarium Plants" [ref=e94] [cursor=pointer]:
+            - /url: /shop?cat=cat-plants
+          - link "Fish Food & Nutrition" [ref=e95] [cursor=pointer]:
+            - /url: /shop?cat=cat-food
+          - link "Tank Accessories" [ref=e96] [cursor=pointer]:
+            - /url: /shop?cat=cat-accessories
+          - link "Care Guides & Blog" [ref=e97] [cursor=pointer]:
+            - /url: /blog
+          - link "Live Arrival Guarantee Details" [ref=e101] [cursor=pointer]:
+            - /url: /page/shipping-acclimation
+    - main [ref=e103]:
+      - generic [ref=e104]:
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - generic [ref=e109]: Bangalore Quarantine Facility • Pan-India Delivery
+            - heading "Hand-Raised Bettas & Ornamental Fish, Delivered Safely to Your Door." [level=1] [ref=e112]
+            - paragraph [ref=e113]: You get the exact fish shown in our photos. Each Betta is raised in clean planted tanks and shipped safely overnight in warm oxygen bags.
+            - generic [ref=e114]:
+              - link "Shop Show Bettas" [ref=e115] [cursor=pointer]:
+                - /url: /shop?cat=cat-betta
+              - link "View All Fish & Plants" [ref=e119] [cursor=pointer]:
+                - /url: /shop
+            - generic [ref=e121]:
+              - generic [ref=e122]: 100% Live Arrival Guarantee
+              - generic [ref=e127]: Overnight Air Cargo
+              - generic [ref=e131]: Breeder WhatsApp Support
+          - generic [ref=e136]:
+            - img "Royal Blue Halfmoon Betta Specimen" [ref=e137]
+            - generic [ref=e138]:
+              - generic [ref=e139]:
+                - generic [ref=e140]: WYSIWYG Specimen
+                - generic [ref=e141]: Royal Blue Halfmoon Betta
+              - link "View" [ref=e142] [cursor=pointer]:
+                - /url: /product/royal-blue-halfmoon-betta
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - generic [ref=e146]:
+              - generic [ref=e147]: Curated Collections
+              - heading "Explore By Category" [level=2] [ref=e148]
+            - link "View All" [ref=e149] [cursor=pointer]:
+              - /url: /shop
+          - generic [ref=e153]:
+            - link "Betta Fish Betta Fish 5 Varieties" [ref=e154] [cursor=pointer]:
+              - /url: /shop?cat=cat-betta
+              - img "Betta Fish" [ref=e156]
+              - heading "Betta Fish" [level=3] [ref=e158]
+              - generic [ref=e159]: 5 Varieties
+            - link "Guppies & Livebearers Guppies & Livebearers 1 Variety" [ref=e160] [cursor=pointer]:
+              - /url: /shop?cat=cat-guppy
+              - img "Guppies & Livebearers" [ref=e162]
+              - heading "Guppies & Livebearers" [level=3] [ref=e164]
+              - generic [ref=e165]: 1 Variety
+            - link "Breeding Pairs & Rare Strains Breeding Pairs & Rare Strains 0 Varieties" [ref=e166] [cursor=pointer]:
+              - /url: /shop?cat=cat-pairs
+              - img "Breeding Pairs & Rare Strains" [ref=e168]
+              - heading "Breeding Pairs & Rare Strains" [level=3] [ref=e170]
+              - generic [ref=e171]: 0 Varieties
+            - link "Aquatic Plants Aquatic Plants 1 Variety" [ref=e172] [cursor=pointer]:
+              - /url: /shop?cat=cat-plants
+              - img "Aquatic Plants" [ref=e174]
+              - heading "Aquatic Plants" [level=3] [ref=e176]
+              - generic [ref=e177]: 1 Variety
+            - link "Fish Food & Nutrition Fish Food & Nutrition 1 Variety" [ref=e178] [cursor=pointer]:
+              - /url: /shop?cat=cat-food
+              - img "Fish Food & Nutrition" [ref=e180]
+              - heading "Fish Food & Nutrition" [level=3] [ref=e182]
+              - generic [ref=e183]: 1 Variety
+            - link "Aquarium Accessories Aquarium Accessories 1 Variety" [ref=e184] [cursor=pointer]:
+              - /url: /shop?cat=cat-accessories
+              - img "Aquarium Accessories" [ref=e186]
+              - heading "Aquarium Accessories" [level=3] [ref=e188]
+              - generic [ref=e189]: 1 Variety
+        - generic [ref=e191]:
+          - generic [ref=e192]:
+            - generic [ref=e193]:
+              - generic [ref=e194]: Promotional Pricing
+              - heading "Weekly Featured Fish & Special Offers" [level=2] [ref=e199]
+              - paragraph [ref=e200]: Healthy quarantine-approved specimens ready for immediate dispatch.
+            - link "View All Specials" [ref=e201] [cursor=pointer]:
+              - /url: /shop?filter=sale
+          - generic [ref=e205]:
+            - article [ref=e206]:
+              - generic [ref=e207]:
+                - link "View details for Royal Blue Halfmoon Betta (Show Class Male)" [ref=e208] [cursor=pointer]:
+                  - /url: /product/royal-blue-halfmoon-betta-show-class
+                  - img "Royal Blue Halfmoon Betta (Show Class Male) - Halfmoon" [ref=e209]
+                - generic [ref=e210]: WYSIWYG 1-of-1
+                - generic [ref=e212]:
+                  - button "Save to Wishlist" [ref=e213] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e216] [cursor=pointer]
+              - generic [ref=e220]:
+                - generic [ref=e221]:
+                  - generic [ref=e222]:
+                    - generic [ref=e223]: Betta Fish
+                    - generic [ref=e224]: Halfmoon
+                  - link [ref=e225] [cursor=pointer]:
+                    - /url: /product/royal-blue-halfmoon-betta-show-class
+                    - heading "Royal Blue Halfmoon Betta (Show Class Male)" [level=3] [ref=e226]
+                  - 'img "Rating: 4.9 out of 5" [ref=e228]':
+                    - generic [aria-hidden] [ref=e240]: "4.9"
+                    - generic [aria-hidden] [ref=e241]: (28)
+                - generic [ref=e242]:
+                  - generic [ref=e243]:
+                    - generic [ref=e244]: ₹1,499
+                    - generic [ref=e245]: ₹1,899
+                  - button "Add to Cart" [ref=e246] [cursor=pointer]
+            - article [ref=e251]:
+              - generic [ref=e252]:
+                - link "View details for Galaxy Koi Plakat Betta (Candy Marbled)" [ref=e253] [cursor=pointer]:
+                  - /url: /product/galaxy-koi-plakat-betta-candy-marbled
+                  - img "Galaxy Koi Plakat Betta (Candy Marbled) - Plakat (Shortfin)" [ref=e254]
+                - generic [ref=e255]: WYSIWYG 1-of-1
+                - generic [ref=e257]:
+                  - button "Remove from Wishlist" [ref=e258] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e261] [cursor=pointer]
+              - generic [ref=e265]:
+                - generic [ref=e266]:
+                  - generic [ref=e267]:
+                    - generic [ref=e268]: Betta Fish
+                    - generic [ref=e269]: Plakat (Shortfin)
+                  - link [ref=e270] [cursor=pointer]:
+                    - /url: /product/galaxy-koi-plakat-betta-candy-marbled
+                    - heading "Galaxy Koi Plakat Betta (Candy Marbled)" [level=3] [ref=e271]
+                  - 'img "Rating: 5 out of 5" [ref=e273]':
+                    - generic [aria-hidden] [ref=e285]: "5.0"
+                    - generic [aria-hidden] [ref=e286]: (19)
+                - generic [ref=e287]:
+                  - generic [ref=e288]:
+                    - generic [ref=e289]: ₹1,799
+                    - generic [ref=e290]: ₹2,200
+                  - button "Add to Cart" [ref=e291] [cursor=pointer]
+            - article [ref=e296]:
+              - generic [ref=e297]:
+                - link "View details for Black Orchid Crowntail Betta (Jet Black Crown)" [ref=e298] [cursor=pointer]:
+                  - /url: /product/black-orchid-crowntail-betta
+                  - img "Black Orchid Crowntail Betta (Jet Black Crown) - Crowntail" [ref=e299]
+                - generic [ref=e300]: 19% OFF
+                - generic [ref=e302]:
+                  - button "Save to Wishlist" [ref=e303] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e306] [cursor=pointer]
+              - generic [ref=e310]:
+                - generic [ref=e311]:
+                  - generic [ref=e312]:
+                    - generic [ref=e313]: Betta Fish
+                    - generic [ref=e314]: Crowntail
+                  - link [ref=e315] [cursor=pointer]:
+                    - /url: /product/black-orchid-crowntail-betta
+                    - heading "Black Orchid Crowntail Betta (Jet Black Crown)" [level=3] [ref=e316]
+                  - 'img "Rating: 4.8 out of 5" [ref=e318]':
+                    - generic [aria-hidden] [ref=e330]: "4.8"
+                    - generic [aria-hidden] [ref=e331]: (34)
+                - generic [ref=e332]:
+                  - generic [ref=e333]:
+                    - generic [ref=e334]: ₹1,299
+                    - generic [ref=e335]: ₹1,599
+                  - button "Add to Cart" [ref=e336] [cursor=pointer]
+            - article [ref=e341]:
+              - generic [ref=e342]:
+                - link "View details for Super White Dumbo Ear Halfmoon Betta" [ref=e343] [cursor=pointer]:
+                  - /url: /product/super-white-dumbo-ear-halfmoon-betta
+                  - img "Super White Dumbo Ear Halfmoon Betta - Dumbo Ear Halfmoon" [ref=e344]
+                - generic [ref=e345]: WYSIWYG 1-of-1
+                - generic [ref=e347]:
+                  - button "Remove from Wishlist" [ref=e348] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e351] [cursor=pointer]
+              - generic [ref=e355]:
+                - generic [ref=e356]:
+                  - generic [ref=e357]:
+                    - generic [ref=e358]: Betta Fish
+                    - generic [ref=e359]: Dumbo Ear Halfmoon
+                  - link [ref=e360] [cursor=pointer]:
+                    - /url: /product/super-white-dumbo-ear-halfmoon-betta
+                    - heading "Super White Dumbo Ear Halfmoon Betta" [level=3] [ref=e361]
+                  - 'img "Rating: 4.9 out of 5" [ref=e363]':
+                    - generic [aria-hidden] [ref=e375]: "4.9"
+                    - generic [aria-hidden] [ref=e376]: (14)
+                - generic [ref=e377]:
+                  - generic [ref=e378]:
+                    - generic [ref=e379]: ₹1,999
+                    - generic [ref=e380]: ₹2,499
+                  - button "Add to Cart" [ref=e381] [cursor=pointer]
+        - generic [ref=e387]:
+          - generic [ref=e388]:
+            - generic [ref=e389]:
+              - generic [ref=e390]: Live Stock Catalog
+              - heading "Bettas by Variety & Tail Type" [level=2] [ref=e391]
+              - paragraph [ref=e392]: Select a strain to filter our Bangalore quarantined live inventory.
+            - generic [ref=e393]:
+              - button "All Bettas" [ref=e394] [cursor=pointer]
+              - button "Halfmoon" [ref=e395] [cursor=pointer]
+              - button "Koi Plakat" [ref=e396] [cursor=pointer]
+              - button "Crowntail" [ref=e397] [cursor=pointer]
+              - button "Dumbo Ear" [ref=e398] [cursor=pointer]
+          - generic [ref=e399]:
+            - article [ref=e400]:
+              - generic [ref=e401]:
+                - link "View details for Royal Blue Halfmoon Betta (Show Class Male)" [ref=e402] [cursor=pointer]:
+                  - /url: /product/royal-blue-halfmoon-betta-show-class
+                  - img "Royal Blue Halfmoon Betta (Show Class Male) - Halfmoon" [ref=e403]
+                - generic [ref=e404]: WYSIWYG 1-of-1
+                - generic [ref=e406]:
+                  - button "Save to Wishlist" [ref=e407] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e410] [cursor=pointer]
+              - generic [ref=e414]:
+                - generic [ref=e415]:
+                  - generic [ref=e416]:
+                    - generic [ref=e417]: Betta Fish
+                    - generic [ref=e418]: Halfmoon
+                  - link [ref=e419] [cursor=pointer]:
+                    - /url: /product/royal-blue-halfmoon-betta-show-class
+                    - heading "Royal Blue Halfmoon Betta (Show Class Male)" [level=3] [ref=e420]
+                  - 'img "Rating: 4.9 out of 5" [ref=e422]':
+                    - generic [aria-hidden] [ref=e434]: "4.9"
+                    - generic [aria-hidden] [ref=e435]: (28)
+                - generic [ref=e436]:
+                  - generic [ref=e437]:
+                    - generic [ref=e438]: ₹1,499
+                    - generic [ref=e439]: ₹1,899
+                  - button "Add to Cart" [ref=e440] [cursor=pointer]
+            - article [ref=e445]:
+              - generic [ref=e446]:
+                - link "View details for Galaxy Koi Plakat Betta (Candy Marbled)" [ref=e447] [cursor=pointer]:
+                  - /url: /product/galaxy-koi-plakat-betta-candy-marbled
+                  - img "Galaxy Koi Plakat Betta (Candy Marbled) - Plakat (Shortfin)" [ref=e448]
+                - generic [ref=e449]: WYSIWYG 1-of-1
+                - generic [ref=e451]:
+                  - button "Remove from Wishlist" [ref=e452] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e455] [cursor=pointer]
+              - generic [ref=e459]:
+                - generic [ref=e460]:
+                  - generic [ref=e461]:
+                    - generic [ref=e462]: Betta Fish
+                    - generic [ref=e463]: Plakat (Shortfin)
+                  - link [ref=e464] [cursor=pointer]:
+                    - /url: /product/galaxy-koi-plakat-betta-candy-marbled
+                    - heading "Galaxy Koi Plakat Betta (Candy Marbled)" [level=3] [ref=e465]
+                  - 'img "Rating: 5 out of 5" [ref=e467]':
+                    - generic [aria-hidden] [ref=e479]: "5.0"
+                    - generic [aria-hidden] [ref=e480]: (19)
+                - generic [ref=e481]:
+                  - generic [ref=e482]:
+                    - generic [ref=e483]: ₹1,799
+                    - generic [ref=e484]: ₹2,200
+                  - button "Add to Cart" [ref=e485] [cursor=pointer]
+            - article [ref=e490]:
+              - generic [ref=e491]:
+                - link "View details for Black Orchid Crowntail Betta (Jet Black Crown)" [ref=e492] [cursor=pointer]:
+                  - /url: /product/black-orchid-crowntail-betta
+                  - img "Black Orchid Crowntail Betta (Jet Black Crown) - Crowntail" [ref=e493]
+                - generic [ref=e494]: 19% OFF
+                - generic [ref=e496]:
+                  - button "Save to Wishlist" [ref=e497] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e500] [cursor=pointer]
+              - generic [ref=e504]:
+                - generic [ref=e505]:
+                  - generic [ref=e506]:
+                    - generic [ref=e507]: Betta Fish
+                    - generic [ref=e508]: Crowntail
+                  - link [ref=e509] [cursor=pointer]:
+                    - /url: /product/black-orchid-crowntail-betta
+                    - heading "Black Orchid Crowntail Betta (Jet Black Crown)" [level=3] [ref=e510]
+                  - 'img "Rating: 4.8 out of 5" [ref=e512]':
+                    - generic [aria-hidden] [ref=e524]: "4.8"
+                    - generic [aria-hidden] [ref=e525]: (34)
+                - generic [ref=e526]:
+                  - generic [ref=e527]:
+                    - generic [ref=e528]: ₹1,299
+                    - generic [ref=e529]: ₹1,599
+                  - button "Add to Cart" [ref=e530] [cursor=pointer]
+            - article [ref=e535]:
+              - generic [ref=e536]:
+                - link "View details for Super White Dumbo Ear Halfmoon Betta" [ref=e537] [cursor=pointer]:
+                  - /url: /product/super-white-dumbo-ear-halfmoon-betta
+                  - img "Super White Dumbo Ear Halfmoon Betta - Dumbo Ear Halfmoon" [ref=e538]
+                - generic [ref=e539]: WYSIWYG 1-of-1
+                - generic [ref=e541]:
+                  - button "Remove from Wishlist" [ref=e542] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e545] [cursor=pointer]
+              - generic [ref=e549]:
+                - generic [ref=e550]:
+                  - generic [ref=e551]:
+                    - generic [ref=e552]: Betta Fish
+                    - generic [ref=e553]: Dumbo Ear Halfmoon
+                  - link [ref=e554] [cursor=pointer]:
+                    - /url: /product/super-white-dumbo-ear-halfmoon-betta
+                    - heading "Super White Dumbo Ear Halfmoon Betta" [level=3] [ref=e555]
+                  - 'img "Rating: 4.9 out of 5" [ref=e557]':
+                    - generic [aria-hidden] [ref=e569]: "4.9"
+                    - generic [aria-hidden] [ref=e570]: (14)
+                - generic [ref=e571]:
+                  - generic [ref=e572]:
+                    - generic [ref=e573]: ₹1,999
+                    - generic [ref=e574]: ₹2,499
+                  - button "Add to Cart" [ref=e575] [cursor=pointer]
+            - article [ref=e580]:
+              - generic [ref=e581]:
+                - link "View details for Alien Green Betta (Wild Hybrid Strain)" [ref=e582] [cursor=pointer]:
+                  - /url: /product/alien-green-betta-wild-hybrid
+                  - img "Alien Green Betta (Wild Hybrid Strain) - Alien (Wild Hybrid)" [ref=e583]
+                - generic [ref=e584]: WYSIWYG 1-of-1
+                - generic [ref=e586]:
+                  - button "Save to Wishlist" [ref=e587] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e590] [cursor=pointer]
+              - generic [ref=e594]:
+                - generic [ref=e595]:
+                  - generic [ref=e596]:
+                    - generic [ref=e597]: Betta Fish
+                    - generic [ref=e598]: Alien (Wild Hybrid)
+                  - link [ref=e599] [cursor=pointer]:
+                    - /url: /product/alien-green-betta-wild-hybrid
+                    - heading "Alien Green Betta (Wild Hybrid Strain)" [level=3] [ref=e600]
+                  - 'img "Rating: 5 out of 5" [ref=e602]':
+                    - generic [aria-hidden] [ref=e614]: "5.0"
+                    - generic [aria-hidden] [ref=e615]: (9)
+                - generic [ref=e616]:
+                  - generic [ref=e617]:
+                    - generic [ref=e618]: ₹2,199
+                    - generic [ref=e619]: ₹2,699
+                  - button "Add to Cart" [ref=e620] [cursor=pointer]
+          - link "Explore All 5 Bettas" [ref=e626] [cursor=pointer]:
+            - /url: /shop?cat=cat-betta
+        - generic [ref=e631]:
+          - generic [ref=e632]:
+            - generic [ref=e633]:
+              - generic [ref=e634]: Live Stock Catalog
+              - heading "Bettas by Variety & Tail Type" [level=2] [ref=e635]
+              - paragraph [ref=e636]: Select a strain to filter our Bangalore quarantined live inventory.
+            - generic [ref=e637]:
+              - button "All Bettas" [ref=e638] [cursor=pointer]
+              - button "Halfmoon" [ref=e639] [cursor=pointer]
+              - button "Koi Plakat" [ref=e640] [cursor=pointer]
+              - button "Crowntail" [ref=e641] [cursor=pointer]
+              - button "Dumbo Ear" [ref=e642] [cursor=pointer]
+          - generic [ref=e643]:
+            - article [ref=e644]:
+              - generic [ref=e645]:
+                - link "View details for Royal Blue Halfmoon Betta (Show Class Male)" [ref=e646] [cursor=pointer]:
+                  - /url: /product/royal-blue-halfmoon-betta-show-class
+                  - img "Royal Blue Halfmoon Betta (Show Class Male) - Halfmoon" [ref=e647]
+                - generic [ref=e648]: WYSIWYG 1-of-1
+                - generic [ref=e650]:
+                  - button "Save to Wishlist" [ref=e651] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e654] [cursor=pointer]
+              - generic [ref=e658]:
+                - generic [ref=e659]:
+                  - generic [ref=e660]:
+                    - generic [ref=e661]: Betta Fish
+                    - generic [ref=e662]: Halfmoon
+                  - link [ref=e663] [cursor=pointer]:
+                    - /url: /product/royal-blue-halfmoon-betta-show-class
+                    - heading "Royal Blue Halfmoon Betta (Show Class Male)" [level=3] [ref=e664]
+                  - 'img "Rating: 4.9 out of 5" [ref=e666]':
+                    - generic [aria-hidden] [ref=e678]: "4.9"
+                    - generic [aria-hidden] [ref=e679]: (28)
+                - generic [ref=e680]:
+                  - generic [ref=e681]:
+                    - generic [ref=e682]: ₹1,499
+                    - generic [ref=e683]: ₹1,899
+                  - button "Add to Cart" [ref=e684] [cursor=pointer]
+            - article [ref=e689]:
+              - generic [ref=e690]:
+                - link "View details for Galaxy Koi Plakat Betta (Candy Marbled)" [ref=e691] [cursor=pointer]:
+                  - /url: /product/galaxy-koi-plakat-betta-candy-marbled
+                  - img "Galaxy Koi Plakat Betta (Candy Marbled) - Plakat (Shortfin)" [ref=e692]
+                - generic [ref=e693]: WYSIWYG 1-of-1
+                - generic [ref=e695]:
+                  - button "Remove from Wishlist" [ref=e696] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e699] [cursor=pointer]
+              - generic [ref=e703]:
+                - generic [ref=e704]:
+                  - generic [ref=e705]:
+                    - generic [ref=e706]: Betta Fish
+                    - generic [ref=e707]: Plakat (Shortfin)
+                  - link [ref=e708] [cursor=pointer]:
+                    - /url: /product/galaxy-koi-plakat-betta-candy-marbled
+                    - heading "Galaxy Koi Plakat Betta (Candy Marbled)" [level=3] [ref=e709]
+                  - 'img "Rating: 5 out of 5" [ref=e711]':
+                    - generic [aria-hidden] [ref=e723]: "5.0"
+                    - generic [aria-hidden] [ref=e724]: (19)
+                - generic [ref=e725]:
+                  - generic [ref=e726]:
+                    - generic [ref=e727]: ₹1,799
+                    - generic [ref=e728]: ₹2,200
+                  - button "Add to Cart" [ref=e729] [cursor=pointer]
+            - article [ref=e734]:
+              - generic [ref=e735]:
+                - link "View details for Black Orchid Crowntail Betta (Jet Black Crown)" [ref=e736] [cursor=pointer]:
+                  - /url: /product/black-orchid-crowntail-betta
+                  - img "Black Orchid Crowntail Betta (Jet Black Crown) - Crowntail" [ref=e737]
+                - generic [ref=e738]: 19% OFF
+                - generic [ref=e740]:
+                  - button "Save to Wishlist" [ref=e741] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e744] [cursor=pointer]
+              - generic [ref=e748]:
+                - generic [ref=e749]:
+                  - generic [ref=e750]:
+                    - generic [ref=e751]: Betta Fish
+                    - generic [ref=e752]: Crowntail
+                  - link [ref=e753] [cursor=pointer]:
+                    - /url: /product/black-orchid-crowntail-betta
+                    - heading "Black Orchid Crowntail Betta (Jet Black Crown)" [level=3] [ref=e754]
+                  - 'img "Rating: 4.8 out of 5" [ref=e756]':
+                    - generic [aria-hidden] [ref=e768]: "4.8"
+                    - generic [aria-hidden] [ref=e769]: (34)
+                - generic [ref=e770]:
+                  - generic [ref=e771]:
+                    - generic [ref=e772]: ₹1,299
+                    - generic [ref=e773]: ₹1,599
+                  - button "Add to Cart" [ref=e774] [cursor=pointer]
+            - article [ref=e779]:
+              - generic [ref=e780]:
+                - link "View details for Super White Dumbo Ear Halfmoon Betta" [ref=e781] [cursor=pointer]:
+                  - /url: /product/super-white-dumbo-ear-halfmoon-betta
+                  - img "Super White Dumbo Ear Halfmoon Betta - Dumbo Ear Halfmoon" [ref=e782]
+                - generic [ref=e783]: WYSIWYG 1-of-1
+                - generic [ref=e785]:
+                  - button "Remove from Wishlist" [ref=e786] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e789] [cursor=pointer]
+              - generic [ref=e793]:
+                - generic [ref=e794]:
+                  - generic [ref=e795]:
+                    - generic [ref=e796]: Betta Fish
+                    - generic [ref=e797]: Dumbo Ear Halfmoon
+                  - link [ref=e798] [cursor=pointer]:
+                    - /url: /product/super-white-dumbo-ear-halfmoon-betta
+                    - heading "Super White Dumbo Ear Halfmoon Betta" [level=3] [ref=e799]
+                  - 'img "Rating: 4.9 out of 5" [ref=e801]':
+                    - generic [aria-hidden] [ref=e813]: "4.9"
+                    - generic [aria-hidden] [ref=e814]: (14)
+                - generic [ref=e815]:
+                  - generic [ref=e816]:
+                    - generic [ref=e817]: ₹1,999
+                    - generic [ref=e818]: ₹2,499
+                  - button "Add to Cart" [ref=e819] [cursor=pointer]
+            - article [ref=e824]:
+              - generic [ref=e825]:
+                - link "View details for Alien Green Betta (Wild Hybrid Strain)" [ref=e826] [cursor=pointer]:
+                  - /url: /product/alien-green-betta-wild-hybrid
+                  - img "Alien Green Betta (Wild Hybrid Strain) - Alien (Wild Hybrid)" [ref=e827]
+                - generic [ref=e828]: WYSIWYG 1-of-1
+                - generic [ref=e830]:
+                  - button "Save to Wishlist" [ref=e831] [cursor=pointer]
+                  - button "Quick View specimen" [ref=e834] [cursor=pointer]
+              - generic [ref=e838]:
+                - generic [ref=e839]:
+                  - generic [ref=e840]:
+                    - generic [ref=e841]: Betta Fish
+                    - generic [ref=e842]: Alien (Wild Hybrid)
+                  - link [ref=e843] [cursor=pointer]:
+                    - /url: /product/alien-green-betta-wild-hybrid
+                    - heading "Alien Green Betta (Wild Hybrid Strain)" [level=3] [ref=e844]
+                  - 'img "Rating: 5 out of 5" [ref=e846]':
+                    - generic [aria-hidden] [ref=e858]: "5.0"
+                    - generic [aria-hidden] [ref=e859]: (9)
+                - generic [ref=e860]:
+                  - generic [ref=e861]:
+                    - generic [ref=e862]: ₹2,199
+                    - generic [ref=e863]: ₹2,699
+                  - button "Add to Cart" [ref=e864] [cursor=pointer]
+          - link "Explore All 5 Bettas" [ref=e870] [cursor=pointer]:
+            - /url: /shop?cat=cat-betta
+        - generic [ref=e876]:
+          - generic [ref=e877]:
+            - generic [ref=e878]:
+              - img "Aquarist caring for Betta fish in natural planted tanks" [ref=e879]
+              - generic [ref=e880]:
+                - generic [ref=e881]: Bengaluru Facility
+                - paragraph [ref=e882]: Individual filtered tanks with natural Catappa leaf tannins.
+            - generic [ref=e887]:
+              - strong [ref=e888]: Ethical Fishkeeping
+              - text: Conditioned with live food
+          - generic [ref=e889]:
+            - generic [ref=e890]:
+              - generic [ref=e891]: Direct From Hobbyist Breeders
+              - heading "\"We are hobbyists first, breeders second, and sellers last.\"" [level=2] [ref=e892]
+            - paragraph [ref=e893]: We started Betta Aquatics to put fish care first. Every Betta lives in its own planted tank with warm, clean water and good food until it heads to your home.
+            - generic [ref=e894]:
+              - generic [ref=e895]:
+                - generic [ref=e896]: "WYSIWYG: Exact Fish Pictured"
+                - paragraph [ref=e901]: The photograph you see is the exact live specimen packaged for you.
+              - generic [ref=e902]:
+                - generic [ref=e903]: Pure Medical Oxygen Packing
+                - paragraph [ref=e908]: Sealed with pure oxygen to ensure your fish arrives swimming and active.
+            - generic [ref=e909]:
+              - link "Ask our Aquarist on WhatsApp" [ref=e910] [cursor=pointer]:
+                - /url: https://wa.me/919876543210
+              - generic [ref=e914]: Need tank cycling advice or water parameters? We reply daily.
+        - generic [ref=e916]:
+          - generic [ref=e917]:
+            - generic [ref=e918]: Fishkeeping Knowledge
+            - heading "Essential Betta Care Guide" [level=2] [ref=e919]
+            - paragraph [ref=e920]: Simple guidelines to ensure your new fish acclimates easily and thrives.
+          - generic [ref=e921]:
+            - generic [ref=e922]:
+              - generic [ref=e923]:
+                - heading "Water Chemistry & pH" [level=3] [ref=e927]
+                - paragraph [ref=e928]: Bettas thrive in soft, slightly acidic to neutral water (pH 6.5 - 7.5). Condition tap water with natural Catappa leaf tannins.
+              - generic [ref=e929]:
+                - generic [ref=e930]: "Optimal:"
+                - generic [ref=e931]: pH 6.5 - 7.5
+            - generic [ref=e932]:
+              - generic [ref=e933]:
+                - heading "Temperature Stability" [level=3] [ref=e937]
+                - paragraph [ref=e938]: Bettas need warm water between 24°C and 28°C. Use a small tank heater to keep the temperature steady year-round.
+              - generic [ref=e939]:
+                - generic [ref=e940]: "Optimal:"
+                - generic [ref=e941]: 24°C - 28°C
+            - generic [ref=e942]:
+              - generic [ref=e943]:
+                - heading "Nutrition & Live Feeds" [level=3] [ref=e948]
+                - paragraph [ref=e949]: Feed 3 to 4 pellets twice a day. Add bloodworms once a week as a healthy treat to help keep their colors bright.
+              - generic [ref=e950]:
+                - generic [ref=e951]: "Optimal:"
+                - generic [ref=e952]: 2x Small Feeds Daily
+            - generic [ref=e953]:
+              - generic [ref=e954]:
+                - heading "Floating Acclimation" [level=3] [ref=e958]
+                - paragraph [ref=e959]: Float the shipping bag for 15-20 minutes, gradually add tank water over 20 minutes, then gently net the fish into your tank.
+              - generic [ref=e960]:
+                - generic [ref=e961]: "Optimal:"
+                - generic [ref=e962]: 30-Min Safe Transition
+          - generic [ref=e963]:
+            - link "Explore All Educational Care Guides" [ref=e964] [cursor=pointer]:
+              - /url: /blog
+            - link "Read Acclimation & Live Arrival Policy" [ref=e968] [cursor=pointer]:
+              - /url: /page/shipping-acclimation
+        - generic [ref=e973]:
+          - generic [ref=e974]:
+            - generic [ref=e975]: Safe Fish Transport
+            - heading "Why Our Live Fish Arrive Healthy" [level=2] [ref=e976]
+            - paragraph [ref=e977]: Dedicated quarantine and temperature-regulated transit protocols for every order across India.
+          - generic [ref=e978]:
+            - generic [ref=e979]:
+              - heading "Medical Pure Oxygen" [level=3] [ref=e985]
+              - paragraph [ref=e986]: We fill each travel bag with pure oxygen. This gives your fish over 72 hours of fresh air to breathe safely.
+            - generic [ref=e987]:
+              - heading "Thermal Insulation" [level=3] [ref=e997]
+              - paragraph [ref=e998]: High-density molded crates with seasonal gel packs protect live fish from heat and cold transit swings.
+            - generic [ref=e999]:
+              - heading "Stress-Coat Water" [level=3] [ref=e1004]
+              - paragraph [ref=e1005]: We add natural almond leaf extract to the water. It protects their scales and helps fish stay calm on the trip.
+            - generic [ref=e1006]:
+              - heading "Live Arrival Guarantee" [level=3] [ref=e1011]
+              - paragraph [ref=e1012]: Full transit protection. If any fish does not arrive active and healthy, we issue an instant replacement or refund.
+        - generic [ref=e1014]:
+          - generic [ref=e1015]:
+            - generic [ref=e1016]: Customer Feedback
+            - heading "Reviews from Fishkeepers Across India" [level=2] [ref=e1017]
+            - paragraph [ref=e1018]: Read honest reviews from fish lovers across India on our safe packaging and healthy fish.
+          - generic [ref=e1019]:
+            - generic [ref=e1020]:
+              - generic [ref=e1021]:
+                - generic [ref=e1022]: Verified Fishkeeper
+                - heading "\"Arrived in peak health & stunning finnage!\"" [level=3] [ref=e1039]
+                - paragraph [ref=e1040]: Received the Royal Blue Halfmoon in Kolkata within 28 hours. The oxygen packing and heat pack kept the water at perfect 26°C. The fish started swimming actively right after acclimation!
+              - generic [ref=e1041]:
+                - generic [ref=e1042]: Aditya Sen
+                - generic [ref=e1043]: Air Cargo Delivery
+            - generic [ref=e1044]:
+              - generic [ref=e1045]:
+                - generic [ref=e1046]: Verified Fishkeeper
+                - heading "\"True Galaxy Koi colours! Exactly as shown in photos\"" [level=3] [ref=e1063]
+                - paragraph [ref=e1064]: I was nervous to buy a fish online, but Betta Aquatics sent the exact fish from the photo. Healthy, active, and beautiful!
+              - generic [ref=e1065]:
+                - generic [ref=e1066]: Priya Nambiar
+                - generic [ref=e1067]: Air Cargo Delivery
+    - contentinfo [ref=e1068]:
+      - generic [ref=e1069]:
+        - generic [ref=e1070]:
+          - generic [ref=e1075]:
+            - generic [ref=e1076]: Live Arrival
+            - generic [ref=e1077]: 100% Guaranteed DOA Policy
+          - generic [ref=e1084]:
+            - generic [ref=e1085]: Express Air Cargo
+            - generic [ref=e1086]: Overnight 24-36h Delivery
+          - generic [ref=e1091]:
+            - generic [ref=e1092]: WYSIWYG Fish
+            - generic [ref=e1093]: Exact Specimen Pictured
+          - generic [ref=e1098]:
+            - generic [ref=e1099]: Health Quarantined
+            - generic [ref=e1100]: 72h Tank Conditioned
+        - generic [ref=e1101]:
+          - generic [ref=e1102]:
+            - generic [ref=e1103]:
+              - img "Betta Aquatics" [ref=e1105]
+              - generic [ref=e1106]: BETTA AQUATICS
+            - paragraph [ref=e1107]: Bengaluru’s trusted online fish store. We deliver healthy show Bettas, exotic guppies, and live plants safely across India.
+            - generic [ref=e1108]:
+              - 'link "WhatsApp: +91 98765 43210" [ref=e1109] [cursor=pointer]':
+                - /url: https://wa.me/919876543210
+              - link "care@bettaaquatics.in" [ref=e1113] [cursor=pointer]:
+                - /url: mailto:care@bettaaquatics.in
+          - generic [ref=e1118]:
+            - heading "Livestock" [level=4] [ref=e1119]
+            - list [ref=e1120]:
+              - listitem [ref=e1121]:
+                - link "Halfmoon & Plakat Bettas" [ref=e1122] [cursor=pointer]:
+                  - /url: /shop?cat=cat-betta
+              - listitem [ref=e1123]:
+                - link "Imported Guppy Pairs" [ref=e1124] [cursor=pointer]:
+                  - /url: /shop?cat=cat-guppy
+              - listitem [ref=e1125]:
+                - link "Breeding Pairs" [ref=e1126] [cursor=pointer]:
+                  - /url: /shop?cat=cat-pairs
+              - listitem [ref=e1127]:
+                - link "Live Aquarium Plants" [ref=e1128] [cursor=pointer]:
+                  - /url: /shop?cat=cat-plants
+              - listitem [ref=e1129]:
+                - link "Fish Food & Pellets" [ref=e1130] [cursor=pointer]:
+                  - /url: /shop?cat=cat-food
+              - listitem [ref=e1131]:
+                - link "Indian Almond Leaves" [ref=e1132] [cursor=pointer]:
+                  - /url: /shop?cat=cat-accessories
+          - generic [ref=e1133]:
+            - heading "Customer Support" [level=4] [ref=e1134]
+            - list [ref=e1135]:
+              - listitem [ref=e1136]:
+                - link "Care Guides & Research Journal" [ref=e1137] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e1138]:
+                - link "Acclimation & DOA Policy" [ref=e1139] [cursor=pointer]:
+                  - /url: /page/shipping-acclimation
+              - listitem [ref=e1140]:
+                - link "Frequently Asked Questions" [ref=e1141] [cursor=pointer]:
+                  - /url: /page/faq
+              - listitem [ref=e1142]:
+                - link "Track Consignment" [ref=e1143] [cursor=pointer]:
+                  - /url: /account/orders
+              - listitem [ref=e1144]:
+                - link "About Our Facility" [ref=e1145] [cursor=pointer]:
+                  - /url: /page/about-us
+              - listitem [ref=e1146]:
+                - link "Admin Operations" [ref=e1147] [cursor=pointer]:
+                  - /url: /admin
+          - generic [ref=e1148]:
+            - heading "Livestock Alerts" [level=4] [ref=e1149]
+            - paragraph [ref=e1150]: Receive updates when new show-class Bettas and rare imports arrive.
+            - generic [ref=e1151]:
+              - textbox "Enter your email" [ref=e1152]
+              - button "Subscribe to Drops" [ref=e1153] [cursor=pointer]
+        - generic [ref=e1158]:
+          - generic [ref=e1159]: © 2026 Betta Aquatics India Pvt Ltd. All rights reserved.
+          - generic [ref=e1160]: "Live Arrival Guarantee: Record a short video of the unopened box within 2 hours of delivery for a fast replacement or refund."
+  - region "Notifications"

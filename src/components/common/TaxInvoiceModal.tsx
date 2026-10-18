@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { X, Printer, Download, CheckCircle2, ShieldCheck, Building2, Phone, Mail } from 'lucide-react';
 import { Order } from '../../lib/types';
 import { formatCurrency, formatDate } from '../../lib/utils';
+import { BrandLogo } from './BrandLogo';
 
 interface TaxInvoiceModalProps {
   order: Order | null;
@@ -11,6 +12,17 @@ interface TaxInvoiceModalProps {
 
 export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen, onClose }) => {
   const printRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !order) return null;
 
@@ -22,21 +34,26 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-ocean-950/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white">
+    <div 
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tax-invoice-title"
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white"
+    >
       {/* Container */}
       <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden my-4 border border-slate-200 print:border-none print:shadow-none print:m-0 print:rounded-none">
         
         {/* Modal Top Control Bar (Hidden on print) */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-slate-900 text-white print:hidden">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-aqua-400 font-mono">Tax Invoice</span>
+            <span id="tax-invoice-title" className="text-xs font-bold uppercase tracking-wider text-blue-400 font-mono">Tax Invoice</span>
             <span className="text-xs text-slate-400">| #{invoiceNumber}</span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-aqua-500 hover:bg-aqua-400 text-ocean-950 text-xs font-bold transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors shadow-sm"
               title="Print or Save as PDF"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -59,11 +76,11 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
           <div className="flex flex-col sm:flex-row justify-between items-start pb-6 border-b border-slate-200 gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-7 h-7 rounded-lg bg-ocean-950 p-1 flex items-center justify-center">
-                  <img src="/logo-fish.svg" alt="Betta Aquatics" className="w-full h-full object-contain" />
+                <div className="w-7 h-7 rounded-lg bg-blue-900 p-1 flex items-center justify-center overflow-hidden shrink-0">
+                  <BrandLogo variant="invoice" className="w-full h-full" imgClassName="w-full h-full object-contain" />
                 </div>
-                <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-ocean-950 uppercase">
-                  BETTA <span className="text-aqua-600">AQUATICS</span>
+                <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-blue-950 uppercase">
+                  BETTA <span className="text-red-600">AQUATICS</span>
                 </h1>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug">
@@ -77,7 +94,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
               <span className="inline-block px-2.5 py-1 rounded bg-slate-100 text-slate-800 text-xs font-mono font-bold uppercase mb-1">
                 Original For Recipient
               </span>
-              <div className="font-mono font-extrabold text-base sm:text-lg text-ocean-950">{invoiceNumber}</div>
+              <div className="font-mono font-extrabold text-base sm:text-lg text-blue-950">{invoiceNumber}</div>
               <div className="text-xs text-slate-500">Date: {invoiceDate}</div>
               <div className="text-xs text-slate-500">Order ID: <strong className="font-mono text-slate-800">{order.order_number}</strong></div>
             </div>
@@ -100,7 +117,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
               <span className="font-bold uppercase tracking-wider text-slate-400 text-[10px] block">Payment & Shipment Mode:</span>
               <div>
                 <span className="text-slate-500">Payment Status: </span>
-                <strong className={`uppercase ${order.payment_status === 'verified' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                <strong className={`uppercase ${order.payment_status === 'verified' ? 'text-blue-700' : 'text-red-600'}`}>
                   {order.payment_status}
                 </strong>
               </div>
@@ -115,7 +132,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
               {order.shipment_details && (
                 <div className="pt-1">
                   <span className="text-slate-500">Air Cargo AWB: </span>
-                  <strong className="font-mono text-sky-800">{order.shipment_details.tracking_number}</strong>
+                  <strong className="font-mono text-blue-800">{order.shipment_details.tracking_number}</strong>
                   <div className="text-[11px] text-slate-500">Carrier: {order.shipment_details.courier_name}</div>
                 </div>
               )}
@@ -187,7 +204,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
               </div>
 
               {order.discount_amount > 0 && (
-                <div className="flex justify-between text-emerald-700 font-semibold">
+                <div className="flex justify-between text-red-600 font-semibold">
                   <span>Coupon Discount ({order.coupon_code}):</span>
                   <span className="font-mono">-{formatCurrency(order.discount_amount)}</span>
                 </div>
@@ -200,7 +217,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
 
               <div className="pt-2 border-t-2 border-slate-900 flex justify-between items-baseline">
                 <span className="font-bold text-sm text-slate-900">Total Invoice Amount:</span>
-                <span className="font-extrabold text-lg text-ocean-950 font-display">
+                <span className="font-extrabold text-lg text-blue-950 font-display">
                   {formatCurrency(order.total_amount)}
                 </span>
               </div>
@@ -210,7 +227,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
           {/* Footer & Signature */}
           <div className="pt-8 mt-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-end gap-6 text-xs text-slate-500">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 border border-blue-200">
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div className="text-[11px] leading-snug">
@@ -221,7 +238,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
 
             <div className="text-center sm:text-right shrink-0">
               <div className="h-10 flex items-center justify-center sm:justify-end">
-                <span className="font-serif italic font-bold text-ocean-950 text-base">Anand R. (Founder & Lead Aquarist)</span>
+                <span className="font-serif italic font-bold text-blue-950 text-base">Anand R. (Founder & Lead Aquarist)</span>
               </div>
               <div className="text-[10px] text-slate-400 border-t border-slate-300 pt-1">
                 Authorized Signatory for Betta Aquatics

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
-  Heart, ShoppingBag, ShieldCheck, Truck, 
+  Heart, ShoppingBag, 
   MapPin, Check, Sparkles, ArrowLeft, Star, Send, 
-  HeartHandshake, MessageCircle 
+  HeartHandshake, MessageCircle, Play, ZoomIn, X, 
+  ChevronLeft, ChevronRight, Film, Image as ImageIcon
 } from 'lucide-react';
 import { mockDb } from '../lib/mockDatabase';
 import { formatCurrency, calculateDiscount } from '../lib/utils';
@@ -23,7 +24,29 @@ export const ProductDetailPage: React.FC = () => {
 
   const product = mockDb.getProductBySlug(slug || '');
 
-  const [selectedImg, setSelectedImg] = useState(0);
+  const productImages = product?.images && product.images.length > 0 
+    ? product.images 
+    : ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80'];
+  const productVideos = product?.videos || [];
+
+  const [activeMediaType, setActiveMediaType] = useState<'image' | 'video'>('image');
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isLightboxOpen) {
+        setIsLightboxOpen(false);
+      } else if (e.key === 'ArrowRight' && isLightboxOpen) {
+        setLightboxIndex((prev) => (prev + 1) % productImages.length);
+      } else if (e.key === 'ArrowLeft' && isLightboxOpen) {
+        setLightboxIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, productImages.length]);
   const [quantity, setQuantity] = useState(1);
   const [pincode, setPincode] = useState('');
   const [pincodeStatus, setPincodeStatus] = useState<{
@@ -45,7 +68,7 @@ export const ProductDetailPage: React.FC = () => {
         <SEO title="Specimen Not Found" description="The requested ornamental fish specimen has already found a home." />
         <h2 className="text-xl font-bold text-slate-800 mb-2">Specimen Not Found</h2>
         <p className="text-sm text-slate-500 mb-6">This unique fish has either been adopted or moved to a breeding project.</p>
-        <Link to="/shop" className="px-5 py-2.5 bg-ocean-900 text-white rounded-xl text-xs font-bold">
+        <Link to="/shop" className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-colors">
           Explore Available Bettas
         </Link>
       </div>
@@ -160,31 +183,42 @@ export const ProductDetailPage: React.FC = () => {
         <nav aria-label="Breadcrumb" className="flex items-center justify-between text-xs text-slate-500 mb-6">
           <ol className="flex items-center gap-1.5 flex-wrap" itemScope itemType="https://schema.org/BreadcrumbList">
             <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
-              <Link to="/" itemProp="item" className="hover:text-ocean-950">
+              <Link to="/" itemProp="item" className="hover:text-blue-900">
                 <span itemProp="name">Home</span>
               </Link>
               <meta itemProp="position" content="1" />
             </li>
             <span>/</span>
             <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
-              <Link to="/shop" itemProp="item" className="hover:text-ocean-950">
+              <Link to="/shop" itemProp="item" className="hover:text-blue-900">
                 <span itemProp="name">Shop</span>
               </Link>
               <meta itemProp="position" content="2" />
             </li>
             <span>/</span>
             <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
-              <Link to={`/shop?cat=${product.category_id}`} itemProp="item" className="hover:text-ocean-950 font-medium">
+              <Link to={`/shop?cat=${product.category_id}`} itemProp="item" className="hover:text-blue-900 font-medium">
                 <span itemProp="name">{product.category_name}</span>
               </Link>
               <meta itemProp="position" content="3" />
             </li>
+            {product.subcategory_name && (
+              <>
+                <span>/</span>
+                <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+                  <Link to={`/shop?cat=${product.category_id}&subcat=${product.subcategory_id}`} itemProp="item" className="hover:text-blue-900 font-medium">
+                    <span itemProp="name">{product.subcategory_name}</span>
+                  </Link>
+                  <meta itemProp="position" content="4" />
+                </li>
+              </>
+            )}
             <span>/</span>
             <li className="text-slate-900 font-semibold truncate max-w-[200px] sm:max-w-none">
               {product.name}
             </li>
           </ol>
-          <Link to="/shop" className="hidden sm:flex items-center gap-1 text-aqua-700 font-semibold hover:underline">
+          <Link to="/shop" className="hidden sm:flex items-center gap-1 text-blue-700 font-semibold hover:underline">
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to All Fish</span>
           </Link>
@@ -194,22 +228,105 @@ export const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
           {/* Gallery Left (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="aspect-square bg-white rounded-3xl overflow-hidden border border-slate-200/80 relative shadow-sm">
-              <img
-                src={product.images[selectedImg] || product.images[0]}
-                alt={`${product.name} - ${product.strain || 'Live Fish'} available at Betta Aquatics`}
-                className="w-full h-full object-cover object-center"
-              />
-              {/* Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
+            {/* Quick Media Type Pills (if videos exist) */}
+            {productVideos.length > 0 && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveMediaType('image');
+                    setActiveMediaIndex(0);
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                    activeMediaType === 'image'
+                      ? 'bg-blue-900 text-white shadow-xs'
+                      : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  }`}
+                >
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  <span>Photos ({productImages.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveMediaType('video');
+                    setActiveMediaIndex(0);
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                    activeMediaType === 'video'
+                      ? 'bg-red-600 text-white shadow-xs'
+                      : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  }`}
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Live Swimming Videos ({productVideos.length})</span>
+                </button>
+              </div>
+            )}
+
+            {/* Main Stage Display (Image or In-Page HTML5 Video Player) */}
+            <div className="aspect-square bg-slate-950 rounded-3xl overflow-hidden border border-slate-200/80 relative shadow-sm flex items-center justify-center group">
+              {activeMediaType === 'image' ? (
+                <>
+                  <img
+                    src={productImages[activeMediaIndex] || productImages[0]}
+                    alt={`${product.name} - ${product.strain || 'Live Fish'} available at Betta Aquatics`}
+                    className="w-full h-full object-cover object-center cursor-zoom-in"
+                    onClick={() => {
+                      setLightboxIndex(activeMediaIndex);
+                      setIsLightboxOpen(true);
+                    }}
+                  />
+                  {/* Zoom hint button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLightboxIndex(activeMediaIndex);
+                      setIsLightboxOpen(true);
+                    }}
+                    className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/60 hover:bg-black/80 text-white text-xs font-medium rounded-xl backdrop-blur-md flex items-center gap-1.5 transition-all shadow-md"
+                    aria-label="Zoom specimen photograph"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" />
+                    <span>Zoom</span>
+                  </button>
+                </>
+              ) : (
+                <div className="w-full h-full bg-black relative flex items-center justify-center">
+                  <video
+                    key={productVideos[activeMediaIndex]?.url}
+                    src={productVideos[activeMediaIndex]?.url}
+                    poster={productVideos[activeMediaIndex]?.thumbnail_url || productImages[0]}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-full object-contain"
+                  />
+                  {/* Video title overlay */}
+                  <div className="absolute top-4 inset-x-4 flex items-center justify-between pointer-events-none">
+                    <span className="px-2.5 py-1 bg-black/70 backdrop-blur-md text-white text-[11px] font-semibold rounded-lg shadow-xs flex items-center gap-1.5">
+                      <Film className="w-3 h-3 text-red-500" />
+                      {productVideos[activeMediaIndex]?.title || 'Conditioned Swimming Footage'}
+                    </span>
+                    {productVideos[activeMediaIndex]?.duration && (
+                      <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded shadow-xs">
+                        {productVideos[activeMediaIndex].duration}s HD
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Badges Overlay */}
+              <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
                 {product.is_unique_specimen && (
-                  <span className="inline-flex items-center gap-1.5 bg-ocean-950/90 backdrop-blur-md text-aqua-300 border border-aqua-400/40 text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                    <Sparkles className="w-3.5 h-3.5 text-aqua-400" />
+                  <span className="inline-flex items-center gap-1.5 bg-blue-950 text-white border border-blue-700 text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-300" />
                     <span>Exact Specimen Pictured</span>
                   </span>
                 )}
                 {discount > 0 && !product.is_unique_specimen && (
-                  <span className="inline-flex items-center bg-coral-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+                  <span className="inline-flex items-center bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
                     {discount}% OFF
                   </span>
                 )}
@@ -217,39 +334,166 @@ export const ProductDetailPage: React.FC = () => {
 
               {/* Wishlist Button */}
               <button
+                type="button"
                 onClick={() => toggleWishlist(product.id)}
-                className={`absolute top-4 right-4 w-11 h-11 rounded-full flex items-center justify-center shadow-md backdrop-blur-md transition-all ${
+                className={`absolute top-4 right-4 w-11 h-11 rounded-full flex items-center justify-center shadow-md backdrop-blur-md transition-all z-10 ${
                   isWishlisted
-                    ? 'bg-rose-50 text-rose-500 border border-rose-200'
-                    : 'bg-white/90 hover:bg-white text-slate-600 hover:text-rose-500'
+                    ? 'bg-red-50 text-red-500 border border-red-200'
+                    : 'bg-white/90 hover:bg-white text-slate-600 hover:text-red-500'
                 }`}
                 aria-label="Save to Wishlist"
               >
-                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-rose-500' : ''}`} />
+                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
               </button>
             </div>
 
-            {/* Thumbnails */}
-            {product.images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-1">
-                {product.images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImg(idx)}
-                    className={`w-20 h-20 rounded-2xl overflow-hidden border-2 bg-white transition-all shrink-0 ${
-                      selectedImg === idx ? 'border-aqua-500 shadow-md ring-2 ring-aqua-500/20' : 'border-slate-200 opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
+            {/* Thumbnails Row: Photos & Videos Combined */}
+            {(productImages.length > 1 || productVideos.length > 0) && (
+              <div className="flex gap-2.5 overflow-x-auto pb-1 pt-1">
+                {/* Photo Thumbnails */}
+                {productImages.map((img, idx) => {
+                  const isSelected = activeMediaType === 'image' && activeMediaIndex === idx;
+                  return (
+                    <button
+                      type="button"
+                      key={`img-${idx}`}
+                      onClick={() => {
+                        setActiveMediaType('image');
+                        setActiveMediaIndex(idx);
+                      }}
+                      className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 bg-white transition-all shrink-0 ${
+                        isSelected 
+                          ? 'border-blue-600 shadow-md ring-2 ring-blue-600/20' 
+                          : 'border-slate-200 opacity-70 hover:opacity-100'
+                      }`}
+                      aria-label={`View photo #${idx + 1}`}
+                    >
+                      <img src={img} alt="" aria-hidden="true" className="w-full h-full object-cover" />
+                      <span className="absolute bottom-1 right-1 px-1 py-0.2 bg-black/60 text-white text-[9px] font-medium rounded backdrop-blur-xs">
+                        #{idx + 1}
+                      </span>
+                    </button>
+                  );
+                })}
+
+                {/* Video Thumbnails */}
+                {productVideos.map((vid, vIdx) => {
+                  const isSelected = activeMediaType === 'video' && activeMediaIndex === vIdx;
+                  return (
+                    <button
+                      type="button"
+                      key={`vid-${vid.id || vIdx}`}
+                      onClick={() => {
+                        setActiveMediaType('video');
+                        setActiveMediaIndex(vIdx);
+                      }}
+                      className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 bg-slate-900 transition-all shrink-0 ${
+                        isSelected 
+                          ? 'border-red-600 shadow-md ring-2 ring-red-600/30' 
+                          : 'border-slate-200 opacity-80 hover:opacity-100'
+                      }`}
+                      aria-label={`Play swimming footage: ${vid.title || 'Video'}`}
+                    >
+                      <img
+                        src={vid.thumbnail_url || productImages[0]}
+                        alt=""
+                        aria-hidden="true"
+                        className="w-full h-full object-cover opacity-85"
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <span className="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md">
+                          <Play className="w-3.5 h-3.5 ml-0.5 fill-current" />
+                        </span>
+                      </div>
+                      <span className="absolute bottom-1 right-1 px-1 py-0.2 bg-red-600 text-white text-[9px] font-bold rounded">
+                        {vid.duration ? `${vid.duration}s` : 'VIDEO'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Fullscreen Image Lightbox Modal */}
+            {isLightboxOpen && (
+              <div
+                className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="lightbox-title"
+              >
+                <div className="relative max-w-5xl w-full h-full max-h-[90vh] flex flex-col justify-between">
+                  {/* Lightbox Header */}
+                  <div className="flex items-center justify-between text-white pb-3">
+                    <span id="lightbox-title" className="text-sm font-semibold truncate max-w-md">
+                      {product.name} — Photo {lightboxIndex + 1} of {productImages.length}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsLightboxOpen(false)}
+                      className="p-2 text-white/80 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+                      aria-label="Close zoom preview"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                  </div>
+
+                  {/* Main Large Image */}
+                  <div className="relative flex-1 flex items-center justify-center overflow-hidden">
+                    <img
+                      src={productImages[lightboxIndex]}
+                      alt={`${product.name} zoomed view`}
+                      className="max-h-full max-w-full object-contain rounded-xl shadow-2xl"
+                    />
+
+                    {/* Navigation Arrows */}
+                    {productImages.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setLightboxIndex((prev) => (prev - 1 + productImages.length) % productImages.length)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white transition-colors"
+                          aria-label="Previous photo"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLightboxIndex((prev) => (prev + 1) % productImages.length)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white transition-colors"
+                          aria-label="Next photo"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Thumbnails in Lightbox */}
+                  {productImages.length > 1 && (
+                    <div className="flex justify-center gap-2 pt-3 overflow-x-auto">
+                      {productImages.map((img, tIdx) => (
+                        <button
+                          type="button"
+                          key={`lb-thumb-${tIdx}`}
+                          onClick={() => setLightboxIndex(tIdx)}
+                          className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
+                            lightboxIndex === tIdx ? 'border-blue-500 scale-105' : 'border-white/30 opacity-60 hover:opacity-100'
+                          }`}
+                        >
+                          <img src={img} alt="" className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
             {/* Reassuring Breeder Commitment */}
-            <div className="bg-warm-50 text-warm-900 p-4 rounded-3xl border border-warm-200 text-xs space-y-2">
+            <div className="bg-blue-50/50 text-slate-800 p-4 rounded-3xl border border-blue-100 text-xs space-y-2">
               <div className="flex items-center gap-2 font-bold text-slate-900">
-                <HeartHandshake className="w-4 h-4 text-aqua-700 shrink-0" />
+                <HeartHandshake className="w-4 h-4 text-blue-700 shrink-0" />
                 <span>Conditioned with Care by Indian Aquascapers</span>
               </div>
               <p className="text-slate-600 leading-relaxed text-[11px]">
@@ -261,10 +505,21 @@ export const ProductDetailPage: React.FC = () => {
           {/* Details Right (6 cols) */}
           <div className="lg:col-span-6 space-y-6">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-aqua-700 bg-aqua-50 px-3 py-0.5 rounded-full border border-aqua-200">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <Link
+                  to={`/shop?cat=${product.category_id}`}
+                  className="text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-0.5 rounded-full border border-blue-200 transition-colors"
+                >
                   {product.category_name}
-                </span>
+                </Link>
+                {product.subcategory_name && (
+                  <Link
+                    to={`/shop?cat=${product.category_id}&subcat=${product.subcategory_id}`}
+                    className="text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 px-2.5 py-0.5 rounded-full border border-red-200 transition-colors"
+                  >
+                    {product.subcategory_name}
+                  </Link>
+                )}
                 {product.strain && (
                   <span className="text-xs text-slate-500">
                     Strain: <strong className="text-slate-800">{product.strain}</strong>
@@ -273,7 +528,7 @@ export const ProductDetailPage: React.FC = () => {
                 <span className="text-xs text-slate-400 font-mono ml-auto">SKU: {product.sku}</span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-ocean-950 font-display leading-snug mb-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display leading-snug mb-3">
                 {product.name}
               </h1>
 
@@ -281,14 +536,14 @@ export const ProductDetailPage: React.FC = () => {
               <div className="flex items-center gap-3 mb-4">
                 <StarRating rating={product.rating} reviewCount={product.review_count} size="md" />
                 <span className="text-xs text-slate-300">•</span>
-                <span className="text-xs text-emerald-800 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-xs text-blue-800 font-bold bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
                   Ready for Express Dispatch
                 </span>
               </div>
 
               {/* Price Block */}
               <div className="p-4 bg-white rounded-3xl border border-slate-200 shadow-sm flex items-baseline gap-3 mb-6">
-                <span className="text-3xl sm:text-4xl font-black text-ocean-950 font-display">
+                <span className="text-3xl sm:text-4xl font-black text-slate-900 font-display">
                   {formatCurrency(product.price)}
                 </span>
                 {product.compare_at_price && product.compare_at_price > product.price && (
@@ -296,7 +551,7 @@ export const ProductDetailPage: React.FC = () => {
                     <span className="text-base sm:text-lg text-slate-400 line-through">
                       {formatCurrency(product.compare_at_price)}
                     </span>
-                    <span className="text-xs font-bold text-coral-600 bg-coral-50 border border-coral-200 px-2.5 py-0.5 rounded-full">
+                    <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full">
                       Save {formatCurrency(product.compare_at_price - product.price)} ({discount}% OFF)
                     </span>
                   </>
@@ -331,29 +586,31 @@ export const ProductDetailPage: React.FC = () => {
               {/* Humanized PIN Code Checker */}
               <div className="p-4 bg-slate-100/70 rounded-3xl border border-slate-200 mb-6">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 mb-2">
-                  <MapPin className="w-4 h-4 text-aqua-600" />
+                  <MapPin className="w-4 h-4 text-blue-600" />
                   <span>Will this fish reach you safely? Check delivery time</span>
                 </div>
                 <form onSubmit={handleCheckPincode} className="flex gap-2">
                   <input
+                    id="pincode-input"
                     type="text"
+                    aria-label="Enter 6-digit delivery PIN code"
                     maxLength={6}
                     value={pincode}
                     onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
                     placeholder="Enter 6-digit PIN code (e.g. 560038)"
-                    className="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-aqua-500"
+                    className="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500"
                   />
                   <button
                     type="submit"
-                    className="bg-ocean-900 hover:bg-ocean-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shrink-0"
+                    className="bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shrink-0"
                   >
                     Check PIN
                   </button>
                 </form>
 
                 {pincodeStatus && (
-                  <div className="mt-2.5 text-xs text-emerald-800 flex items-center gap-1.5 font-medium">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="mt-2.5 text-xs text-blue-800 flex items-center gap-1.5 font-medium">
+                    <Check className="w-4 h-4 text-blue-600 shrink-0" />
                     <span>Eligible for Overnight Air Cargo: Arrives within <strong>{pincodeStatus.days}</strong></span>
                   </div>
                 )}
@@ -390,17 +647,17 @@ export const ProductDetailPage: React.FC = () => {
                     className={`flex-1 h-12 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs ${
                       isOutOfStock
                         ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                        : 'bg-slate-900 hover:bg-slate-800 text-white active:scale-95'
+                        : 'bg-blue-900 hover:bg-blue-800 text-white active:scale-95'
                     }`}
                   >
-                    <ShoppingBag className="w-4 h-4 text-teal-400" />
+                    <ShoppingBag className="w-4 h-4 text-blue-300" />
                     <span>Add to Tank</span>
                   </button>
 
                   <button
                     onClick={handleBuyNow}
                     disabled={isOutOfStock}
-                    className="flex-1 h-12 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 text-white transition-all shadow-xs active:scale-95"
+                    className="flex-1 h-12 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white transition-all shadow-xs active:scale-95"
                   >
                     <span>Adopt Now</span>
                   </button>
@@ -414,9 +671,9 @@ export const ProductDetailPage: React.FC = () => {
                   href="https://wa.me/919876543210"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 text-emerald-700 font-bold hover:underline"
+                  className="flex items-center gap-1.5 text-blue-700 font-bold hover:underline"
                 >
-                  <MessageCircle className="w-4 h-4 text-emerald-600" />
+                  <MessageCircle className="w-4 h-4 text-blue-600" />
                   <span>Ask our breeder on WhatsApp</span>
                 </a>
               </div>
@@ -426,7 +683,7 @@ export const ProductDetailPage: React.FC = () => {
 
         {/* Simple Care Guide Summary */}
         <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-16 space-y-6">
-          <h2 className="text-xl font-bold text-ocean-950 font-display">
+          <h2 className="text-xl font-bold text-slate-900 font-display">
             Habitat & Floating Acclimation Guide
           </h2>
 
@@ -454,7 +711,7 @@ export const ProductDetailPage: React.FC = () => {
                 <br />
                 3. Gently net your Betta into his new home. Do not dump the transit bag water.
               </p>
-              <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-xs">
+              <div className="p-3 bg-blue-50 rounded-2xl border border-blue-200 text-blue-900 text-xs">
                 <strong>100% Live Arrival Guarantee:</strong> If anything happens in transit, simply record a 30-second video of the unopened shipping bag within 2 hours of delivery for an instant replacement or refund.
               </div>
             </div>
@@ -465,7 +722,7 @@ export const ProductDetailPage: React.FC = () => {
         <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-16">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
             <div>
-              <h2 className="text-xl font-bold text-ocean-950 font-display">
+              <h2 className="text-xl font-bold text-slate-900 font-display">
                 Aquarist Reviews ({reviewsList.length})
               </h2>
               <div className="flex items-center gap-2 mt-1">
@@ -486,7 +743,7 @@ export const ProductDetailPage: React.FC = () => {
                   value={reviewName}
                   onChange={(e) => setReviewName(e.target.value)}
                   placeholder="e.g. Anand Kumar"
-                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                 />
               </div>
               <div>
@@ -509,7 +766,7 @@ export const ProductDetailPage: React.FC = () => {
                 value={reviewTitle}
                 onChange={(e) => setReviewTitle(e.target.value)}
                 placeholder="e.g. Arrived active, colors are breathtaking!"
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
               />
             </div>
             <div>
@@ -519,14 +776,14 @@ export const ProductDetailPage: React.FC = () => {
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
                 placeholder="How was the packaging, temperature, and fish behavior?"
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
               />
             </div>
             <button
               type="submit"
-              className="px-5 py-2.5 bg-ocean-900 hover:bg-ocean-800 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors"
+              className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors"
             >
-              <Send className="w-3.5 h-3.5 text-aqua-400" />
+              <Send className="w-3.5 h-3.5 text-red-400" />
               <span>Submit Review</span>
             </button>
           </form>
@@ -537,9 +794,9 @@ export const ProductDetailPage: React.FC = () => {
               <div key={rev.id} className="p-4 rounded-2xl border border-slate-100 bg-slate-50/50">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold text-xs text-slate-900">{rev.user_name}</span>
-                  <div className="flex items-center text-amber-400">
+                  <div className="flex items-center text-red-500">
                     {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
+                      <Star key={i} className="w-3.5 h-3.5 fill-red-500" />
                     ))}
                   </div>
                 </div>
@@ -553,7 +810,7 @@ export const ProductDetailPage: React.FC = () => {
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mb-10">
-            <h2 className="text-xl sm:text-2xl font-bold text-ocean-950 font-display mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-display mb-6">
               Other Specimens You Might Adore
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -572,16 +829,16 @@ export const ProductDetailPage: React.FC = () => {
             onClick={() => toggleWishlist(product.id)}
             className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-colors shrink-0 ${
               isWishlisted
-                ? 'bg-rose-50 text-rose-500 border-rose-200'
-                : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-rose-500'
+                ? 'bg-red-50 text-red-500 border-red-200'
+                : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-red-500'
             }`}
             aria-label={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
           >
-            <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-rose-500' : ''}`} />
+            <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-500' : ''}`} />
           </button>
           <div>
             <div className="text-[10px] text-slate-400 font-medium leading-none mb-0.5">Live Specimen:</div>
-            <div className="text-base font-extrabold text-ocean-950 font-display leading-tight">
+            <div className="text-base font-extrabold text-slate-900 font-display leading-tight">
               {formatCurrency(product.price)}
             </div>
           </div>
@@ -591,15 +848,15 @@ export const ProductDetailPage: React.FC = () => {
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition-all"
+            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-blue-900 hover:bg-blue-800 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition-all"
           >
-            <ShoppingBag className="w-3.5 h-3.5 text-teal-400" />
+            <ShoppingBag className="w-3.5 h-3.5 text-blue-300" />
             <span>Add to Tank</span>
           </button>
           <button
             onClick={handleBuyNow}
             disabled={isOutOfStock}
-            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-teal-600 hover:bg-teal-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-2xs transition-all"
+            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-2xs transition-all"
           >
             <span>Adopt Now</span>
           </button>

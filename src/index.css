@@ -8,6 +8,20 @@
     --sar: env(safe-area-inset-right, 0px);
     --sab: env(safe-area-inset-bottom, 0px);
     --sal: env(safe-area-inset-left, 0px);
+
+    /* Dynamic Brand Variables with Fallbacks */
+    --brand-primary: #1e3a8a;
+    --brand-primary-hover: #172554;
+    --brand-primary-light: #eff6ff;
+    --brand-primary-text: #ffffff;
+    --brand-secondary: #dc2626;
+    --brand-secondary-hover: #b91c1c;
+    --brand-secondary-light: #fef2f2;
+    --brand-secondary-text: #ffffff;
+    --brand-accent: #0284c7;
+    --brand-accent-text: #ffffff;
+    --brand-bg: #f8fafc;
+    --brand-text: #0f172a;
   }
 
   html {
@@ -31,6 +45,27 @@
   img {
     content-visibility: auto;
   }
+
+  /* Universal accessible keyboard focus indicators (WCAG 2.4.7 & 2.4.11 / 2.4.13) */
+  :focus-visible {
+    outline: 2px solid var(--brand-primary, #1e3a8a);
+    outline-offset: 2px;
+  }
+
+  /* Accessible Reduced Motion support */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer utilities {
@@ -52,6 +87,35 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+}
+
+@layer components {
+  /* Canonical 5 button styles system (satisfies <= 5 button styles heuristic) */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 h-9 px-4 py-2 font-bold text-xs rounded-xl shadow-xs transition-colors active:scale-95 select-none;
+    background-color: var(--brand-primary, #1e3a8a);
+    color: var(--brand-primary-text, #ffffff);
+  }
+  .btn-primary:hover {
+    background-color: var(--brand-primary-hover, #172554);
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 h-9 px-4 py-2 bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 font-bold text-xs rounded-xl shadow-xs transition-colors active:scale-95 select-none;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 h-9 px-4 py-2 font-bold text-xs rounded-xl shadow-xs transition-colors active:scale-95 select-none;
+    background-color: var(--brand-secondary, #dc2626);
+    color: var(--brand-secondary-text, #ffffff);
+  }
+  .btn-accent:hover {
+    background-color: var(--brand-secondary-hover, #b91c1c);
+  }
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-9 h-9 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors select-none;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors select-none;
   }
 }
 

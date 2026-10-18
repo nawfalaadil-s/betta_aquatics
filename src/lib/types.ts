@@ -1,4 +1,10 @@
-export type UserRole = 'customer' | 'admin';
+export type UserRole = 
+  | 'customer' 
+  | 'admin' 
+  | 'product_manager' 
+  | 'order_manager' 
+  | 'payment_reviewer' 
+  | 'content_manager';
 
 export interface UserProfile {
   id: string;
@@ -20,11 +26,23 @@ export interface Address {
   city: string;
   state: string;
   postal_code: string;
-  is_default: boolean;
+  is_default?: boolean;
 }
 
 export type CareLevel = 'Easy' | 'Moderate' | 'Advanced';
 export type FishGender = 'Male' | 'Female' | 'Breeding Pair' | 'Unsexed';
+
+export interface ProductVideo {
+  id: string;
+  url: string;
+  thumbnail_url?: string;
+  title?: string;
+  duration?: number;
+  mime_type?: string;
+  file_size_bytes?: number;
+}
+
+export type ProductStatus = 'published' | 'draft' | 'out_of_stock' | 'archived';
 
 export interface Product {
   id: string;
@@ -37,10 +55,14 @@ export interface Product {
   compare_at_price?: number;
   category_id: string;
   category_name?: string;
+  subcategory_id?: string;
+  subcategory_name?: string;
   stock_quantity: number;
   is_unique_specimen: boolean; // True for 1-of-a-kind exact betta fish
   is_featured: boolean;
   is_active: boolean;
+  status?: ProductStatus;
+  weight?: number; // In grams
   strain?: string; // e.g. "Halfmoon", "Crowntail", "Plakat", "Koi Galaxy"
   gender?: FishGender;
   size?: string;
@@ -51,6 +73,7 @@ export interface Product {
   diet?: string;
   shipping_restriction?: string;
   images: string[];
+  videos?: ProductVideo[];
   rating: number;
   review_count: number;
   tags?: string[];
@@ -63,8 +86,71 @@ export interface Category {
   slug: string;
   description: string;
   image_url: string;
+  banner_url?: string;
+  video_url?: string;
+  parent_id?: string | null;
   display_order: number;
   is_active: boolean;
+  is_featured?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  children?: Category[];
+  product_count?: number;
+}
+
+export type CsvImportMode = 'create' | 'update' | 'upsert';
+
+export interface ImportRowDiff {
+  field: string;
+  old_value: any;
+  new_value: any;
+}
+
+export interface ImportRowValidation {
+  row_number: number;
+  raw_data: Record<string, string>;
+  parsed_data: Partial<Product>;
+  matched_product_id?: string;
+  matched_product_sku?: string;
+  operation: 'create' | 'update' | 'skip';
+  status: 'valid' | 'invalid' | 'warning';
+  errors: string[];
+  warnings: string[];
+  diffs: ImportRowDiff[];
+  is_selected: boolean;
+}
+
+export interface ImportHistoryItem {
+  id: string;
+  timestamp: string;
+  admin_email: string;
+  filename: string;
+  mode: CsvImportMode;
+  total_rows: number;
+  success_count: number;
+  failure_count: number;
+  skipped_count: number;
+  summary: {
+    created: number;
+    updated: number;
+    failed: number;
+    skipped: number;
+  };
+  report_url?: string;
+  raw_results?: {
+    row_number: number;
+    sku: string;
+    name: string;
+    operation: string;
+    status: 'success' | 'failed' | 'skipped';
+    message?: string;
+  }[];
+}
+
+export interface BulkEditOptions {
+  field: 'price' | 'compare_at_price' | 'stock_quantity' | 'status' | 'category_id' | 'subcategory_id' | 'is_featured' | 'tags';
+  operation: 'set' | 'increase_amount' | 'decrease_amount' | 'increase_percent' | 'decrease_percent' | 'add_tags' | 'remove_tags';
+  value: any;
 }
 
 export interface CartItem {
@@ -152,6 +238,25 @@ export interface StoreSettings {
   announcement_link?: string;
   serviceable_pincodes: string[];
   maintenance_mode: boolean;
+  branding?: BrandingSettings;
+}
+
+export interface BrandingSettings {
+  logo_url: string;
+  mobile_logo_url?: string;
+  footer_logo_url?: string;
+  favicon_url: string;
+  site_name: string;
+  tagline?: string;
+  primary_color: string;
+  secondary_color: string;
+  accent_color?: string;
+  background_color?: string;
+  text_color?: string;
+  primary_text_color?: string;
+  secondary_text_color?: string;
+  updated_at?: string;
+  version?: number;
 }
 
 export type SectionType = 
@@ -197,6 +302,20 @@ export interface CMSPage {
   revisions?: CMSPageRevision[];
 }
 
+export interface MediaAsset {
+  id: string;
+  filename: string;
+  url: string;
+  alt_text: string;
+  file_size_bytes: number;
+  mime_type: string;
+  category: 'banner' | 'specimen' | 'breeder' | 'ui' | 'video' | 'blog' | 'general';
+  thumbnail_url?: string;
+  duration_seconds?: number;
+  dimensions?: { width: number; height: number };
+  created_at: string;
+}
+
 export interface ProductReview {
   id: string;
   product_id: string;
@@ -230,4 +349,34 @@ export interface AdminAuditLog {
   entity_id: string;
   details: string;
   created_at: string;
+}
+
+export type BlogCategory = 
+  | 'Betta Care & Acclimation'
+  | 'Genetics & Strains'
+  | 'Breeding & Conditioning'
+  | 'Aquascaping & Plants'
+  | 'Fish Health & Nutrition';
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content_html: string;
+  featured_image: string;
+  category: BlogCategory;
+  tags: string[];
+  author: {
+    name: string;
+    role: string;
+    avatar: string;
+  };
+  read_time_minutes: number;
+  is_published: boolean;
+  views_count: number;
+  published_at: string;
+  updated_at: string;
+  meta_title?: string;
+  meta_description?: string;
 }

@@ -4,8 +4,8 @@ import confetti from 'canvas-confetti';
 import { 
   ShieldCheck, QrCode, 
   Upload, CheckCircle2, ArrowRight, 
-  Copy, Building, Lock, Check, MessageSquare,
-  Smartphone, ExternalLink, X, FileText, Printer
+  Copy, Building, Lock, MessageSquare,
+  Smartphone, ExternalLink, X, FileText
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -23,20 +23,20 @@ export const CheckoutPage: React.FC = () => {
   const { settings } = useStoreSettings();
   const { showToast } = useToast();
 
-  // Selected address state
+  // Selected address state: only customer-selected or newly entered
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    addresses.find(a => a.is_default)?.id || addresses[0]?.id || 'new'
+    addresses.length > 0 ? '' : 'new'
   );
   const [isAddingNewAddress, setIsAddingNewAddress] = useState(addresses.length === 0);
 
-  // New address form state
+  // New address form state - No default address: customer enters their destination directly
   const [newAddrFullName, setNewAddrFullName] = useState(user?.full_name || '');
   const [newAddrPhone, setNewAddrPhone] = useState(user?.phone || '');
   const [newAddrStreet, setNewAddrStreet] = useState('');
   const [newAddrLandmark, setNewAddrLandmark] = useState('');
-  const [newAddrCity, setNewAddrCity] = useState('Bengaluru');
-  const [newAddrState, setNewAddrState] = useState('Karnataka');
-  const [newAddrPostalCode, setNewAddrPostalCode] = useState('560038');
+  const [newAddrCity, setNewAddrCity] = useState('');
+  const [newAddrState, setNewAddrState] = useState('');
+  const [newAddrPostalCode, setNewAddrPostalCode] = useState('');
 
   // Payment method selection & submission
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'bank_transfer'>('upi');
@@ -55,7 +55,7 @@ export const CheckoutPage: React.FC = () => {
         <SEO title="Checkout | Betta Aquatics" description="Complete your live fish order securely." />
         <h2 className="text-xl font-bold text-slate-800 mb-2">No Items in Cart</h2>
         <p className="text-xs sm:text-sm text-slate-500 mb-4">Please add live fish or aquarium products to proceed with checkout.</p>
-        <Link to="/shop" className="px-5 py-2.5 bg-ocean-900 text-white rounded-xl text-xs font-bold">
+        <Link to="/shop" className="px-5 py-2.5 bg-blue-900 text-white rounded-xl text-xs font-bold hover:bg-blue-800 transition-colors">
           Browse Store
         </Link>
       </div>
@@ -94,24 +94,28 @@ export const CheckoutPage: React.FC = () => {
 
     let shippingAddress: Address;
     if (isAddingNewAddress || selectedAddressId === 'new') {
-      if (!newAddrFullName || !newAddrPhone || !newAddrStreet || !newAddrPostalCode) {
-        showToast('Please complete all delivery address fields', 'error');
+      if (!newAddrFullName.trim() || !newAddrPhone.trim() || !newAddrStreet.trim() || !newAddrCity.trim() || !newAddrState.trim() || !newAddrPostalCode.trim()) {
+        showToast('Please enter all delivery address fields (Name, Phone, Street, City, State, PIN Code)', 'error');
         return;
       }
       shippingAddress = addAddress({
-        full_name: newAddrFullName,
-        phone: newAddrPhone,
-        street_address: newAddrStreet,
-        landmark: newAddrLandmark,
-        city: newAddrCity,
-        state: newAddrState,
-        postal_code: newAddrPostalCode,
-        is_default: addresses.length === 0,
+        full_name: newAddrFullName.trim(),
+        phone: newAddrPhone.trim(),
+        street_address: newAddrStreet.trim(),
+        landmark: newAddrLandmark.trim() || undefined,
+        city: newAddrCity.trim(),
+        state: newAddrState.trim(),
+        postal_code: newAddrPostalCode.trim(),
+        is_default: false,
       });
     } else {
+      if (!selectedAddressId) {
+        showToast('Please select a delivery address or enter a new one', 'error');
+        return;
+      }
       const existing = addresses.find(a => a.id === selectedAddressId);
       if (!existing) {
-        showToast('Please select a valid delivery address', 'error');
+        showToast('Please select a valid delivery address or enter a new one', 'error');
         return;
       }
       shippingAddress = existing;
@@ -190,30 +194,30 @@ export const CheckoutPage: React.FC = () => {
         <SEO title={`Order ${placedOrderNumber} Confirmed | Betta Aquatics`} description="Thank you for your order. Our team will verify your payment and prepare your insulated live fish consignment." />
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-xl">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-10 h-10" />
             </div>
 
-            <span className="text-xs font-bold uppercase tracking-wider text-aqua-700 bg-aqua-50 px-3 py-1 rounded-full border border-aqua-200 inline-block mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-800 bg-blue-50 px-3 py-1 rounded-full border border-blue-200 inline-block mb-3">
               Order Placed Successfully
             </span>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-ocean-950 font-display mb-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-950 font-display mb-2">
               Thank You For Your Order!
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-600 mb-6">
-              Order Number: <strong className="text-ocean-950 font-mono text-base">{placedOrderNumber}</strong>
+              Order Number: <strong className="text-blue-950 font-mono text-base">{placedOrderNumber}</strong>
             </p>
 
             {/* Uploaded Screenshot & UTR Summary */}
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-left text-xs space-y-3 mb-8">
               <div className="flex items-center gap-2 text-slate-800 font-bold">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>Next Step: Admin Payment Verification</span>
               </div>
               <p className="text-slate-600 leading-relaxed">
-                Your payment submission (UTR: <strong className="font-mono text-ocean-950">{upiReference}</strong>) has been routed to our verification desk. Once credited, our team will prepare your insulated live oxygen crate.
+                Your payment submission (UTR: <strong className="font-mono text-blue-950">{upiReference}</strong>) has been routed to our verification desk. Once credited, our team will prepare your insulated live oxygen crate.
               </p>
 
               {proofImage && (
@@ -224,8 +228,8 @@ export const CheckoutPage: React.FC = () => {
                     className="w-14 h-14 object-cover rounded-lg border border-slate-200 shrink-0"
                   />
                   <div className="text-xs">
-                    <span className="font-bold text-emerald-700 flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="font-bold text-blue-700 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
                       <span>Payment Screenshot Attached</span>
                     </span>
                     <span className="text-[11px] text-slate-500 font-mono block mt-0.5">
@@ -239,10 +243,10 @@ export const CheckoutPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/account/orders"
-                className="px-6 py-3 bg-ocean-900 hover:bg-ocean-800 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
+                className="px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
               >
                 <span>View Order & Tracking</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-red-400" />
               </Link>
 
               {placedOrder && (
@@ -251,7 +255,7 @@ export const CheckoutPage: React.FC = () => {
                   onClick={() => setIsInvoiceOpen(true)}
                   className="px-5 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
                 >
-                  <FileText className="w-4 h-4 text-aqua-600" />
+                  <FileText className="w-4 h-4 text-blue-600" />
                   <span>View Tax Invoice</span>
                 </button>
               )}
@@ -285,13 +289,13 @@ export const CheckoutPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-aqua-700">Safe & Insulated Checkout</span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-ocean-950 font-display">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-700">Safe & Insulated Checkout</span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-950 font-display">
               Finalize Your Consignment
             </h1>
           </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-            <Lock className="w-3.5 h-3.5 text-emerald-600" />
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-blue-800 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
+            <Lock className="w-3.5 h-3.5 text-blue-600" />
             <span>Encrypted Order Processing</span>
           </div>
         </div>
@@ -303,8 +307,8 @@ export const CheckoutPage: React.FC = () => {
               {/* Step 1: Customer Contact Info */}
               <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                  <div className="flex items-center gap-2 font-bold text-sm text-ocean-950">
-                    <span className="w-6 h-6 rounded-full bg-ocean-950 text-aqua-300 text-xs flex items-center justify-center font-bold">1</span>
+                  <div className="flex items-center gap-2 font-bold text-sm text-blue-950">
+                    <span className="w-6 h-6 rounded-full bg-blue-950 text-white text-xs flex items-center justify-center font-bold">1</span>
                     <span>Customer Details</span>
                   </div>
                   {user && (
@@ -319,15 +323,23 @@ export const CheckoutPage: React.FC = () => {
               {/* Step 2: Shipping Address */}
               <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                  <div className="flex items-center gap-2 font-bold text-sm text-ocean-950">
-                    <span className="w-6 h-6 rounded-full bg-ocean-950 text-aqua-300 text-xs flex items-center justify-center font-bold">2</span>
+                  <div className="flex items-center gap-2 font-bold text-sm text-blue-950">
+                    <span className="w-6 h-6 rounded-full bg-blue-950 text-white text-xs flex items-center justify-center font-bold">2</span>
                     <span>Delivery Address</span>
                   </div>
                   {addresses.length > 0 && (
                     <button
                       type="button"
-                      onClick={() => setIsAddingNewAddress(!isAddingNewAddress)}
-                      className="text-xs text-aqua-700 hover:underline font-semibold"
+                      onClick={() => {
+                        const next = !isAddingNewAddress;
+                        setIsAddingNewAddress(next);
+                        if (next) {
+                          setSelectedAddressId('new');
+                        } else {
+                          setSelectedAddressId('');
+                        }
+                      }}
+                      className="text-xs text-blue-700 hover:underline font-semibold"
                     >
                       {isAddingNewAddress ? 'Choose Saved Address' : '+ Add New Address'}
                     </button>
@@ -336,12 +348,13 @@ export const CheckoutPage: React.FC = () => {
 
                 {!isAddingNewAddress && addresses.length > 0 ? (
                   <div className="space-y-3">
+                    <p className="text-xs text-slate-500 mb-2">Select your delivery destination for this consignment:</p>
                     {addresses.map((addr) => (
                       <label
                         key={addr.id}
                         className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${
                           selectedAddressId === addr.id
-                            ? 'border-aqua-500 bg-aqua-50/30 ring-1 ring-aqua-500'
+                            ? 'border-blue-500 bg-blue-50/40 ring-1 ring-blue-500'
                             : 'border-slate-200 hover:border-slate-300'
                         }`}
                       >
@@ -350,17 +363,12 @@ export const CheckoutPage: React.FC = () => {
                           name="address"
                           checked={selectedAddressId === addr.id}
                           onChange={() => setSelectedAddressId(addr.id)}
-                          className="mt-1 accent-aqua-600"
+                          className="mt-1 accent-blue-600"
                         />
                         <div className="text-xs flex-1">
                           <div className="font-bold text-slate-900 flex items-center gap-2">
                             <span>{addr.full_name}</span>
                             <span className="text-slate-500 font-normal">({addr.phone})</span>
-                            {addr.is_default && (
-                              <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-semibold">
-                                Default
-                              </span>
-                            )}
                           </div>
                           <div className="text-slate-600 mt-1 leading-relaxed">
                             {addr.street_address}, {addr.landmark && `${addr.landmark}, `}{addr.city}, {addr.state} - <strong>{addr.postal_code}</strong>
@@ -371,6 +379,7 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-3 text-xs">
+                    <p className="text-xs text-slate-500 mb-1">Enter your delivery address for live oxygen-insulated consignment:</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block font-semibold text-slate-700 mb-1">Full Name *</label>
@@ -379,8 +388,8 @@ export const CheckoutPage: React.FC = () => {
                           required
                           value={newAddrFullName}
                           onChange={(e) => setNewAddrFullName(e.target.value)}
-                          placeholder="e.g. Rahul Sharma"
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                          placeholder="Recipient's full name"
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                         />
                       </div>
                       <div>
@@ -390,8 +399,8 @@ export const CheckoutPage: React.FC = () => {
                           required
                           value={newAddrPhone}
                           onChange={(e) => setNewAddrPhone(e.target.value)}
-                          placeholder="+91 98450 12345"
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                          placeholder="10-digit mobile number"
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                         />
                       </div>
                     </div>
@@ -402,8 +411,8 @@ export const CheckoutPage: React.FC = () => {
                         required
                         value={newAddrStreet}
                         onChange={(e) => setNewAddrStreet(e.target.value)}
-                        placeholder="House / Apartment / Street Name"
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                        placeholder="Flat / House No., Building Name, Street"
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                       />
                     </div>
                     <div>
@@ -412,8 +421,8 @@ export const CheckoutPage: React.FC = () => {
                         type="text"
                         value={newAddrLandmark}
                         onChange={(e) => setNewAddrLandmark(e.target.value)}
-                        placeholder="e.g. Near Metro Station / Behind Temple"
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                        placeholder="Nearby landmark (optional)"
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                       />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -424,7 +433,8 @@ export const CheckoutPage: React.FC = () => {
                           required
                           value={newAddrCity}
                           onChange={(e) => setNewAddrCity(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                          placeholder="City / Town"
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                         />
                       </div>
                       <div>
@@ -434,7 +444,8 @@ export const CheckoutPage: React.FC = () => {
                           required
                           value={newAddrState}
                           onChange={(e) => setNewAddrState(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                          placeholder="State / Province"
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                         />
                       </div>
                       <div>
@@ -445,7 +456,8 @@ export const CheckoutPage: React.FC = () => {
                           maxLength={6}
                           value={newAddrPostalCode}
                           onChange={(e) => setNewAddrPostalCode(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                          placeholder="6-digit PIN code"
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                         />
                       </div>
                     </div>
@@ -456,11 +468,11 @@ export const CheckoutPage: React.FC = () => {
               {/* Step 3: Manual Payment Verification Instructions */}
               <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                  <div className="flex items-center gap-2 font-bold text-sm text-ocean-950">
-                    <span className="w-6 h-6 rounded-full bg-ocean-950 text-aqua-300 text-xs flex items-center justify-center font-bold">3</span>
+                  <div className="flex items-center gap-2 font-bold text-sm text-blue-950">
+                    <span className="w-6 h-6 rounded-full bg-blue-950 text-white text-xs flex items-center justify-center font-bold">3</span>
                     <span>Manual Payment Verification</span>
                   </div>
-                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  <span className="text-[11px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
                     Zero Gateway Fees
                   </span>
                 </div>
@@ -472,11 +484,11 @@ export const CheckoutPage: React.FC = () => {
                     onClick={() => setPaymentMethod('upi')}
                     className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                       paymentMethod === 'upi'
-                        ? 'border-aqua-500 bg-aqua-50/50 text-ocean-950 shadow-sm ring-1 ring-aqua-500'
+                        ? 'border-blue-600 bg-blue-50/60 text-blue-950 shadow-sm ring-1 ring-blue-600'
                         : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    <QrCode className="w-4 h-4 text-aqua-600" />
+                    <QrCode className="w-4 h-4 text-blue-600" />
                     <span>Instant UPI / QR Code</span>
                   </button>
 
@@ -485,11 +497,11 @@ export const CheckoutPage: React.FC = () => {
                     onClick={() => setPaymentMethod('bank_transfer')}
                     className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                       paymentMethod === 'bank_transfer'
-                        ? 'border-aqua-500 bg-aqua-50/50 text-ocean-950 shadow-sm ring-1 ring-aqua-500'
+                        ? 'border-blue-600 bg-blue-50/60 text-blue-950 shadow-sm ring-1 ring-blue-600'
                         : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    <Building className="w-4 h-4 text-aqua-600" />
+                    <Building className="w-4 h-4 text-blue-600" />
                     <span>Direct Bank Transfer</span>
                   </button>
                 </div>
@@ -498,13 +510,13 @@ export const CheckoutPage: React.FC = () => {
                 {paymentMethod === 'upi' ? (
                   <div className="space-y-4 mb-6">
                     {/* Step A: Direct Pay with UPI App */}
-                    <div className="p-4 sm:p-5 bg-emerald-50/60 rounded-2xl border border-emerald-200 text-xs space-y-3.5">
+                    <div className="p-4 sm:p-5 bg-blue-50/60 rounded-2xl border border-blue-200 text-xs space-y-3.5">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                        <div className="flex items-center gap-2 font-bold text-sm text-emerald-950">
-                          <Smartphone className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <div className="flex items-center gap-2 font-bold text-sm text-blue-950">
+                          <Smartphone className="w-4 h-4 text-blue-600 shrink-0" />
                           <span>Step 1: Open UPI App & Pay</span>
                         </div>
-                        <span className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200 self-start sm:self-auto">
+                        <span className="font-mono text-xs font-bold text-red-700 bg-red-50 px-2.5 py-0.5 rounded-full border border-red-200 self-start sm:self-auto">
                           Exact Amount: {formatCurrency(total)}
                         </span>
                       </div>
@@ -518,11 +530,11 @@ export const CheckoutPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={handleOpenUPIApp}
-                          className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 active:scale-98"
+                          className="w-full py-3.5 px-4 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 active:scale-98"
                         >
-                          <Smartphone className="w-5 h-5 text-emerald-100" />
+                          <Smartphone className="w-5 h-5 text-red-100" />
                           <span>Pay Now via UPI App ({formatCurrency(total)})</span>
-                          <ExternalLink className="w-4 h-4 text-emerald-100" />
+                          <ExternalLink className="w-4 h-4 text-red-100" />
                         </button>
                       </div>
 
@@ -553,15 +565,15 @@ export const CheckoutPage: React.FC = () => {
                       </div>
 
                       {/* UPI ID copy pill */}
-                      <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-emerald-200 text-[11px]">
+                      <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-blue-200 text-[11px]">
                         <div className="flex items-center gap-2">
                           <span className="text-slate-500">UPI ID:</span>
-                          <span className="font-mono font-bold text-ocean-950">{settings.upi_id}</span>
+                          <span className="font-mono font-bold text-blue-950">{settings.upi_id}</span>
                         </div>
                         <button
                           type="button"
                           onClick={handleCopyUPI}
-                          className="text-aqua-700 hover:text-aqua-800 font-bold inline-flex items-center gap-1 p-1"
+                          className="text-blue-700 hover:text-blue-800 font-bold inline-flex items-center gap-1 p-1"
                         >
                           <Copy className="w-3.5 h-3.5" />
                           <span>Copy</span>
@@ -569,11 +581,11 @@ export const CheckoutPage: React.FC = () => {
                       </div>
 
                       {/* Desktop QR Code Toggle */}
-                      <div className="pt-2 border-t border-emerald-200/60">
+                      <div className="pt-2 border-t border-blue-200/60">
                         <button
                           type="button"
                           onClick={() => setShowQRCode(!showQRCode)}
-                          className="text-[11px] text-emerald-800 font-semibold hover:underline flex items-center gap-1"
+                          className="text-[11px] text-blue-800 font-semibold hover:underline flex items-center gap-1"
                         >
                           <QrCode className="w-3.5 h-3.5" />
                           <span>{showQRCode ? 'Hide Desktop QR Code' : 'Paying from PC / Another Phone? Show QR Code'}</span>
@@ -591,18 +603,18 @@ export const CheckoutPage: React.FC = () => {
                     {/* Step B: Mandatory Confirmation & Proof Submission */}
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-200/70">
-                        <div className="flex items-center gap-2 font-bold text-sm text-ocean-950">
-                          <span className="w-6 h-6 rounded-full bg-ocean-950 text-aqua-300 text-xs flex items-center justify-center font-bold">2</span>
+                        <div className="flex items-center gap-2 font-bold text-sm text-blue-950">
+                          <span className="w-6 h-6 rounded-full bg-blue-950 text-white text-xs flex items-center justify-center font-bold">2</span>
                           <span>Submit UTR & Payment Screenshot</span>
                         </div>
-                        <span className="text-[10px] uppercase font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
                           Mandatory
                         </span>
                       </div>
 
                       {hasClickedPayNow && (
-                        <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 text-blue-900 text-xs flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                           <span>UPI app triggered! Complete your transfer, then upload your screenshot and enter the 12-digit UTR below.</span>
                         </div>
                       )}
@@ -618,7 +630,7 @@ export const CheckoutPage: React.FC = () => {
                           value={upiReference}
                           onChange={(e) => setUpiReference(e.target.value)}
                           placeholder="e.g. 407519823412 (Found in receipt)"
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-aqua-500"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-blue-500"
                         />
                         <span className="text-[10px] text-slate-400 block mt-1">
                           Found in your Google Pay, PhonePe, or Paytm receipt (labeled 'UPI transaction ID' or 'UTR').
@@ -632,7 +644,7 @@ export const CheckoutPage: React.FC = () => {
                         </label>
 
                         {proofImage ? (
-                          <div className="p-3 bg-white rounded-2xl border border-emerald-200 space-y-2">
+                          <div className="p-3 bg-white rounded-2xl border border-blue-200 space-y-2">
                             <div className="flex items-center gap-3">
                               <img
                                 src={proofImage}
@@ -640,8 +652,8 @@ export const CheckoutPage: React.FC = () => {
                                 className="w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-sm shrink-0"
                               />
                               <div className="text-xs space-y-0.5 flex-1">
-                                <div className="flex items-center gap-1.5 text-emerald-800 font-bold">
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                                <div className="flex items-center gap-1.5 text-blue-900 font-bold">
+                                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                                   <span>Screenshot Attached</span>
                                 </div>
                                 <div className="text-[11px] text-slate-500">Ready for instant admin verification</div>
@@ -649,7 +661,7 @@ export const CheckoutPage: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => setProofImage(null)}
-                                className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                                className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
                                 title="Remove Screenshot"
                               >
                                 <X className="w-4 h-4" />
@@ -658,8 +670,8 @@ export const CheckoutPage: React.FC = () => {
                           </div>
                         ) : (
                           <div>
-                            <label className="cursor-pointer flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 hover:border-aqua-500 hover:bg-white rounded-2xl text-xs transition-all text-center">
-                              <Upload className="w-6 h-6 text-aqua-600 mb-1.5" />
+                            <label className="cursor-pointer flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 hover:border-blue-500 hover:bg-white rounded-2xl text-xs transition-all text-center">
+                              <Upload className="w-6 h-6 text-blue-600 mb-1.5" />
                               <span className="font-bold text-slate-700">Tap to Upload Payment Screenshot</span>
                               <span className="text-[11px] text-slate-400 mt-0.5">JPEG, PNG or WebP from your device</span>
                               <input
@@ -699,7 +711,7 @@ export const CheckoutPage: React.FC = () => {
                           value={upiReference}
                           onChange={(e) => setUpiReference(e.target.value)}
                           placeholder="e.g. 407519823412 or Bank Ref"
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-blue-500"
                         />
                       </div>
                       <div>
@@ -763,12 +775,12 @@ export const CheckoutPage: React.FC = () => {
                   <div className="flex justify-between text-slate-600">
                     <span>Express Air Delivery</span>
                     <span>
-                      {deliveryFee === 0 ? <strong className="text-emerald-600">FREE</strong> : formatCurrency(deliveryFee)}
+                      {deliveryFee === 0 ? <strong className="text-blue-700">FREE</strong> : formatCurrency(deliveryFee)}
                     </span>
                   </div>
 
                   {discountAmount > 0 && (
-                    <div className="flex justify-between text-emerald-700 font-semibold">
+                    <div className="flex justify-between text-red-600 font-semibold">
                       <span>Discount ({appliedCoupon?.code})</span>
                       <span>-{formatCurrency(discountAmount)}</span>
                     </div>
@@ -776,7 +788,7 @@ export const CheckoutPage: React.FC = () => {
 
                   <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
                     <span className="font-bold text-sm text-slate-900">Total Payable</span>
-                    <span className="font-extrabold text-2xl text-ocean-950 font-display">
+                    <span className="font-extrabold text-2xl text-blue-950 font-display">
                       {formatCurrency(total)}
                     </span>
                   </div>
@@ -785,14 +797,14 @@ export const CheckoutPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isPlacingOrder}
-                  className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
+                  className="w-full py-4 bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
                 >
                   {isPlacingOrder ? (
                     <span>Confirming Order...</span>
                   ) : (
                     <>
                       <span>Submit Payment Proof & Confirm Order</span>
-                      <ArrowRight className="w-4 h-4 text-teal-400" />
+                      <ArrowRight className="w-4 h-4 text-red-400" />
                     </>
                   )}
                 </button>
@@ -803,12 +815,12 @@ export const CheckoutPage: React.FC = () => {
                     : 'Bank IMPS/NEFT reference required for order approval'}
                 </p>
 
-                <div className="p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 text-xs text-emerald-950 space-y-1.5">
-                  <div className="flex items-center gap-1.5 font-bold text-emerald-900">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-4 bg-blue-50 border border-blue-200 text-xs text-blue-950 space-y-1.5 rounded-2xl">
+                  <div className="flex items-center gap-1.5 font-bold text-blue-900">
+                    <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
                     <span>Why Manual Verification?</span>
                   </div>
-                  <p className="text-emerald-800 text-[11px] leading-relaxed">
+                  <p className="text-blue-800 text-[11px] leading-relaxed">
                     Every ornamental fish in your order is a living 1-of-1 specimen. Our head breeder personally inspects fin integrity and vigor before approving cargo transit.
                   </p>
                 </div>
@@ -822,9 +834,9 @@ export const CheckoutPage: React.FC = () => {
                     href="https://wa.me/919845012345?text=Hi%20Anand,%20I%20am%20at%20checkout%20and%20need%20assistance%20with%20payment"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 shrink-0"
+                    className="px-3 py-1.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 shrink-0"
                   >
-                    <MessageSquare className="w-3.5 h-3.5" />
+                    <MessageSquare className="w-3.5 h-3.5 text-red-400" />
                     <span>WhatsApp</span>
                   </a>
                 </div>

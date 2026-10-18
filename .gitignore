@@ -7,10 +7,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
 dist
 dist-ssr
 *.local
+
+# Environment variables & secrets (Never commit secrets to GitHub!)
+.env
+.env.*
+!.env.example
+
+# Test & Browser MCP scratch files
+.playwright-mcp/
+
+# Raw media source archives (assets are served from public/videos)
+Products Video/
 
 # Editor directories and files
 .vscode/*

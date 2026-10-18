@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:migrate": "node scripts/run-migrations.cjs",
+    "db:seed": "node scripts/seed-supabase.cjs",
+    "db:status": "node scripts/test-db.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
@@ -23,11 +26,13 @@
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^24.13.3",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.6.1",
     "oxlint": "^1.81.0",
+    "pg": "^8.23.1",
     "postcss": "^8.5.30",
     "tailwindcss": "^3.4.17",
     "typescript": "~6.0.2",

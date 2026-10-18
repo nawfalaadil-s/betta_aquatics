@@ -3,14 +3,19 @@ import { Sparkles, ArrowRight, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { mockDb } from '../../lib/mockDatabase';
 import { ProductCard } from '../common/ProductCard';
-import { Product } from '../../lib/types';
+import { Product, HomepageSection } from '../../lib/types';
 
 interface FlashDealSectionProps {
+  section?: HomepageSection;
   onQuickView?: (product: Product) => void;
 }
 
-export const FlashDealSection: React.FC<FlashDealSectionProps> = ({ onQuickView }) => {
+export const FlashDealSection: React.FC<FlashDealSectionProps> = ({ section, onQuickView }) => {
   const products = mockDb.getProducts().filter(p => p.compare_at_price && p.compare_at_price > p.price).slice(0, 4);
+
+  const title = section?.title || 'Weekly Featured Fish & Special Offers';
+  const subtitle = section?.subtitle || 'Healthy quarantine-approved specimens ready for immediate dispatch.';
+  const bannerText = section?.config?.bannerText || 'Promotional Pricing';
 
   return (
     <section className="py-10 bg-white border-b border-slate-200">
@@ -18,21 +23,21 @@ export const FlashDealSection: React.FC<FlashDealSectionProps> = ({ onQuickView 
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
           <div>
-            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-teal-700 mb-1">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-red-600 mb-1">
               <Tag className="w-3.5 h-3.5" />
-              <span>Promotional Pricing</span>
+              <span>{bannerText}</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-display">
-              Weekly Featured Fish & Special Offers
+              {title}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Healthy quarantine-approved specimens ready for immediate dispatch.
+            <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+              {subtitle}
             </p>
           </div>
 
           <Link
             to="/shop?filter=sale"
-            className="text-xs sm:text-sm font-semibold text-teal-700 hover:text-teal-800 flex items-center gap-1 shrink-0"
+            className="text-xs sm:text-sm font-semibold text-red-600 hover:underline flex items-center gap-1 shrink-0"
           >
             <span>View All Specials</span>
             <ArrowRight className="w-4 h-4" />

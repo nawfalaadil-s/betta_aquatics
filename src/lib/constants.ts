@@ -1,4 +1,4 @@
-import { Category, Product, StoreSettings, HomepageSection, CMSPage, Coupon } from './types';
+import { Category, Product, StoreSettings, HomepageSection, CMSPage, Coupon, BlogPost, MediaAsset, BrandingSettings } from './types';
 
 export const COURIER_PRESETS = [
   {
@@ -35,7 +35,50 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'betta-fish',
     description: 'Exquisite Halfmoon, Crowntail, Plakat & Rare Giant Bettas sourced from champion bloodlines.',
     image_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
+    banner_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80',
+    parent_id: null,
     display_order: 1,
+    is_active: true,
+    is_featured: true,
+  },
+  {
+    id: 'cat-sub-halfmoon',
+    name: 'Halfmoon Bettas',
+    slug: 'halfmoon-bettas',
+    description: '180-degree caudal spread show-class specimen males and females.',
+    image_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
+    parent_id: 'cat-betta',
+    display_order: 1,
+    is_active: true,
+  },
+  {
+    id: 'cat-sub-crowntail',
+    name: 'Crowntail Bettas',
+    slug: 'crowntail-bettas',
+    description: 'Dramatic ray web reductions creating crown-like finnage.',
+    image_url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=600&q=80',
+    parent_id: 'cat-betta',
+    display_order: 2,
+    is_active: true,
+  },
+  {
+    id: 'cat-sub-plakat',
+    name: 'Plakat & Fighter Bettas',
+    slug: 'plakat-bettas',
+    description: 'Short-finned, muscular traditional and modern HMPK fighters.',
+    image_url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=600&q=80',
+    parent_id: 'cat-betta',
+    display_order: 3,
+    is_active: true,
+  },
+  {
+    id: 'cat-sub-giant',
+    name: 'Giant Bettas',
+    slug: 'giant-bettas',
+    description: 'Over-sized Betta strains reaching 6 to 8+ centimeters in length.',
+    image_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
+    parent_id: 'cat-betta',
+    display_order: 4,
     is_active: true,
   },
   {
@@ -44,8 +87,11 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'guppies',
     description: 'Pure strain Albino Full Red, Dumbo Ear Mosaic, and Blue Dragon imported guppy pairs.',
     image_url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=600&q=80',
+    banner_url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=1200&q=80',
+    parent_id: null,
     display_order: 2,
     is_active: true,
+    is_featured: true,
   },
   {
     id: 'cat-pairs',
@@ -53,6 +99,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'breeding-pairs',
     description: 'Carefully conditioned, proven fertile breeding pairs with lineage certificates.',
     image_url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=600&q=80',
+    banner_url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=1200&q=80',
+    parent_id: null,
     display_order: 3,
     is_active: true,
   },
@@ -62,7 +110,30 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'aquatic-plants',
     description: 'Snail-free, tissue-cultured and submerged aquatic plants for lush natural aquascapes.',
     image_url: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=600&q=80',
+    banner_url: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=1200&q=80',
+    parent_id: null,
     display_order: 4,
+    is_active: true,
+    is_featured: true,
+  },
+  {
+    id: 'cat-sub-carpet',
+    name: 'Carpet & Foreground Plants',
+    slug: 'carpet-plants',
+    description: 'Monte Carlo, Glossostigma, and Dwarf Hairgrass lush bottom covers.',
+    image_url: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=600&q=80',
+    parent_id: 'cat-plants',
+    display_order: 1,
+    is_active: true,
+  },
+  {
+    id: 'cat-sub-stem',
+    name: 'Stem & Background Plants',
+    slug: 'stem-plants',
+    description: 'Rotala, Ludwigia, and Cabomba vibrant red and green stems.',
+    image_url: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=600&q=80',
+    parent_id: 'cat-plants',
+    display_order: 2,
     is_active: true,
   },
   {
@@ -71,7 +142,19 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'fish-food',
     description: 'High-protein micro pellets, freeze-dried bloodworms, and color-enhancing spirulina feeds.',
     image_url: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80',
+    banner_url: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=1200&q=80',
+    parent_id: null,
     display_order: 5,
+    is_active: true,
+  },
+  {
+    id: 'cat-sub-pellets',
+    name: 'Micro Pellets & Granules',
+    slug: 'micro-pellets',
+    description: 'High-protein sinking and floating pellets formulated for Anabantoids.',
+    image_url: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80',
+    parent_id: 'cat-food',
+    display_order: 1,
     is_active: true,
   },
   {
@@ -80,7 +163,19 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'accessories',
     description: 'Gentle sponge filters, Betta leaf hammocks, Indian almond leaves, and water conditioners.',
     image_url: 'https://images.unsplash.com/photo-1544943910-4c1dc44a0558?auto=format&fit=crop&w=600&q=80',
+    banner_url: 'https://images.unsplash.com/photo-1544943910-4c1dc44a0558?auto=format&fit=crop&w=1200&q=80',
+    parent_id: null,
     display_order: 6,
+    is_active: true,
+  },
+  {
+    id: 'cat-sub-conditioners',
+    name: 'Water Conditioners & Botanicals',
+    slug: 'conditioners-botanicals',
+    description: 'Natural Indian Almond Leaves, blackwater extract, and dechlorinators.',
+    image_url: 'https://images.unsplash.com/photo-1544943910-4c1dc44a0558?auto=format&fit=crop&w=600&q=80',
+    parent_id: 'cat-accessories',
+    display_order: 1,
     is_active: true,
   },
 ];
@@ -97,10 +192,14 @@ export const INITIAL_PRODUCTS: Product[] = [
     compare_at_price: 1899,
     category_id: 'cat-betta',
     category_name: 'Betta Fish',
+    subcategory_id: 'cat-sub-halfmoon',
+    subcategory_name: 'Halfmoon Bettas',
     stock_quantity: 1,
     is_unique_specimen: true,
     is_featured: true,
     is_active: true,
+    status: 'published',
+    weight: 150,
     strain: 'Halfmoon',
     gender: 'Male',
     size: '4.2 cm (Body)',
@@ -113,6 +212,16 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-001',
+        url: 'https://assets.mixkit.co/videos/preview/mixkit-bright-red-betta-fish-swimming-41712-large.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
+        title: 'Active Swimming & Flare Demonstration',
+        duration: 14,
+        mime_type: 'video/mp4',
+      }
     ],
     rating: 4.9,
     review_count: 28,
@@ -130,10 +239,14 @@ export const INITIAL_PRODUCTS: Product[] = [
     compare_at_price: 2200,
     category_id: 'cat-betta',
     category_name: 'Betta Fish',
+    subcategory_id: 'cat-sub-plakat',
+    subcategory_name: 'Plakat & Fighter Bettas',
     stock_quantity: 1,
     is_unique_specimen: true,
     is_featured: true,
     is_active: true,
+    status: 'published',
+    weight: 150,
     strain: 'Plakat (Shortfin)',
     gender: 'Male',
     size: '3.8 cm (Body)',
@@ -145,7 +258,17 @@ export const INITIAL_PRODUCTS: Product[] = [
     shipping_restriction: 'Live Arrival Guarantee with thermal insulation.',
     images: [
       'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-002',
+        url: 'https://assets.mixkit.co/videos/preview/mixkit-colorful-betta-fish-in-an-aquarium-41713-large.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80',
+        title: 'Koi Plakat Active Tank Maneuver',
+        duration: 18,
+        mime_type: 'video/mp4',
+      }
     ],
     rating: 5.0,
     review_count: 19,
@@ -354,34 +477,504 @@ export const INITIAL_PRODUCTS: Product[] = [
     review_count: 67,
     tags: ['Water Care', 'Essential'],
     created_at: '2026-03-18T10:00:00Z',
+  },
+  {
+    id: 'prod-010',
+    name: 'Vibrant Fighter Betta (Healthy Active Male)',
+    slug: 'vibrant-fighter-betta-active-male-100',
+    sku: 'RG-BT-100',
+    description: 'High-vigor, healthy active fighter Betta male. Acclimated and conditioned in our facility with crisp fins and striking coloration. Suitable for planted nano aquariums.',
+    short_description: 'Vibrant active male fighter Betta conditioned for tropical nano aquariums.',
+    price: 100,
+    compare_at_price: 150,
+    category_id: 'cat-betta',
+    category_name: 'Betta Fish',
+    subcategory_id: 'cat-sub-plakat',
+    subcategory_name: 'Plakat & Fighter Bettas',
+    stock_quantity: 12,
+    is_unique_specimen: false,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 120,
+    strain: 'Plakat Fighter',
+    gender: 'Male',
+    size: '3.5 - 4.0 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '24°C - 28°C',
+    ph_range: '6.5 - 7.5',
+    care_level: 'Easy',
+    diet: 'High-protein micro pellets & daphnia',
+    shipping_restriction: 'Live Arrival Guarantee with thermal air packaging.',
+    images: [
+      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-010',
+        url: '/videos/betta-male-100.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
+        title: 'Active Male Betta Swimming Video',
+        duration: 15,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 4.8,
+    review_count: 31,
+    tags: ['Bestseller', 'Active Swimmer', 'Live Video'],
+    created_at: '2026-10-18T10:00:00Z',
+  },
+  {
+    id: 'prod-011',
+    name: 'Selected Crown & Plakat Betta (Hand-Picked)',
+    slug: 'selected-crown-plakat-betta-250',
+    sku: 'RG-BT-250',
+    description: 'Carefully hand-picked hybrid Crown & Plakat Betta male exhibiting distinctive fin serration and lively territorial flaring behavior.',
+    short_description: 'Selected Crown/Plakat cross Betta with vibrant coloration.',
+    price: 250,
+    compare_at_price: 350,
+    category_id: 'cat-betta',
+    category_name: 'Betta Fish',
+    subcategory_id: 'cat-sub-crowntail',
+    subcategory_name: 'Crowntail Bettas',
+    stock_quantity: 6,
+    is_unique_specimen: false,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 130,
+    strain: 'Crown Plakat Cross',
+    gender: 'Male',
+    size: '4.0 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '24°C - 28°C',
+    ph_range: '6.5 - 7.2',
+    care_level: 'Moderate',
+    diet: 'Artemia, frozen bloodworms & flakes',
+    images: [
+      'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-011',
+        url: '/videos/betta-250.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80',
+        title: 'Selected Crown Betta Swimming Video',
+        duration: 12,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 4.9,
+    review_count: 18,
+    tags: ['Hand Picked', 'Live Video'],
+    created_at: '2026-10-18T10:30:00Z',
+  },
+  {
+    id: 'prod-012',
+    name: 'Exotic Show Halfmoon Betta Specimen',
+    slug: 'exotic-show-halfmoon-betta-350',
+    sku: 'RG-BT-350',
+    description: 'Stunning exhibition-grade Halfmoon Betta featuring high caudal spread, wide dorsal fin, and deep metallic iridescence.',
+    short_description: 'Show-class Halfmoon Betta with expansive 180° caudal spread.',
+    price: 350,
+    compare_at_price: 500,
+    category_id: 'cat-betta',
+    category_name: 'Betta Fish',
+    subcategory_id: 'cat-sub-halfmoon',
+    subcategory_name: 'Halfmoon Bettas',
+    stock_quantity: 4,
+    is_unique_specimen: true,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 150,
+    strain: 'Halfmoon',
+    gender: 'Male',
+    size: '4.5 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '24°C - 28°C',
+    ph_range: '6.5 - 7.0',
+    care_level: 'Moderate',
+    diet: 'High-protein micro pellets & live brine shrimp',
+    images: [
+      'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-012',
+        url: '/videos/betta-350.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80',
+        title: 'Show Halfmoon Flaring Demonstration',
+        duration: 18,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 5.0,
+    review_count: 24,
+    tags: ['Show Class', 'Single Specimen', 'Live Video'],
+    created_at: '2026-10-18T11:00:00Z',
+  },
+  {
+    id: 'prod-013',
+    name: 'Green Tail Pure Strain Guppy',
+    slug: 'green-tail-pure-strain-guppy-100',
+    sku: 'RG-GP-100',
+    description: 'Pure-strain Green Tail Guppy with radiant emerald metallic sheen on the caudal fin and active schooling behavior in planted tanks.',
+    short_description: 'Pure strain Green Tail Guppy with radiant emerald coloration.',
+    price: 100,
+    compare_at_price: 140,
+    category_id: 'cat-guppy',
+    category_name: 'Guppies & Livebearers',
+    stock_quantity: 20,
+    is_unique_specimen: false,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 80,
+    strain: 'Green Tail Delta',
+    gender: 'Male',
+    size: '3.0 - 3.5 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '22°C - 26°C',
+    ph_range: '7.0 - 7.8',
+    care_level: 'Easy',
+    diet: 'Spirulina flakes, micro pellets, daphnia',
+    images: [
+      'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-013',
+        url: '/videos/green-tail-100.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=800&q=80',
+        title: 'Green Tail Guppy Active Swimming Video',
+        duration: 10,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 4.8,
+    review_count: 15,
+    tags: ['Pure Strain', 'Green Tail', 'Live Video'],
+    created_at: '2026-10-18T11:30:00Z',
+  },
+  {
+    id: 'prod-014',
+    name: 'Active Guppy Breeding Pair (Proven 1M + 1F)',
+    slug: 'active-guppy-breeding-pair-120',
+    sku: 'RG-GP-120P',
+    description: 'Conditioned and fertile guppy breeding pair (1 male + 1 female) displaying high vitality, vibrant tail patterns, and rapid acclimation to tap water.',
+    short_description: 'Proven 1 Male + 1 Female fertile guppy breeding pair.',
+    price: 120,
+    compare_at_price: 180,
+    category_id: 'cat-guppy',
+    category_name: 'Guppies & Livebearers',
+    stock_quantity: 15,
+    is_unique_specimen: false,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 110,
+    strain: 'Selected Domestic Strain',
+    gender: 'Breeding Pair',
+    size: '3.2 - 4.5 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '22°C - 27°C',
+    ph_range: '7.0 - 8.0',
+    care_level: 'Easy',
+    diet: 'Flake food, micro worms, baby brine shrimp',
+    images: [
+      'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-014',
+        url: '/videos/guppy-pair-120.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80',
+        title: 'Guppy Pair Swimming & Courtship Video',
+        duration: 12,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 4.9,
+    review_count: 27,
+    tags: ['Breeding Pair', 'High Fertility', 'Live Video'],
+    created_at: '2026-10-18T12:00:00Z',
+  },
+  {
+    id: 'prod-015',
+    name: 'Vibrant Delta Tail Guppy (Assorted Show Male)',
+    slug: 'vibrant-delta-tail-guppy-120',
+    sku: 'RG-GP-120',
+    description: 'Wide delta tail guppy male showcasing energetic swimming patterns, saturated fin pigments, and healthy dorsal development.',
+    short_description: 'Wide delta tail male guppy with saturated fin pigments.',
+    price: 120,
+    compare_at_price: 160,
+    category_id: 'cat-guppy',
+    category_name: 'Guppies & Livebearers',
+    stock_quantity: 25,
+    is_unique_specimen: false,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 85,
+    strain: 'Delta Tail',
+    gender: 'Male',
+    size: '3.5 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '23°C - 27°C',
+    ph_range: '7.0 - 7.6',
+    care_level: 'Easy',
+    diet: 'Micro pellets, artemia flakes',
+    images: [
+      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-015',
+        url: '/videos/guppy-120.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
+        title: 'Delta Tail Guppy Active Swimming Video',
+        duration: 11,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 4.7,
+    review_count: 19,
+    tags: ['Delta Tail', 'Active', 'Live Video'],
+    created_at: '2026-10-18T12:30:00Z',
+  },
+  {
+    id: 'prod-016',
+    name: 'Select Grade Exotic Guppy Male',
+    slug: 'select-grade-exotic-guppy-150',
+    sku: 'RG-GP-150',
+    description: 'Premium select grade guppy male chosen for symmetry, deep fin contrast, and peaceful community tank temperament.',
+    short_description: 'Select grade guppy male with premium fin symmetry.',
+    price: 150,
+    compare_at_price: 220,
+    category_id: 'cat-guppy',
+    category_name: 'Guppies & Livebearers',
+    stock_quantity: 18,
+    is_unique_specimen: false,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 90,
+    strain: 'Exotic Cross',
+    gender: 'Male',
+    size: '3.5 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '22°C - 27°C',
+    ph_range: '7.0 - 7.8',
+    care_level: 'Easy',
+    diet: 'High-protein baby flakes, bloodworm fragments',
+    images: [
+      'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-016',
+        url: '/videos/guppy-150.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80',
+        title: 'Select Grade Guppy Swimming Footage',
+        duration: 10,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 4.8,
+    review_count: 14,
+    tags: ['Exotic Grade', 'Live Video'],
+    created_at: '2026-10-18T13:00:00Z',
+  },
+  {
+    id: 'prod-017',
+    name: 'Hardy Mixed Strain Community Guppy',
+    slug: 'hardy-mixed-strain-community-guppy-45',
+    sku: 'RG-GP-045',
+    description: 'Extremely hardy, community-friendly mixed strain guppy. Perfect for beginners and community planted tanks.',
+    short_description: 'Affordable, hardy community guppy for beginner hobbyists.',
+    price: 45,
+    compare_at_price: 70,
+    category_id: 'cat-guppy',
+    category_name: 'Guppies & Livebearers',
+    stock_quantity: 60,
+    is_unique_specimen: false,
+    is_featured: false,
+    is_active: true,
+    status: 'published',
+    weight: 75,
+    strain: 'Mixed Community Strain',
+    gender: 'Unsexed',
+    size: '2.5 - 3.5 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '20°C - 28°C',
+    ph_range: '6.8 - 8.2',
+    care_level: 'Easy',
+    diet: 'All staple flakes & micro granules',
+    images: [
+      'https://images.unsplash.com/photo-1579273166152-d725a4e2b755?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-017',
+        url: '/videos/guppy-45.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1579273166152-d725a4e2b755?auto=format&fit=crop&w=800&q=80',
+        title: 'Community Tank Guppy Active Swimming Video',
+        duration: 13,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 4.6,
+    review_count: 52,
+    tags: ['Community Fish', 'Affordable', 'Beginner Friendly', 'Live Video'],
+    created_at: '2026-10-18T13:15:00Z',
+  },
+  {
+    id: 'prod-018',
+    name: 'Collector Grade Champion Lineage Guppy Pair',
+    slug: 'collector-grade-champion-lineage-guppy-pair-800',
+    sku: 'RG-GP-800',
+    description: 'Rare collector-grade imported champion bloodline guppy pair with enormous dorsal spread, pure color saturation, and verified pedigree lineage.',
+    short_description: '1 Male + 1 Female rare collector-grade champion lineage pair.',
+    price: 800,
+    compare_at_price: 1200,
+    category_id: 'cat-guppy',
+    category_name: 'Guppies & Livebearers',
+    stock_quantity: 3,
+    is_unique_specimen: true,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 120,
+    strain: 'Champion Lineage Show Guppy',
+    gender: 'Breeding Pair',
+    size: '3.5 - 4.8 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '22°C - 26°C',
+    ph_range: '7.2 - 7.8',
+    care_level: 'Moderate',
+    diet: 'Baby brine shrimp, decapsulated artemia cysts, high-protein micropellets',
+    images: [
+      'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-018',
+        url: '/videos/guppy-800.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80',
+        title: 'Collector Champion Guppy Pair Swimming Video',
+        duration: 25,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 5.0,
+    review_count: 8,
+    tags: ['Champion Bloodline', 'Collector Grade', 'Single Specimen', 'Live Video'],
+    created_at: '2026-10-18T13:30:00Z',
+  },
+  {
+    id: 'prod-019',
+    name: 'Zebra Danio Active Schooling Pack (5 Pairs / 10 Fish)',
+    slug: 'zebra-danio-active-schooling-pack-150',
+    sku: 'RG-ZB-150',
+    description: 'Dynamic schooling pack of 10 Zebra Danios (5 pairs). Fast, lively upper-level swimmers with silver-blue horizontal racing stripes that bring non-stop movement to aquascapes.',
+    short_description: 'Pack of 10 active schooling Zebra Danios with crisp racing stripes.',
+    price: 150,
+    compare_at_price: 250,
+    category_id: 'cat-guppy',
+    category_name: 'Guppies & Livebearers',
+    stock_quantity: 25,
+    is_unique_specimen: false,
+    is_featured: true,
+    is_active: true,
+    status: 'published',
+    weight: 200,
+    strain: 'Zebra Danio (Brachydanio rerio)',
+    gender: 'Unsexed',
+    size: '3.0 - 4.0 cm',
+    water_type: 'Freshwater (Tropical)',
+    temperature_range: '18°C - 26°C',
+    ph_range: '6.5 - 7.8',
+    care_level: 'Easy',
+    diet: 'Micro pellets, spirulina flakes, daphnia',
+    images: [
+      'https://images.unsplash.com/photo-1544943910-4c1dc44a0558?auto=format&fit=crop&w=800&q=80'
+    ],
+    videos: [
+      {
+        id: 'vid-prod-019',
+        url: '/videos/zebra-5pair-150.mp4',
+        thumbnail_url: 'https://images.unsplash.com/photo-1544943910-4c1dc44a0558?auto=format&fit=crop&w=800&q=80',
+        title: 'Zebra Danio Schooling Pack Active Swimming Video',
+        duration: 40,
+        mime_type: 'video/mp4',
+      }
+    ],
+    rating: 4.9,
+    review_count: 36,
+    tags: ['Schooling Fish', 'Pack of 10', 'High Energy', 'Live Video'],
+    created_at: '2026-10-18T14:00:00Z',
   }
 ];
 
 export const INITIAL_STORE_SETTINGS: StoreSettings = {
-  brand_name: 'Betta Aquatics',
-  tagline: 'India’s Premier Ornamental Fish Sanctuary',
-  contact_email: 'care@bettaaquatics.in',
+  brand_name: 'Ra Guppy',
+  tagline: 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary',
+  contact_email: 'care@raguppy.in',
   contact_phone: '+91 98765 43210',
   whatsapp_number: '919876543210',
-  upi_id: 'bettaaquatics@icici',
-  upi_payee_name: 'Betta Aquatics Pvt Ltd',
+  upi_id: 'raguppy@icici',
+  upi_payee_name: 'Ra Guppy Aquatics',
   bank_name: 'ICICI Bank',
   bank_account_no: '002405009988',
   bank_ifsc: 'ICIC0000024',
-  bank_account_holder: 'Betta Aquatics Pvt Ltd',
+  bank_account_holder: 'Ra Guppy Aquatics',
   free_shipping_threshold: 1999,
   standard_shipping_rate: 199,
   live_packing_charge: 149,
-  announcement_text: '✨ 10% OFF on all Show Bettas! Use coupon AQUA10 at checkout | Free Live Oxygen Packing on orders above ₹1999',
+  announcement_text: '✨ Special Stock: Pure Strain Guppies & Bettas with live video proof! Use coupon AQUA10 for 10% off',
   announcement_code: 'AQUA10',
   announcement_active: true,
-  announcement_link: '/shop?category=betta-fish',
+  announcement_link: '/shop',
   serviceable_pincodes: [
     '110001', '110020', '400001', '400050', '560001', '560034',
     '600001', '600028', '700001', '700029', '500001', '500081',
     '380001', '411001', '682001', '641001', '302001'
   ],
   maintenance_mode: false,
+  branding: {
+    logo_url: '/logo.jpeg',
+    mobile_logo_url: '/logo.jpeg',
+    footer_logo_url: '/logo.jpeg',
+    favicon_url: '/favicon.svg',
+    site_name: 'Ra Guppy',
+    tagline: 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary',
+    primary_color: '#1e3a8a',
+    secondary_color: '#dc2626',
+    accent_color: '#0284c7',
+    background_color: '#f8fafc',
+    text_color: '#0f172a',
+    primary_text_color: '#ffffff',
+    secondary_text_color: '#ffffff',
+    version: 1,
+  },
+};
+
+export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
+  logo_url: '/logo-fish.svg',
+  mobile_logo_url: '',
+  footer_logo_url: '',
+  favicon_url: '/favicon.svg',
+  site_name: 'Betta Aquatics',
+  tagline: 'Pure Strain Ornamental Fish & Aquarium Supplies',
+  primary_color: '#1e3a8a',
+  secondary_color: '#dc2626',
+  accent_color: '#0284c7',
+  background_color: '#f8fafc',
+  text_color: '#0f172a',
+  primary_text_color: '#ffffff',
+  secondary_text_color: '#ffffff',
+  version: 1,
 };
 
 export const INITIAL_HOMEPAGE_SECTIONS: HomepageSection[] = [
@@ -601,5 +1194,392 @@ export const INITIAL_COUPONS: Coupon[] = [
     min_order_amount: 3000,
     max_discount: 1000,
     is_active: true,
+  },
+  {
+    id: 'cp-04',
+    code: 'EXPIRED50',
+    description: 'Expired test promotional discount',
+    discount_type: 'percentage',
+    discount_value: 50,
+    min_order_amount: 500,
+    expires_at: '2025-01-01T00:00:00Z',
+    is_active: true,
   }
 ];
+
+export const INITIAL_BLOG_POSTS: BlogPost[] = [
+  {
+    id: 'post-01',
+    slug: 'acclimating-show-grade-betta-fish',
+    title: 'The Ultimate Acclimation Protocol: Protecting High-Grade Bettas After Air Freight',
+    excerpt: 'Step-by-step master protocol to transition sensitive show-grade Bettas from pressurized oxygen transit pouches into your home aquarium without osmotic shock or fin curl.',
+    featured_image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80',
+    category: 'Betta Care & Acclimation',
+    tags: ['Acclimation', 'Water Parameters', 'Show Bettas', 'Air Freight'],
+    author: {
+      name: 'Dr. Anand Raman',
+      role: 'Chief Marine Biologist & Founder',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    },
+    read_time_minutes: 6,
+    is_published: true,
+    views_count: 1420,
+    published_at: '2026-03-15T09:00:00Z',
+    updated_at: '2026-03-20T11:30:00Z',
+    meta_title: 'Acclimating Show-Grade Betta Fish After Air Shipping | Betta Aquatics',
+    meta_description: 'Prevent temperature shock and fin clamp with our veterinarian-approved drip acclimation protocol for live Betta splendens shipments.',
+    content_html: `
+      <h2>The Critical First 120 Minutes</h2>
+      <p>When your Betta Aquatics insulated thermocol crate arrives, your specimen has traveled under high-purity medical oxygen. While our double-walled bags maintain stable dissolved oxygen, the physical chemistry inside the bag changes gradually as the fish respires.</p>
+      
+      <p>Opening the bag introduces fresh atmospheric air, which causes ammonia in the water to convert quickly into toxic free ammonia (NH3) as pH rises. <strong>Therefore, speed and precision are critical once the shipping seal is broken.</strong></p>
+
+      <h3>Phase 1: Temperature Float (20-25 Minutes)</h3>
+      <p>Never open the shipping pouch immediately. Float the sealed bag intact in your dimmed quarantine or display tank for 20 to 25 minutes. This ensures thermal equilibrium between the shipping water (typically 24°C - 26°C) and your aquarium (ideal: 26.5°C - 27.5°C).</p>
+
+      <h3>Phase 2: Slow Drip Acclimation (45 Minutes)</h3>
+      <p>Pour the fish and transit water into a clean, dedicated 5-liter acclimation bucket. Using airline tubing with a plastic control valve, initiate a drip siphon from the destination tank into the bucket at a rate of <strong>2 to 3 drops per second</strong>.</p>
+      
+      <ul>
+        <li>Double the initial water volume over 30 minutes.</li>
+        <li>Discard half the water carefully, then drip-fill again for another 15 minutes.</li>
+        <li>Add 2 drops of concentrated stress-guard or natural Indian almond leaf extract (tannins).</li>
+      </ul>
+
+      <h3>Phase 3: The Net Transfer (Zero Transit Water)</h3>
+      <p><strong>Golden Rule: Never dump courier bag water into your established aquarium.</strong> Use a soft, knotless nylon specimen net to gently lift the Betta into the destination tank. Leave all tank lighting OFF for the first 12 hours to prevent disorientation and cortisol spikes.</p>
+
+      <blockquote>
+        "Patience during the first 6 hours post-arrival determines the longevity and vibrant fin flare of a champion show betta." — Dr. Anand Raman
+      </blockquote>
+    `
+  },
+  {
+    id: 'post-02',
+    slug: 'betta-fish-genetics-halfmoon-vs-alien-strains',
+    title: 'Betta Genetics Breakdown: Understanding Dragon Scale, Halfmoon, and Alien Hybrid Strains',
+    excerpt: 'An enthusiast breakdown of fin morphology, iridescent guanine pigment layers, and the fascinating hybridization behind modern wild-type Alien Bettas.',
+    featured_image: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=1200&q=80',
+    category: 'Genetics & Strains',
+    tags: ['Betta Genetics', 'Alien Betta', 'Halfmoon', 'Morphology'],
+    author: {
+      name: 'Rohan Mehra',
+      role: 'Line Breeding Geneticist',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    },
+    read_time_minutes: 8,
+    is_published: true,
+    views_count: 2180,
+    published_at: '2026-03-22T14:00:00Z',
+    updated_at: '2026-03-24T08:15:00Z',
+    meta_title: 'Betta Genetics Explained: Halfmoon, Alien & Dragonscale | Betta Aquatics',
+    meta_description: 'Explore the fascinating scientific genetics behind Betta splendens fin spreads, iridescent dragonscale layering, and complex Alien hybrids.',
+    content_html: `
+      <h2>The 180-Degree Halfmoon Standard</h2>
+      <p>The iconic <em>Halfmoon (HM)</em> betta is defined by a caudal fin that expands to a full 180-degree semi-circle when flaring at a mirror or rival. This trait is controlled by polygenic ray-branching genetics (primary rays branching into secondary and tertiary rays).</p>
+
+      <p>True show-grade halfmoons require crisp, straight outer fin edges (known as the 'D-shape'). Over-halfmoons (OHM) exceed 180 degrees, while Super Deltas typically reach 150 to 175 degrees.</p>
+
+      <h3>The Phenomenon of Alien Bettas</h3>
+      <p>Unlike standard captive domestic varieties derived solely from <em>Betta splendens</em>, <strong>Alien Bettas are complex inter-species hybrids</strong>. Modern bloodlines combine:</p>
+      <ul>
+        <li><strong>Betta mahachaiensis:</strong> Contributes the tight metallic grid-scale pattern and green/copper sheen.</li>
+        <li><strong>Betta stiktos & imbellis:</strong> Provides peaceful temperament and distinctive facial mask streaks.</li>
+        <li><strong>Betta smaragdina:</strong> Adds turquoise radiance and elongated pelvic fins.</li>
+      </ul>
+
+      <h3>Dragonscale Layering: Beauty & Caution</h3>
+      <p>The metallic opacity in Dragonscale bettas is caused by an extraordinarily thick layer of guanine crystals in the top stratum of dermal cells. While visually striking, keepers must watch for diamond-eye (growth of guanine over the lens), making clean, unblocked lineages prized by connoisseurs.</p>
+    `
+  },
+  {
+    id: 'post-03',
+    slug: 'top-aquarium-plants-for-betta-tanks',
+    title: 'Top 7 Live Aquarium Plants for Small Betta Tanks & Nano Aquascapes',
+    excerpt: 'Transform your nano tank into a biological paradise. Discover non-sharp live plants that absorb excess nitrates, provide resting hammocks, and thrive without CO2 injection.',
+    featured_image: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=1200&q=80',
+    category: 'Aquascaping & Plants',
+    tags: ['Aquascaping', 'Live Plants', 'Nano Tanks', 'Water Quality'],
+    author: {
+      name: 'Pooja Varma',
+      role: 'Aquascape Designer',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
+    },
+    read_time_minutes: 5,
+    is_published: true,
+    views_count: 980,
+    published_at: '2026-03-28T16:30:00Z',
+    updated_at: '2026-04-01T10:00:00Z',
+    meta_title: 'Best Live Plants for Betta Fish Aquariums | Betta Aquatics Guide',
+    meta_description: 'Anubias, Java Fern, and Amazon Swords: Learn which aquarium plants are best for Betta splendens tanks with low light and zero CO2.',
+    content_html: `
+      <h2>Why Real Plants Beat Artificial Decor</h2>
+      <p>Plastic plants have sharp molding seams that easily shred delicate betta finnage. Real aquatic plants, on the other hand, produce oxygen, absorb toxic nitrates, and provide resting resting leaves near the water surface where bettas breathe atmospheric oxygen through their labyrinth organ.</p>
+
+      <h3>1. Anubias Barteri var. Nana</h3>
+      <p>The ultimate betta plant. Its broad, thick horizontal leaves serve as natural sleeping hammocks near the waterline. <em>Crucial Note:</em> Never bury the rhizome in gravel or substrate; attach it to driftwood or lava rock using aquarium-safe cyanoacrylate glue or cotton thread.</p>
+
+      <h3>2. Java Fern (Microsorum Pteropus)</h3>
+      <p>Virtually indestructible, Java Fern thrives in low-to-medium ambient light. Its ruffled upright foliage creates visual depth and shelter for resting bettas without demanding CO2 supplementation.</p>
+
+      <h3>3. Amazon Frogbit & Red Root Floaters</h3>
+      <p>Floating plants with dangling root systems replicate the natural rice-paddy environments of Southeast Asia. Bettas use floating root networks as anchor points for constructing bubble nests.</p>
+    `
+  },
+  {
+    id: 'post-04',
+    slug: 'conditioning-betta-breeding-pairs',
+    title: 'Conditioning Trophy Betta Breeding Pairs: Live Feed, Temperature Cycles & Bubble Nesting',
+    excerpt: 'The professional breeder schedule for conditioning male and female Bettas. Learn live culture feeding regimes, barrier introduction protocols, and water chemistry triggers.',
+    featured_image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80',
+    category: 'Breeding & Conditioning',
+    tags: ['Breeding', 'Live Food', 'Bubble Nest', 'Egg Conditioning'],
+    author: {
+      name: 'Dr. Anand Raman',
+      role: 'Chief Marine Biologist & Founder',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    },
+    read_time_minutes: 7,
+    is_published: true,
+    views_count: 1750,
+    published_at: '2026-04-02T11:00:00Z',
+    updated_at: '2026-04-04T12:00:00Z',
+    meta_title: 'How to Condition Betta Breeding Pairs | Professional Breeder Guide',
+    meta_description: 'Step-by-step master conditioning guide: live mosquito larvae feeding, Indian almond leaf conditioning, bubble nest triggers, and safe pair introduction.',
+    content_html: `
+      <h2>The 14-Day Conditioning Countdown</h2>
+      <p>Successful Betta breeding is 80% conditioning and 20% spawning mechanics. A female without mature egg clutches will fail to trigger the male, while an undernourished male will exhaust his energy reserves before the fry become free-swimming.</p>
+
+      <h3>Dietary Energy: Live Foods Only</h3>
+      <p>During the two-week conditioning phase, suspend dry commercial pellets. Feed 3 to 4 micro-meals daily of:</p>
+      <ul>
+        <li>Freshly hatched Baby Brine Shrimp (Artemia nauplii) rich in unsaturated fatty acids.</li>
+        <li>Live cultured white worms or blackworms for high lipid content.</li>
+        <li>Frozen bloodworms supplemented with liquid marine multivitamins.</li>
+      </ul>
+
+      <h3>The Chimney Barrier Technique</h3>
+      <p>Introduce the female inside a clear glass cylinder (the 'chimney') placed inside the male's shallow (15cm depth) breeding tank. The male will flare intensely, develop deep coloration, and begin constructing a foam bubble nest under floating styrofoam or almond leaves without physically harming the female.</p>
+    `
+  }
+];
+
+export const INITIAL_MEDIA_ASSETS: MediaAsset[] = [
+  {
+    id: 'med-01',
+    filename: 'hero-halfmoon-specimen.jpg',
+    url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1600&q=85',
+    alt_text: 'Show-class Royal Blue Halfmoon Betta swimming in planted display aquarium',
+    file_size_bytes: 342100,
+    mime_type: 'image/jpeg',
+    category: 'banner',
+    created_at: '2026-03-01T10:00:00Z',
+  },
+  {
+    id: 'med-02',
+    filename: 'bengaluru-facility-tanks.jpg',
+    url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=1200&q=80',
+    alt_text: 'Indoor climate-controlled individual Betta barrack system in Bengaluru facility',
+    file_size_bytes: 412800,
+    mime_type: 'image/jpeg',
+    category: 'breeder',
+    created_at: '2026-03-02T11:30:00Z',
+  },
+  {
+    id: 'med-03',
+    filename: 'galaxy-koi-plakat-detail.jpg',
+    url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=1200&q=80',
+    alt_text: 'Candy marbled Galaxy Koi Plakat Betta with cyan iridescent dragon scales',
+    file_size_bytes: 289400,
+    mime_type: 'image/jpeg',
+    category: 'specimen',
+    created_at: '2026-03-05T09:15:00Z',
+  },
+  {
+    id: 'med-04',
+    filename: 'logo-fish.svg',
+    url: '/logo-fish.svg',
+    alt_text: 'Betta Aquatics brand emblem with stylized Siamese fighting fish icon',
+    file_size_bytes: 4200,
+    mime_type: 'image/svg+xml',
+    category: 'ui',
+    created_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 'med-04b',
+    filename: 'logo.jpeg',
+    url: '/logo.jpeg',
+    alt_text: 'Betta Aquatics custom primary logo',
+    file_size_bytes: 111539,
+    mime_type: 'image/jpeg',
+    category: 'ui',
+    created_at: '2026-10-18T13:53:48Z',
+  },
+  {
+    id: 'med-05',
+    filename: 'anubias-planted-aquascape.jpg',
+    url: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=1200&q=80',
+    alt_text: 'Anubias and submerged tropical aquarium plants anchored on natural driftwood',
+    file_size_bytes: 367900,
+    mime_type: 'image/jpeg',
+    category: 'banner',
+    created_at: '2026-03-10T14:20:00Z',
+  },
+  {
+    id: 'med-06',
+    filename: 'alien-green-wild-hybrid.jpg',
+    url: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=1200&q=80',
+    alt_text: 'Alien Green wild hybrid Betta with full-body emerald metallic sheen',
+    file_size_bytes: 312500,
+    mime_type: 'image/jpeg',
+    category: 'specimen',
+    created_at: '2026-03-14T16:00:00Z',
+  },
+  {
+    id: 'med-07',
+    filename: 'royal-blue-halfmoon-swimming.mp4',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-bright-red-betta-fish-swimming-41712-large.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'High-definition 1080p swimming footage of Royal Blue Halfmoon Betta actively flaring in planted biotope',
+    file_size_bytes: 14200000,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 14,
+    dimensions: { width: 1920, height: 1080 },
+    created_at: '2026-03-15T11:00:00Z',
+  },
+  {
+    id: 'med-08',
+    filename: 'planted-aquarium-ambient-showcase.mp4',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-colorful-betta-fish-in-an-aquarium-41713-large.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=1200&q=80',
+    alt_text: 'Ambient planted aquarium tank loop with gentle water flow and schooling rasboras',
+    file_size_bytes: 21500000,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 22,
+    dimensions: { width: 1920, height: 1080 },
+    created_at: '2026-03-16T15:30:00Z',
+  },
+  {
+    id: 'med-vid-01',
+    filename: 'betta-male-100.mp4',
+    url: '/videos/betta-male-100.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Active Male Fighter Betta Swimming Video',
+    file_size_bytes: 4706838,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 15,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-02',
+    filename: 'betta-250.mp4',
+    url: '/videos/betta-250.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Selected Crown & Plakat Betta Swimming Video',
+    file_size_bytes: 915905,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 12,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-03',
+    filename: 'betta-350.mp4',
+    url: '/videos/betta-350.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Show Halfmoon Flaring Demonstration',
+    file_size_bytes: 2446150,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 18,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-04',
+    filename: 'green-tail-100.mp4',
+    url: '/videos/green-tail-100.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Green Tail Pure Strain Guppy Swimming Video',
+    file_size_bytes: 484407,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 10,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-05',
+    filename: 'guppy-pair-120.mp4',
+    url: '/videos/guppy-pair-120.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Guppy Pair Swimming & Courtship Video',
+    file_size_bytes: 513572,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 12,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-06',
+    filename: 'guppy-120.mp4',
+    url: '/videos/guppy-120.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Delta Tail Guppy Active Swimming Video',
+    file_size_bytes: 463988,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 11,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-07',
+    filename: 'guppy-150.mp4',
+    url: '/videos/guppy-150.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Select Grade Exotic Guppy Swimming Footage',
+    file_size_bytes: 443294,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 10,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-08',
+    filename: 'guppy-45.mp4',
+    url: '/videos/guppy-45.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1579273166152-d725a4e2b755?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Community Tank Guppy Active Swimming Video',
+    file_size_bytes: 570832,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 13,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-09',
+    filename: 'guppy-800.mp4',
+    url: '/videos/guppy-800.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Collector Champion Guppy Pair Swimming Video',
+    file_size_bytes: 1513566,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 25,
+    created_at: '2026-10-18T14:30:00Z',
+  },
+  {
+    id: 'med-vid-10',
+    filename: 'zebra-5pair-150.mp4',
+    url: '/videos/zebra-5pair-150.mp4',
+    thumbnail_url: 'https://images.unsplash.com/photo-1544943910-4c1dc44a0558?auto=format&fit=crop&w=800&q=80',
+    alt_text: 'Zebra Danio Schooling Pack Active Swimming Video',
+    file_size_bytes: 6753113,
+    mime_type: 'video/mp4',
+    category: 'video',
+    duration_seconds: 40,
+    created_at: '2026-10-18T14:30:00Z',
+  }
+];
+

@@ -42,22 +42,22 @@ export const MobileBottomNav: React.FC = () => {
               key={item.label}
               to={item.path}
               className={`flex-1 flex flex-col items-center justify-center h-full min-h-[44px] min-w-[44px] transition-colors relative ${
-                isActive ? 'text-slate-950 font-bold' : 'text-slate-500 hover:text-slate-800'
+                isActive ? 'text-blue-900 font-bold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <div className="relative">
                 <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-rose-500 text-white text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
                     {item.badge}
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] mt-1 tracking-tight ${isActive ? 'font-bold text-slate-900' : 'text-slate-500'}`}>
+              <span className={`text-xs mt-1 tracking-tight ${isActive ? 'font-bold text-blue-900' : 'text-slate-600'}`}>
                 {item.label}
               </span>
               {isActive && (
-                <span className="absolute bottom-1 w-1 h-1 rounded-full bg-slate-900" />
+                <span className="absolute bottom-1 w-1 h-1 rounded-full bg-blue-900" />
               )}
             </NavLink>
           );

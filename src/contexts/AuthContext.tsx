@@ -1,94 +1,90 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserProfile, Address, UserRole } from '../lib/types';
+import { UserProfile, Address } from '../lib/types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { mockDb } from '../lib/mockDatabase';
+import { AdminPermission, hasPermission as checkPermission, isStaffRole } from '../lib/permissions';
+
+interface AuthResponse {
+  success: boolean;
+  message?: string;
+  user?: UserProfile;
+}
 
 interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isStaff: boolean;
+  hasPermission: (permission: AdminPermission) => boolean;
+  isMockMode: boolean;
   addresses: Address[];
-  login: (email: string, password?: string) => Promise<boolean>;
-  register: (name: string, email: string, password?: string, phone?: string) => Promise<boolean>;
+  login: (email: string, password?: string) => Promise<AuthResponse>;
+  adminLogin: (email: string, password: string) => Promise<AuthResponse>;
+  register: (name: string, email: string, password?: string, phone?: string) => Promise<AuthResponse>;
+  requestPasswordReset: (email: string) => Promise<AuthResponse>;
   logout: () => void;
-  switchRole: (role: UserRole) => void;
   addAddress: (address: Omit<Address, 'id' | 'user_id'>) => Address;
   updateAddress: (address: Address) => void;
   deleteAddress: (id: string) => void;
   setDefaultAddress: (id: string) => void;
 }
 
-const DEMO_CUSTOMER: UserProfile = {
-  id: 'usr-customer-demo',
-  email: 'customer@bettaaquatics.in',
-  full_name: 'Rahul Sharma',
-  phone: '+91 98450 12345',
-  role: 'customer',
-  avatar_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-};
-
-const DEMO_ADMIN: UserProfile = {
-  id: 'usr-admin-demo',
-  email: 'admin@bettaaquatics.in',
-  full_name: 'Aathil (Store Admin)',
-  phone: '+91 98765 43210',
-  role: 'admin',
-  avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80',
-};
-
-const INITIAL_ADDRESSES: Address[] = [
-  {
-    id: 'addr-01',
-    user_id: 'usr-customer-demo',
-    full_name: 'Rahul Sharma',
-    phone: '+91 98450 12345',
-    street_address: '402, Aqua Green Apartments, 12th Main Road, Indiranagar',
-    landmark: 'Opposite BDA Complex',
-    city: 'Bengaluru',
-    state: 'Karnataka',
-    postal_code: '560038',
-    is_default: true,
-  },
-  {
-    id: 'addr-02',
-    user_id: 'usr-customer-demo',
-    full_name: 'Rahul Sharma (Office)',
-    phone: '+91 98450 12345',
-    street_address: 'Level 5, Tech Park, Outer Ring Road, Bellandur',
-    landmark: 'Near EcoSpace Gate 2',
-    city: 'Bengaluru',
-    state: 'Karnataka',
-    postal_code: '560103',
-    is_default: false,
-  }
-];
+const INITIAL_ADDRESSES: Address[] = [];
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const isMockMode = !isSupabaseConfigured;
+
+  // Initialize and validate user session against authoritative store
   const [user, setUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('ba_current_user');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return DEMO_CUSTOMER;
+    if (!saved) return null;
+
+    try {
+      const parsed: UserProfile = JSON.parse(saved);
+      // Security Check: Validate user identity and role against trusted mockDb in mock mode
+      const authoritativeUser = mockDb.getUserByEmail(parsed.email);
+      if (!authoritativeUser) {
+        localStorage.removeItem('ba_current_user');
+        return null;
       }
+
+      // Never trust local storage role over authoritative store
+      return {
+        id: authoritativeUser.id,
+        email: authoritativeUser.email,
+        full_name: authoritativeUser.full_name,
+        phone: authoritativeUser.phone,
+        role: authoritativeUser.role,
+        avatar_url: parsed.avatar_url,
+        created_at: authoritativeUser.created_at,
+      };
+    } catch {
+      localStorage.removeItem('ba_current_user');
+      return null;
     }
-    return DEMO_CUSTOMER; // Start logged in as customer for immediate seamless testing
   });
 
   const [addresses, setAddresses] = useState<Address[]>(() => {
     const saved = localStorage.getItem('ba_user_addresses');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Strictly exclude demo/mock addresses: addresses must be customer-entered only
+          return parsed.filter(
+            (a: Address) => a.id !== 'addr-01' && a.id !== 'addr-02' && a.user_id !== 'usr-customer-demo'
+          );
+        }
       } catch {
-        return INITIAL_ADDRESSES;
+        return [];
       }
     }
-    return INITIAL_ADDRESSES;
+    return [];
   });
 
+  // Sync session storage
   useEffect(() => {
     if (user) {
       localStorage.setItem('ba_current_user', JSON.stringify(user));
@@ -101,68 +97,204 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('ba_user_addresses', JSON.stringify(addresses));
   }, [addresses]);
 
-  const login = async (email: string): Promise<boolean> => {
-    // If Supabase is active
+  // Customer Login (Strictly verifies and sets customer role)
+  const login = async (email: string, password?: string): Promise<AuthResponse> => {
+    if (!email.trim()) {
+      return { success: false, message: 'Please enter your email address.' };
+    }
+
     if (isSupabaseConfigured && supabase) {
       try {
-        // Real Supabase Auth would go here
-      } catch (err) {
-        console.warn('Supabase auth fallback:', err);
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password || '',
+        });
+        if (error) {
+          return { success: false, message: error.message };
+        }
+        if (data.user) {
+          // Fetch authoritative profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+          const userProfile: UserProfile = {
+            id: data.user.id,
+            email: data.user.email || email,
+            full_name: profile?.full_name || email.split('@')[0],
+            phone: profile?.phone,
+            role: profile?.role === 'admin' ? 'admin' : 'customer',
+            avatar_url: profile?.avatar_url,
+          };
+          setUser(userProfile);
+          return { success: true, user: userProfile };
+        }
+      } catch (err: any) {
+        return { success: false, message: err.message || 'Supabase authentication failed.' };
       }
     }
 
-    if (email.toLowerCase().includes('admin')) {
-      setUser(DEMO_ADMIN);
-    } else {
-      setUser({
-        ...DEMO_CUSTOMER,
-        email,
-        full_name: email.split('@')[0],
-      });
+    // Mock Mode Execution
+    const result = mockDb.authenticateCustomer(email, password);
+    if (result.success && result.user) {
+      setUser(result.user);
+      return { success: true, user: result.user };
     }
-    return true;
+    return { success: false, message: result.message || 'Authentication failed.' };
   };
 
-  const register = async (name: string, email: string, _password?: string, phone?: string): Promise<boolean> => {
-    const newUser: UserProfile = {
-      id: 'usr-' + Date.now(),
-      email,
-      full_name: name,
-      phone: phone || '+91 99999 88888',
-      role: 'customer',
-    };
-    setUser(newUser);
-    return true;
+  // Dedicated Admin Login (Strictly verifies administrative credentials & authorization)
+  const adminLogin = async (email: string, password: string): Promise<AuthResponse> => {
+    if (!email.trim() || !password) {
+      return { success: false, message: 'Please enter both administrator email and password.' };
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (error) {
+          return { success: false, message: 'Invalid administrative credentials.' };
+        }
+        if (data.user) {
+          // Strictly verify admin role from trusted server table
+          const { data: profile, error: profileErr } = await supabase
+            .from('profiles')
+            .select('role, full_name, phone')
+            .eq('id', data.user.id)
+            .single();
+
+          if (profileErr || !profile || !isStaffRole(profile.role)) {
+            await supabase.auth.signOut();
+            return { 
+              success: false, 
+              message: 'Access Denied: This account does not have administrative privileges.' 
+            };
+          }
+
+          const adminProfile: UserProfile = {
+            id: data.user.id,
+            email: data.user.email || email,
+            full_name: profile.full_name,
+            phone: profile.phone,
+            role: profile.role,
+          };
+          setUser(adminProfile);
+          return { success: true, user: adminProfile };
+        }
+      } catch (err: any) {
+        return { success: false, message: err.message || 'Administrative verification failed.' };
+      }
+    }
+
+    // Mock Mode Execution
+    const result = mockDb.authenticateAdmin(email, password);
+    if (result.success && result.user) {
+      setUser(result.user);
+      return { success: true, user: result.user };
+    }
+    return { success: false, message: result.message || 'Invalid administrative credentials.' };
   };
 
+  // Customer Registration (Always creates role = 'customer')
+  const register = async (
+    name: string, 
+    email: string, 
+    password?: string, 
+    phone?: string
+  ): Promise<AuthResponse> => {
+    if (!name.trim() || !email.trim()) {
+      return { success: false, message: 'Please provide full name and email address.' };
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
+          password: password || 'Customer@123',
+          options: {
+            data: {
+              full_name: name.trim(),
+              phone: phone?.trim(),
+              role: 'customer', // Default
+            }
+          }
+        });
+        if (error) {
+          return { success: false, message: error.message };
+        }
+        if (data.user) {
+          const profile: UserProfile = {
+            id: data.user.id,
+            email: data.user.email || email,
+            full_name: name.trim(),
+            phone: phone?.trim(),
+            role: 'customer',
+          };
+          setUser(profile);
+          return { success: true, user: profile };
+        }
+      } catch (err: any) {
+        return { success: false, message: err.message || 'Registration failed.' };
+      }
+    }
+
+    // Mock Mode Execution
+    const result = mockDb.registerCustomer(name, email, password, phone);
+    if (result.success && result.user) {
+      setUser(result.user);
+      return { success: true, user: result.user };
+    }
+    return { success: false, message: result.message || 'Registration failed.' };
+  };
+
+  // Password Reset Request
+  const requestPasswordReset = async (email: string): Promise<AuthResponse> => {
+    if (!email.trim()) {
+      return { success: false, message: 'Please enter your account email address.' };
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: `${window.location.origin}/auth?reset=true`,
+        });
+        if (error) {
+          // Do not leak whether user exists
+          console.warn('Password reset notice:', error.message);
+        }
+      } catch (err) {
+        console.warn('Supabase reset password fallback:', err);
+      }
+    }
+
+    const result = mockDb.requestPasswordReset(email);
+    return { success: true, message: result.message };
+  };
+
+  // Invalidate Session
   const logout = () => {
+    if (isSupabaseConfigured && supabase) {
+      supabase.auth.signOut().catch(console.error);
+    }
     setUser(null);
     localStorage.removeItem('ba_current_user');
   };
 
-  const switchRole = (role: UserRole) => {
-    if (role === 'admin') {
-      setUser(DEMO_ADMIN);
-    } else {
-      setUser(DEMO_CUSTOMER);
-    }
-  };
-
+  // Address Management: Customer enters their address directly; never set default address automatically
   const addAddress = (addrData: Omit<Address, 'id' | 'user_id'>): Address => {
     const newAddress: Address = {
       ...addrData,
       id: 'addr-' + Date.now(),
       user_id: user?.id || 'guest',
-      is_default: addresses.length === 0 ? true : addrData.is_default,
+      is_default: false, // Don't set default address
     };
 
-    setAddresses(prev => {
-      let updated = prev;
-      if (newAddress.is_default) {
-        updated = updated.map(a => ({ ...a, is_default: false }));
-      }
-      return [newAddress, ...updated];
-    });
+    setAddresses(prev => [newAddress, ...prev]);
 
     return newAddress;
   };
@@ -194,17 +326,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const isStaff = isStaffRole(user?.role);
+  const isAdmin = user?.role === 'admin';
+  const hasPermission = (permission: AdminPermission): boolean => checkPermission(user?.role, permission);
+
   return (
     <AuthContext.Provider
       value={{
         user,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'admin',
+        isAdmin,
+        isStaff,
+        hasPermission,
+        isMockMode,
         addresses,
         login,
+        adminLogin,
         register,
+        requestPasswordReset,
         logout,
-        switchRole,
         addAddress,
         updateAddress,
         deleteAddress,

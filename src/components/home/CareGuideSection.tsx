@@ -12,13 +12,13 @@ const GUIDES = [
   {
     icon: Thermometer,
     title: 'Temperature Stability',
-    description: 'As tropical labyrinth fish, Bettas require steady temperatures between 24°C and 28°C. An aquarium heater is recommended.',
+    description: 'Bettas need warm water between 24°C and 28°C. Use a small tank heater to keep the temperature steady year-round.',
     metric: '24°C - 28°C',
   },
   {
     icon: Utensils,
     title: 'Nutrition & Live Feeds',
-    description: 'Feed 3-4 micro-pellets twice daily. Supplement with freeze-dried bloodworms or live daphnia for vibrant color and digestion.',
+    description: 'Feed 3 to 4 pellets twice a day. Add bloodworms once a week as a healthy treat to help keep their colors bright.',
     metric: '2x Small Feeds Daily',
   },
   {
@@ -29,19 +29,28 @@ const GUIDES = [
   }
 ];
 
-export const CareGuideSection: React.FC = () => {
+import { HomepageSection } from '../../lib/types';
+
+interface CareGuideSectionProps {
+  section?: HomepageSection;
+}
+
+export const CareGuideSection: React.FC<CareGuideSectionProps> = ({ section }) => {
+  const title = section?.title || 'Essential Betta Care Guide';
+  const subtitle = section?.subtitle || 'Simple guidelines to ensure your new fish acclimates easily and thrives.';
+
   return (
     <section className="py-12 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-8">
-          <span className="text-xs font-bold uppercase tracking-wider text-teal-700 block mb-1">
+          <span className="text-xs font-bold text-blue-900 block mb-1">
             Fishkeeping Knowledge
           </span>
           <h2 className="text-xl sm:text-3xl font-bold text-slate-900 font-display mb-2">
-            Essential Betta Care Guide
+            {title}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Simple guidelines to ensure your new fish acclimates easily and thrives.
+          <p className="text-xs sm:text-sm text-slate-600">
+            {subtitle}
           </p>
         </div>
 
@@ -54,7 +63,7 @@ export const CareGuideSection: React.FC = () => {
                 className="bg-slate-50 rounded-2xl p-5 border border-slate-200 flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 flex items-center justify-center mb-3">
                     <Icon className="w-5 h-5" />
                   </div>
                   <h3 className="font-bold text-slate-900 text-sm mb-1.5">
@@ -65,21 +74,28 @@ export const CareGuideSection: React.FC = () => {
                   </p>
                 </div>
                 <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 font-medium">Optimal:</span>
-                  <span className="font-bold text-slate-900 font-mono text-[11px]">{g.metric}</span>
+                  <span className="text-slate-600 font-medium">Optimal:</span>
+                  <span className="font-bold text-slate-900 font-mono text-xs">{g.metric}</span>
                 </div>
               </div>
             );
           })}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs sm:text-sm">
+          <Link
+            to="/blog"
+            className="btn-primary"
+          >
+            <span>Explore All Educational Care Guides</span>
+            <ArrowRight className="w-4 h-4 text-white" />
+          </Link>
           <Link
             to="/page/shipping-acclimation"
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-teal-700 hover:text-teal-800"
+            className="inline-flex items-center gap-1.5 font-semibold text-blue-900 hover:underline"
           >
-            <span>Read Complete Acclimation & Live Arrival Policy</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>Read Acclimation & Live Arrival Policy</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

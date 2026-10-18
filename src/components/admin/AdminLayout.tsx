@@ -1,58 +1,133 @@
-import React, { useState } from 'react';
-import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { NavLink, Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, ShoppingCart, Package, Palette, 
-  Settings, History, LogOut, Menu, X, ArrowLeft, 
-  ExternalLink, Bell, Sparkles, ShieldCheck 
+  Settings, History, LogOut, Menu, X, 
+  ExternalLink, BookOpen, ChevronRight, ShieldCheck,
+  FileSpreadsheet, FolderTree, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { mockDb } from '../../lib/mockDatabase';
+import { AdminPermission, ROLE_LABELS } from '../../lib/permissions';
+import { BrandLogo } from '../common/BrandLogo';
+
+interface AdminNavItem {
+  label: string;
+  path: string;
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+  permission: AdminPermission;
+  badge?: number;
+}
 
 export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
-  const { user, switchRole, logout } = useAuth();
+  const location = useLocation();
+  const { user, hasPermission, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const mobileDrawerRef = useRef<HTMLDivElement | null>(null);
 
-  // Count of pending payments
+  // Count of pending payments for alert badge
   const pendingPaymentsCount = mockDb.getOrders().filter(o => o.payment_status === 'pending').length;
 
-  const navLinks = [
-    { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+  const handleAdminLogout = () => {
+    logout();
+    navigate('/admin/login', { replace: true });
+  };
+
+  const allNavLinks: AdminNavItem[] = [
+    { label: 'Dashboard', path: '/admin', icon: LayoutDashboard, permission: 'view_dashboard' },
     { 
       label: 'Orders & Verification', 
       path: '/admin/orders', 
       icon: ShoppingCart, 
+      permission: 'manage_orders',
       badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : undefined 
     },
-    { label: 'Products & Inventory', path: '/admin/products', icon: Package },
-    { label: 'Visual CMS & Pages', path: '/admin/cms', icon: Palette },
-    { label: 'Store & UPI Settings', path: '/admin/settings', icon: Settings },
-    { label: 'Security & Audit Logs', path: '/admin/audit', icon: History },
+    { label: 'Products & Inventory', path: '/admin/products', icon: Package, permission: 'manage_products' },
+    { label: 'Bulk Products & CSV', path: '/admin/bulk-products', icon: FileSpreadsheet, permission: 'manage_products' },
+    { label: 'Category Hierarchy', path: '/admin/categories', icon: FolderTree, permission: 'manage_products' },
+    { label: 'Visual CMS & Pages', path: '/admin/cms', icon: Palette, permission: 'manage_cms' },
+    { label: 'Branding & Theme', path: '/admin/branding', icon: Sparkles, permission: 'manage_cms' },
+    { label: 'Blog & Care Guides', path: '/admin/blogs', icon: BookOpen, permission: 'manage_blogs' },
+    { label: 'Store & UPI Settings', path: '/admin/settings', icon: Settings, permission: 'manage_settings' },
+    { label: 'Security & Audit Logs', path: '/admin/audit', icon: History, permission: 'view_audit_logs' },
   ];
+
+  // Filter links by current user's granted permissions
+  const authorizedNavLinks = allNavLinks.filter(item => hasPermission(item.permission));
+
+  // Determine active page label for breadcrumb
+  const currentLink = allNavLinks.find(l => 
+    l.path === '/admin' ? location.pathname === '/admin' : location.pathname.startsWith(l.path)
+  );
+  const currentPageTitle = currentLink?.label || 'Overview';
+  const roleTitle = user?.role ? ROLE_LABELS[user.role] : 'Store Staff';
+
+  // Handle Escape key and focus management for mobile menu
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+        menuTriggerRef.current?.focus();
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Focus first interactive element in drawer
+      const focusable = mobileDrawerRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable && focusable.length > 0) {
+        focusable[0].focus();
+      }
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+    menuTriggerRef.current?.focus();
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
+      {/* Accessible Skip Link for Administrative Workspace */}
+      <a
+        href="#admin-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-blue-950 focus:text-white focus:rounded-xl focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-xs"
+      >
+        Skip to administrative content
+      </a>
+
       {/* Admin Top Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200/90 px-4 sm:px-6 py-3 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
           <button
+            ref={menuTriggerRef}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-            aria-label="Toggle menu"
+            className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-900"
+            aria-label={isMobileMenuOpen ? 'Close administrative menu' : 'Open administrative menu'}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-admin-drawer"
           >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isMobileMenuOpen ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
           </button>
 
-          <Link to="/admin" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-ocean-950 p-1 flex items-center justify-center shadow-xs">
-              <img src="/logo-fish.svg" alt="Betta Aquatics" className="w-full h-full object-contain" />
+          <Link to="/admin" className="flex items-center gap-2.5 focus-visible:ring-2 focus-visible:ring-blue-900 rounded-xl p-1 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-blue-950 p-1.5 flex items-center justify-center shadow-xs overflow-hidden shrink-0">
+              <BrandLogo variant="admin" className="w-full h-full" imgClassName="w-full h-full object-contain" />
             </div>
             <div>
-              <span className="font-display font-extrabold text-sm sm:text-base tracking-wider text-ocean-950 uppercase">
-                BETTA <span className="text-aqua-600">ADMIN</span>
+              <span className="font-display font-extrabold text-sm sm:text-base tracking-wider text-blue-950 uppercase">
+                BETTA <span className="text-red-600">ADMIN</span>
               </span>
-              <span className="block text-[9px] uppercase tracking-widest text-slate-400 font-mono -mt-0.5">
-                Executive Console & Operations
+              <span className="block text-[9px] uppercase tracking-widest text-slate-500 font-mono -mt-0.5">
+                Operations & Management
               </span>
             </div>
           </Link>
@@ -60,48 +135,56 @@ export const AdminLayout: React.FC = () => {
 
         {/* Right Action Tools */}
         <div className="flex items-center gap-2.5">
-          {/* Quick Return to Storefront */}
           <Link
             to="/"
             target="_blank"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-700 hover:text-ocean-950 font-semibold px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-700 hover:text-blue-950 font-semibold px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition-colors focus-visible:ring-2 focus-visible:ring-blue-900"
+            aria-label="View live storefront in new browser tab"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-aqua-600" />
+            <ExternalLink className="w-3.5 h-3.5 text-blue-700" aria-hidden="true" />
             <span>View Live Store</span>
           </Link>
 
-          {/* Role Toggle Switch */}
           <button
-            onClick={() => {
-              switchRole('customer');
-              navigate('/shop');
-            }}
-            className="text-xs px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold shadow-2xs transition-colors flex items-center gap-1.5"
+            type="button"
+            onClick={handleAdminLogout}
+            className="px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-red-600"
+            title="Sign Out of Admin Console"
+            aria-label="Sign Out of Admin Console"
           >
-            <Sparkles className="w-3.5 h-3.5 text-aqua-600" />
-            <span className="hidden sm:inline">Switch to Customer View</span>
-            <span className="sm:hidden">Customer</span>
-          </button>
-
-          <button
-            onClick={logout}
-            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
-            title="Log Out"
-            aria-label="Log Out"
-          >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Sign Out</span>
           </button>
         </div>
       </header>
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Desktop Sidebar Navigation (Pristine White) */}
-        <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200/90 p-4 justify-between shrink-0 shadow-2xs">
-          <div className="space-y-1">
-            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
-              Management Modules
+        {/* Desktop Sidebar Navigation */}
+        <aside 
+          aria-label="Admin Navigation Sidebar" 
+          className="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200/90 p-4 justify-between shrink-0 shadow-2xs"
+        >
+          <div className="space-y-4">
+            {/* Top Sidebar Brand Showcase (Strict Source of Truth from CMS) */}
+            <div className="p-3 bg-gradient-to-br from-slate-50 to-blue-50/50 rounded-2xl border border-slate-200/80 flex items-center gap-3 overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-white p-1.5 border border-slate-200 flex items-center justify-center shadow-2xs shrink-0 overflow-hidden">
+                <BrandLogo variant="admin" className="w-full h-full" imgClassName="w-full h-full object-contain" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="font-display font-black text-xs text-slate-900 uppercase tracking-tight block truncate">
+                  Betta Aquatics
+                </span>
+                <span className="text-[10px] text-blue-700 font-semibold block uppercase tracking-wider font-mono">
+                  Primary Brand
+                </span>
+              </div>
             </div>
-            {navLinks.map((link) => {
+
+            <nav aria-label="Management Modules Navigation" className="space-y-1">
+              <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                Management Modules
+              </div>
+            {authorizedNavLinks.map((link) => {
               const Icon = link.icon;
               return (
                 <NavLink
@@ -109,101 +192,155 @@ export const AdminLayout: React.FC = () => {
                   to={link.path}
                   end={link.path === '/admin'}
                   className={({ isActive }) =>
-                    `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                    `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-blue-900 ${
                       isActive
-                        ? 'bg-ocean-950 text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
+                        ? 'bg-blue-900 text-white shadow-sm font-bold'
+                        : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
                     }`
                   }
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className="w-4 h-4 shrink-0" />
+                    <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
                     <span>{link.label}</span>
                   </div>
                   {link.badge && (
-                    <span className="bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px] px-2 py-0.5 rounded-full">
+                    <span 
+                      aria-label={`${link.badge} pending orders`}
+                      className="bg-red-600 text-white font-bold text-[10px] px-2 py-0.5 rounded-full"
+                    >
                       {link.badge}
                     </span>
                   )}
                 </NavLink>
               );
             })}
-          </div>
+          </nav>
+        </div>
 
-          {/* Admin User Card */}
-          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1">
-            <div className="flex items-center gap-1.5 text-emerald-700 font-bold text-[10px] uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Admin Online</span>
+          <div className="pt-4 border-t border-slate-100 space-y-2">
+            <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600">
+              <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-800" aria-hidden="true" />
+                <span>{roleTitle}</span>
+              </div>
+              <span className="font-mono text-[10px] text-slate-600 block truncate mt-0.5" title={user?.email}>
+                {user?.email}
+              </span>
             </div>
-            <div className="font-bold text-slate-900 truncate">{user?.full_name || 'Aathil (Admin)'}</div>
-            <div className="text-[10px] text-slate-500">Super Administrator Access</div>
           </div>
         </aside>
 
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-50 flex lg:hidden">
-            <div
-              className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-            <div className="relative w-4/5 max-w-xs bg-white text-slate-900 h-full p-4 flex flex-col justify-between overflow-y-auto z-10 border-r border-slate-200 shadow-xl">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <span className="font-bold text-sm text-ocean-950 font-display uppercase tracking-wide">
-                    Admin Modules
-                  </span>
-                  <button onClick={() => setIsMobileMenuOpen(false)} className="p-1 rounded-lg hover:bg-slate-100">
-                    <X className="w-5 h-5 text-slate-500" />
+          <div 
+            className="lg:hidden fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-xs flex"
+            onClick={closeMobileMenu}
+          >
+            <div 
+              ref={mobileDrawerRef}
+              id="mobile-admin-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile Administrative Menu"
+              onClick={(e) => e.stopPropagation()}
+              className="w-72 bg-white h-full p-4 flex flex-col justify-between shadow-2xl"
+            >
+              <div>
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-blue-950 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+                      <BrandLogo variant="admin" className="w-full h-full" imgClassName="w-full h-full object-contain" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-sm text-blue-950 block leading-tight">Betta Operations</span>
+                      <span className="text-[10px] text-slate-500 font-mono">Control Center</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={closeMobileMenu}
+                    className="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-900"
+                    aria-label="Close administrative menu"
+                  >
+                    <X className="w-5 h-5" aria-hidden="true" />
                   </button>
                 </div>
-                <div className="space-y-1 pt-2">
-                  {navLinks.map((link) => {
+
+                <nav aria-label="Mobile Navigation Links" className="space-y-1">
+                  {authorizedNavLinks.map((link) => {
                     const Icon = link.icon;
                     return (
                       <NavLink
                         key={link.path}
                         to={link.path}
                         end={link.path === '/admin'}
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        onClick={closeMobileMenu}
                         className={({ isActive }) =>
-                          `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                          `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-blue-900 ${
                             isActive
-                              ? 'bg-ocean-950 text-white shadow-sm'
-                              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                              ? 'bg-blue-900 text-white shadow-sm'
+                              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
                           }`
                         }
                       >
                         <div className="flex items-center gap-3">
-                          <Icon className="w-4 h-4 shrink-0" />
+                          <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
                           <span>{link.label}</span>
                         </div>
                         {link.badge && (
-                          <span className="bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px] px-2 py-0.5 rounded-full">
+                          <span 
+                            aria-label={`${link.badge} pending orders`}
+                            className="bg-red-600 text-white font-bold text-[10px] px-2 py-0.5 rounded-full"
+                          >
                             {link.badge}
                           </span>
                         )}
                       </NavLink>
                     );
                   })}
-                </div>
+                </nav>
               </div>
 
-              <div className="pt-4 border-t border-slate-100">
+              <div className="pt-4 border-t border-slate-100 space-y-2">
+                <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600">
+                  <span className="font-bold text-slate-800 block">{roleTitle}</span>
+                  <span className="text-[10px] text-slate-500 truncate block">{user?.email}</span>
+                </div>
                 <Link
                   to="/"
-                  className="block text-center py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl mb-2 transition-colors"
+                  target="_blank"
+                  className="block text-center py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-blue-900"
                 >
                   View Public Store
                 </Link>
+                <button
+                  type="button"
+                  onClick={handleAdminLogout}
+                  className="w-full py-2.5 bg-red-50 text-red-700 hover:bg-red-100 text-xs font-bold rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-red-600"
+                >
+                  Sign Out
+                </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Content Viewport (Clean light backdrop) */}
-        <main className="flex-1 overflow-y-auto bg-slate-50/70 p-4 sm:p-8">
+        {/* Content Viewport with Accessible Landmark & Breadcrumbs */}
+        <main 
+          id="admin-main" 
+          tabIndex={-1} 
+          className="flex-1 overflow-y-auto bg-slate-50/70 p-4 sm:p-8 outline-none"
+        >
+          {/* Breadcrumb Navigation */}
+          <nav aria-label="Administrative Breadcrumb" className="mb-4 text-xs flex items-center gap-1.5 text-slate-500 font-medium">
+            <Link to="/admin" className="hover:text-blue-900 transition-colors focus-visible:ring-1 focus-visible:ring-blue-900 rounded">
+              Admin
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
+            <span aria-current="page" className="text-slate-900 font-bold">
+              {currentPageTitle}
+            </span>
+          </nav>
+
           <Outlet />
         </main>
       </div>

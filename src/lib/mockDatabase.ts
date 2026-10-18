@@ -1,10 +1,12 @@
 import { 
   Product, Category, Order, StoreSettings, HomepageSection, 
-  CMSPage, ProductReview, Coupon, AdminAuditLog, PaymentStatus, FulfillmentStatus, Address 
+  CMSPage, ProductReview, Coupon, AdminAuditLog, PaymentStatus, FulfillmentStatus, BlogPost, MediaAsset, UserProfile, UserRole,
+  ImportHistoryItem, BrandingSettings
 } from './types';
 import { 
   INITIAL_PRODUCTS, INITIAL_CATEGORIES, INITIAL_STORE_SETTINGS, 
-  INITIAL_HOMEPAGE_SECTIONS, INITIAL_CMS_PAGES, INITIAL_COUPONS 
+  INITIAL_HOMEPAGE_SECTIONS, INITIAL_CMS_PAGES, INITIAL_COUPONS, INITIAL_BLOG_POSTS, INITIAL_MEDIA_ASSETS,
+  DEFAULT_BRANDING_SETTINGS
 } from './constants';
 
 const STORAGE_KEYS = {
@@ -17,6 +19,11 @@ const STORAGE_KEYS = {
   REVIEWS: 'ba_reviews',
   COUPONS: 'ba_coupons',
   AUDIT_LOGS: 'ba_audit_logs',
+  BLOG_POSTS: 'ba_blog_posts',
+  MEDIA_ASSETS: 'ba_media_assets',
+  USERS: 'ba_users',
+  IMPORT_HISTORY: 'ba_import_history',
+  BRANDING_SETTINGS: 'ba_branding_settings',
 };
 
 // Helper to safely read from localStorage
@@ -39,6 +46,73 @@ function setStoredItem<T>(key: string, value: T): void {
     console.error(`Error writing ${key} to storage:`, e);
   }
 }
+
+export interface StoredUser {
+  id: string;
+  email: string;
+  full_name: string;
+  phone?: string;
+  role: UserRole;
+  password_hash: string;
+  created_at: string;
+}
+
+const INITIAL_USERS: StoredUser[] = [
+  {
+    id: 'usr-admin-primary',
+    email: 'admin@bettaaquatics.in',
+    full_name: 'Aathil (Store Admin)',
+    phone: '+91 98765 43210',
+    role: 'admin',
+    password_hash: 'Admin@123',
+    created_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 'usr-staff-products',
+    email: 'products@bettaaquatics.in',
+    full_name: 'Priya Sharma (Product Manager)',
+    phone: '+91 98765 11111',
+    role: 'product_manager',
+    password_hash: 'Staff@123',
+    created_at: '2026-01-05T00:00:00Z',
+  },
+  {
+    id: 'usr-staff-orders',
+    email: 'orders@bettaaquatics.in',
+    full_name: 'Vikram Rao (Order & Logistics Manager)',
+    phone: '+91 98765 22222',
+    role: 'order_manager',
+    password_hash: 'Staff@123',
+    created_at: '2026-01-08T00:00:00Z',
+  },
+  {
+    id: 'usr-staff-reviewer',
+    email: 'reviewer@bettaaquatics.in',
+    full_name: 'Suresh Nair (Payment Reviewer)',
+    phone: '+91 98765 33333',
+    role: 'payment_reviewer',
+    password_hash: 'Staff@123',
+    created_at: '2026-01-10T00:00:00Z',
+  },
+  {
+    id: 'usr-staff-content',
+    email: 'content@bettaaquatics.in',
+    full_name: 'Ananya Das (CMS & Content Specialist)',
+    phone: '+91 98765 44444',
+    role: 'content_manager',
+    password_hash: 'Staff@123',
+    created_at: '2026-01-12T00:00:00Z',
+  },
+  {
+    id: 'usr-customer-demo',
+    email: 'customer@bettaaquatics.in',
+    full_name: 'Rahul Sharma',
+    phone: '+91 98450 12345',
+    role: 'customer',
+    password_hash: 'Customer@123',
+    created_at: '2026-01-15T00:00:00Z',
+  }
+];
 
 // Initial sample orders for demonstration
 const INITIAL_ORDERS: Order[] = [
@@ -104,7 +178,29 @@ const INITIAL_ORDERS: Order[] = [
 export const mockDb = {
   // PRODUCTS
   getProducts: (): Product[] => {
-    return getStoredItem<Product[]>(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
+    const prods = getStoredItem<Product[]>(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
+    let modified = false;
+    const currentIds = new Set(prods.map(p => p.id));
+    const missing = INITIAL_PRODUCTS.filter(ip => !currentIds.has(ip.id));
+    let baseList = prods;
+    if (missing.length > 0) {
+      baseList = [...prods, ...missing];
+      modified = true;
+    }
+    const merged = baseList.map(p => {
+      if (!p.videos || p.videos.length === 0) {
+        const init = INITIAL_PRODUCTS.find(ip => ip.id === p.id);
+        if (init && init.videos && init.videos.length > 0) {
+          modified = true;
+          return { ...p, videos: init.videos };
+        }
+      }
+      return p;
+    });
+    if (modified) {
+      setStoredItem(STORAGE_KEYS.PRODUCTS, merged);
+    }
+    return merged;
   },
 
   getProductBySlug: (slug: string): Product | undefined => {
@@ -158,6 +254,7 @@ export const mockDb = {
         images: product.images && product.images.length > 0 
           ? product.images 
           : ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80'],
+        videos: product.videos || [],
         rating: 5.0,
         review_count: 0,
         tags: product.tags || [],
@@ -170,40 +267,318 @@ export const mockDb = {
     }
   },
 
-  deleteProduct: (id: string): void => {
-    const products = mockDb.getProducts();
-    const filtered = products.filter(p => p.id !== id);
-    setStoredItem(STORAGE_KEYS.PRODUCTS, filtered);
-    mockDb.addAuditLog('Deleted product ID: ' + id, 'product', id);
+  deleteProduct: (id: string, options?: { force?: boolean; archiveIfInOrders?: boolean }): { success: boolean; action: 'deleted' | 'archived' | 'protected'; message: string } => {
+    let products = mockDb.getProducts();
+    const product = products.find(p => p.id === id);
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    // Safety check: protect historical orders, GST tax invoices, and accounting records
+    const orders = mockDb.getOrders();
+    const hasOrderHistory = orders.some(o => o.items.some(i => i.product_id === id));
+
+    if (hasOrderHistory) {
+      if (options?.archiveIfInOrders) {
+        product.is_active = false;
+        product.status = 'archived';
+        setStoredItem(STORAGE_KEYS.PRODUCTS, products);
+        mockDb.addAuditLog('Archived product (preserved in orders): ' + product.name, 'product', id);
+        return { success: true, action: 'archived', message: `Product "${product.name}" has historical order records and was safely archived rather than deleted.` };
+      }
+      return { success: false, action: 'protected', message: `Product "${product.name}" cannot be hard-deleted because it is referenced in past customer orders. Please archive it instead.` };
+    }
+
+    products = products.filter(p => p.id !== id);
+    setStoredItem(STORAGE_KEYS.PRODUCTS, products);
+    mockDb.addAuditLog('Deleted product: ' + product.name, 'product', id);
+    return { success: true, action: 'deleted', message: `Product "${product.name}" permanently deleted.` };
   },
 
-  // CATEGORIES
+  bulkSaveProducts: (productsToSave: Product[]): { created: number; updated: number } => {
+    const products = mockDb.getProducts();
+    let created = 0;
+    let updated = 0;
+
+    for (const p of productsToSave) {
+      const idx = products.findIndex(existing => existing.id === p.id || (p.sku && existing.sku === p.sku));
+      if (idx >= 0) {
+        products[idx] = {
+          ...products[idx],
+          ...p,
+        };
+        updated++;
+      } else {
+        products.unshift(p);
+        created++;
+      }
+    }
+
+    setStoredItem(STORAGE_KEYS.PRODUCTS, products);
+    mockDb.addAuditLog(`Bulk saved products: ${created} created, ${updated} updated`, 'product', 'bulk');
+    return { created, updated };
+  },
+
+  bulkDeleteProducts: (productIds: string[], options?: { force?: boolean; archiveIfInOrders?: boolean }): { deletedIds: string[]; archivedIds: string[]; protectedIds: string[] } => {
+    let products = mockDb.getProducts();
+    const orders = mockDb.getOrders();
+
+    // Map of product IDs present in historical orders
+    const orderedProductIds = new Set<string>();
+    for (const order of orders) {
+      for (const item of order.items) {
+        if (item.product_id) {
+          orderedProductIds.add(item.product_id);
+        }
+      }
+    }
+
+    const deletedIds: string[] = [];
+    const archivedIds: string[] = [];
+    const protectedIds: string[] = [];
+
+    for (const id of productIds) {
+      const prod = products.find(p => p.id === id);
+      if (!prod) continue;
+
+      if (orderedProductIds.has(id)) {
+        if (options?.archiveIfInOrders) {
+          // Soft-delete / Archive to preserve order history and tax invoices
+          prod.is_active = false;
+          prod.status = 'archived';
+          archivedIds.push(id);
+        } else {
+          protectedIds.push(id);
+        }
+      } else {
+        deletedIds.push(id);
+      }
+    }
+
+    if (deletedIds.length > 0) {
+      const deletedSet = new Set(deletedIds);
+      products = products.filter(p => !deletedSet.has(p.id));
+    }
+
+    setStoredItem(STORAGE_KEYS.PRODUCTS, products);
+
+    mockDb.addAuditLog(
+      `Bulk product deletion: ${deletedIds.length} removed, ${archivedIds.length} archived, ${protectedIds.length} protected (in active orders)`,
+      'product',
+      'bulk'
+    );
+
+    return { deletedIds, archivedIds, protectedIds };
+  },
+
+  // CATEGORIES & HIERARCHY
   getCategories: (): Category[] => {
-    return getStoredItem<Category[]>(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
+    const cats = getStoredItem<Category[]>(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
+    // Auto-merge any newly defined initial categories or subcategories
+    let modified = false;
+    const existingIds = new Set(cats.map(c => c.id));
+    for (const initCat of INITIAL_CATEGORIES) {
+      if (!existingIds.has(initCat.id)) {
+        cats.push(initCat);
+        modified = true;
+      }
+    }
+    if (modified) {
+      setStoredItem(STORAGE_KEYS.CATEGORIES, cats);
+    }
+    return cats.sort((a, b) => a.display_order - b.display_order);
+  },
+
+  getCategoryHierarchy: (): Category[] => {
+    const all = mockDb.getCategories();
+    const products = mockDb.getProducts();
+
+    // Map product counts
+    const countMap: Record<string, number> = {};
+    for (const p of products) {
+      if (p.category_id) {
+        countMap[p.category_id] = (countMap[p.category_id] || 0) + 1;
+      }
+      if (p.subcategory_id) {
+        countMap[p.subcategory_id] = (countMap[p.subcategory_id] || 0) + 1;
+      }
+    }
+
+    const rootCategories: Category[] = [];
+    const childrenMap: Record<string, Category[]> = {};
+
+    for (const c of all) {
+      const enriched: Category = {
+        ...c,
+        product_count: countMap[c.id] || 0,
+        children: [],
+      };
+      if (!c.parent_id) {
+        rootCategories.push(enriched);
+      } else {
+        if (!childrenMap[c.parent_id]) {
+          childrenMap[c.parent_id] = [];
+        }
+        childrenMap[c.parent_id].push(enriched);
+      }
+    }
+
+    for (const root of rootCategories) {
+      root.children = (childrenMap[root.id] || []).sort((a, b) => a.display_order - b.display_order);
+      // Aggregate child counts to root
+      const childrenSum = root.children.reduce((acc, ch) => acc + (ch.product_count || 0), 0);
+      root.product_count = (root.product_count || 0) + childrenSum;
+    }
+
+    return rootCategories.sort((a, b) => a.display_order - b.display_order);
+  },
+
+  getCategoryById: (id: string): Category | undefined => {
+    const categories = mockDb.getCategories();
+    return categories.find(c => c.id === id);
+  },
+
+  getCategoryBySlug: (slug: string): Category | undefined => {
+    const categories = mockDb.getCategories();
+    return categories.find(c => c.slug === slug);
   },
 
   saveCategory: (category: Partial<Category> & { name: string }): Category => {
     const categories = mockDb.getCategories();
     const existingIndex = categories.findIndex(c => c.id === category.id);
+
+    // Validation: Slug uniqueness
+    const targetSlug = category.slug 
+      ? category.slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+      : category.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    
+    const duplicateSlug = categories.find(c => c.slug === targetSlug && c.id !== category.id);
+    if (duplicateSlug) {
+      throw new Error(`Category slug "${targetSlug}" is already in use by category "${duplicateSlug.name}".`);
+    }
+
+    // Circular hierarchy prevention
+    if (category.id && category.parent_id) {
+      if (category.parent_id === category.id) {
+        throw new Error('A category cannot be its own parent.');
+      }
+      // Check if parent_id is one of this category's descendants
+      let currParent = categories.find(c => c.id === category.parent_id);
+      while (currParent && currParent.parent_id) {
+        if (currParent.parent_id === category.id) {
+          throw new Error('Circular category hierarchy detected: A category cannot be parented to its own child.');
+        }
+        currParent = categories.find(c => c.id === currParent?.parent_id);
+      }
+    }
+
     if (existingIndex >= 0) {
-      const updated: Category = { ...categories[existingIndex], ...category };
+      const updated: Category = {
+        ...categories[existingIndex],
+        ...category,
+        slug: targetSlug,
+        updated_at: new Date().toISOString(),
+      };
       categories[existingIndex] = updated;
       setStoredItem(STORAGE_KEYS.CATEGORIES, categories);
+      mockDb.addAuditLog('Updated category: ' + updated.name, 'category', updated.id);
       return updated;
     } else {
       const newCat: Category = {
         id: category.id || 'cat-' + Date.now(),
         name: category.name,
-        slug: category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        slug: targetSlug,
         description: category.description || '',
         image_url: category.image_url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
-        display_order: category.display_order || categories.length + 1,
-        is_active: true,
+        banner_url: category.banner_url,
+        video_url: category.video_url,
+        parent_id: category.parent_id || null,
+        display_order: category.display_order ?? (categories.length + 1),
+        is_active: category.is_active !== undefined ? category.is_active : true,
+        is_featured: Boolean(category.is_featured),
+        created_at: new Date().toISOString(),
       };
       categories.push(newCat);
       setStoredItem(STORAGE_KEYS.CATEGORIES, categories);
+      mockDb.addAuditLog('Created category: ' + newCat.name, 'category', newCat.id);
       return newCat;
     }
+  },
+
+  reorderCategories: (orderedIds: string[]): void => {
+    const categories = mockDb.getCategories();
+    orderedIds.forEach((id, idx) => {
+      const found = categories.find(c => c.id === id);
+      if (found) {
+        found.display_order = idx + 1;
+      }
+    });
+    setStoredItem(STORAGE_KEYS.CATEGORIES, categories);
+    mockDb.addAuditLog('Reordered categories display sequence', 'category', 'bulk');
+  },
+
+  deleteCategory: (id: string, options?: { reassignToId?: string; archiveProducts?: boolean }): { success: boolean; message: string } => {
+    const categories = mockDb.getCategories();
+    const cat = categories.find(c => c.id === id);
+    if (!cat) throw new Error('Category not found');
+
+    // 1. Check child subcategories
+    const childCategories = categories.filter(c => c.parent_id === id);
+    if (childCategories.length > 0) {
+      if (options?.reassignToId !== undefined) {
+        // Move child subcategories to new parent (or root if reassignToId is null/empty)
+        childCategories.forEach(ch => {
+          ch.parent_id = options.reassignToId || null;
+        });
+      } else {
+        throw new Error(`Cannot delete category "${cat.name}" because it contains ${childCategories.length} child subcategory(s). Reassign or move child subcategories first.`);
+      }
+    }
+
+    // 2. Check assigned products
+    const products = mockDb.getProducts();
+    const assignedProducts = products.filter(p => p.category_id === id || p.subcategory_id === id);
+    if (assignedProducts.length > 0) {
+      if (options?.reassignToId) {
+        const targetCategory = categories.find(c => c.id === options.reassignToId);
+        assignedProducts.forEach(p => {
+          if (p.category_id === id) {
+            p.category_id = options.reassignToId!;
+            p.category_name = targetCategory?.name;
+          }
+          if (p.subcategory_id === id) {
+            p.subcategory_id = undefined;
+            p.subcategory_name = undefined;
+          }
+        });
+        setStoredItem(STORAGE_KEYS.PRODUCTS, products);
+      } else if (options?.archiveProducts) {
+        assignedProducts.forEach(p => {
+          p.is_active = false;
+          p.status = 'archived';
+        });
+        setStoredItem(STORAGE_KEYS.PRODUCTS, products);
+      } else {
+        throw new Error(`Cannot delete category "${cat.name}" because ${assignedProducts.length} product(s) are currently assigned to it. Please reassign products first.`);
+      }
+    }
+
+    const filtered = categories.filter(c => c.id !== id);
+    setStoredItem(STORAGE_KEYS.CATEGORIES, filtered);
+    mockDb.addAuditLog('Deleted category: ' + cat.name, 'category', id);
+    return { success: true, message: `Category "${cat.name}" deleted successfully.` };
+  },
+
+  // IMPORT HISTORY
+  getImportHistory: (): ImportHistoryItem[] => {
+    return getStoredItem<ImportHistoryItem[]>(STORAGE_KEYS.IMPORT_HISTORY, []);
+  },
+
+  saveImportHistory: (item: ImportHistoryItem): void => {
+    const history = mockDb.getImportHistory();
+    history.unshift(item);
+    setStoredItem(STORAGE_KEYS.IMPORT_HISTORY, history.slice(0, 50));
+    mockDb.addAuditLog(`CSV Import (${item.mode}): ${item.filename} - ${item.success_count} success, ${item.failure_count} failed`, 'import', item.id);
   },
 
   // ORDERS
@@ -223,6 +598,19 @@ export const mockDb = {
 
   createOrder: (orderData: Omit<Order, 'id' | 'order_number' | 'created_at' | 'updated_at'>): Order => {
     const orders = mockDb.getOrders();
+    const products = mockDb.getProducts();
+
+    // 1. Strict Server/Database-Side Inventory Validation
+    for (const item of orderData.items) {
+      const p = products.find(prod => prod.id === item.product_id);
+      if (!p) {
+        throw new Error(`Product "${item.product_name}" is no longer available in catalog.`);
+      }
+      if (p.stock_quantity < item.quantity) {
+        throw new Error(`Item "${p.name}" has only ${p.stock_quantity} left in stock. Requested quantity: ${item.quantity}.`);
+      }
+    }
+
     const newOrderNumber = 'BA-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
     const newOrder: Order = {
       ...orderData,
@@ -232,8 +620,7 @@ export const mockDb = {
       updated_at: new Date().toISOString(),
     };
 
-    // Decrement stock for ordered items
-    const products = mockDb.getProducts();
+    // 2. Decrement stock for ordered items
     newOrder.items.forEach(item => {
       const pIndex = products.findIndex(p => p.id === item.product_id);
       if (pIndex >= 0) {
@@ -244,6 +631,13 @@ export const mockDb = {
 
     orders.unshift(newOrder);
     setStoredItem(STORAGE_KEYS.ORDERS, orders);
+
+    // 3. Dispatch real-time events across windows & components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_inventory_updated'));
+      window.dispatchEvent(new CustomEvent('ba_orders_updated'));
+    }
+
     return newOrder;
   },
 
@@ -291,6 +685,10 @@ export const mockDb = {
     orders[index] = order;
     setStoredItem(STORAGE_KEYS.ORDERS, orders);
     mockDb.addAuditLog(`Order ${order.order_number} payment ${paymentStatus}`, 'order', order.id);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_orders_updated'));
+    }
     return order;
   },
 
@@ -321,6 +719,10 @@ export const mockDb = {
     orders[index] = order;
     setStoredItem(STORAGE_KEYS.ORDERS, orders);
     mockDb.addAuditLog(`Order ${order.order_number} dispatched via ${courierName} (${trackingNumber})`, 'shipment', order.id);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_orders_updated'));
+    }
     return order;
   },
 
@@ -349,6 +751,101 @@ export const mockDb = {
     return updated;
   },
 
+  // BRANDING & THEME SETTINGS
+  getBrandingSettings: (): BrandingSettings => {
+    const stored = getStoredItem<BrandingSettings>(STORAGE_KEYS.BRANDING_SETTINGS, DEFAULT_BRANDING_SETTINGS);
+
+    let needsSave = false;
+    const migrated: BrandingSettings = { ...DEFAULT_BRANDING_SETTINGS, ...stored };
+
+    // Migrate legacy default logo to the active project logo asset
+    if (!migrated.logo_url || migrated.logo_url === '/logo-fish.svg') {
+      migrated.logo_url = '/logo.jpeg';
+      needsSave = true;
+    }
+
+    // If mobile logo was missing or set to the old legacy default svg, sync to primary logo
+    if (!migrated.mobile_logo_url || migrated.mobile_logo_url === '/logo-fish.svg') {
+      migrated.mobile_logo_url = migrated.logo_url;
+      needsSave = true;
+    }
+
+    // If footer logo was missing or set to the old legacy default svg, sync to primary logo
+    if (!migrated.footer_logo_url || migrated.footer_logo_url === '/logo-fish.svg') {
+      migrated.footer_logo_url = migrated.logo_url;
+      needsSave = true;
+    }
+
+    if (!migrated.site_name || migrated.site_name === 'Betta Aquatics') {
+      migrated.site_name = 'Ra Guppy';
+      needsSave = true;
+    }
+
+    if (needsSave) {
+      setStoredItem(STORAGE_KEYS.BRANDING_SETTINGS, migrated);
+    }
+
+    return migrated;
+  },
+
+  updateBrandingSettings: (newBranding: Partial<BrandingSettings>): BrandingSettings => {
+    const current = mockDb.getBrandingSettings();
+    const updatedLogo = newBranding.logo_url || current.logo_url;
+
+    let newMobile = newBranding.mobile_logo_url !== undefined ? newBranding.mobile_logo_url : current.mobile_logo_url;
+    let newFooter = newBranding.footer_logo_url !== undefined ? newBranding.footer_logo_url : current.footer_logo_url;
+
+    // Auto-sync mobile and footer logos if they were empty, legacy default, or identical to old primary logo
+    if (newBranding.logo_url) {
+      if (!newMobile || newMobile === '/logo-fish.svg' || newMobile === current.logo_url) {
+        newMobile = updatedLogo;
+      }
+      if (!newFooter || newFooter === '/logo-fish.svg' || newFooter === current.footer_logo_url) {
+        newFooter = updatedLogo;
+      }
+    }
+
+    const updated: BrandingSettings = {
+      ...current,
+      ...newBranding,
+      logo_url: updatedLogo,
+      mobile_logo_url: newMobile,
+      footer_logo_url: newFooter,
+      updated_at: new Date().toISOString(),
+      version: (current.version || 1) + 1,
+    };
+    setStoredItem(STORAGE_KEYS.BRANDING_SETTINGS, updated);
+
+    // Keep store_settings in sync
+    const storeSettings = mockDb.getStoreSettings();
+    setStoredItem(STORAGE_KEYS.STORE_SETTINGS, {
+      ...storeSettings,
+      branding: updated,
+      brand_name: updated.site_name || storeSettings.brand_name,
+    });
+
+    mockDb.addAuditLog(`Branding & theme settings updated: logo and colors (v${updated.version})`, 'cms', 'branding');
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_branding_updated', { detail: updated }));
+    }
+    return updated;
+  },
+
+  resetBrandingSettings: (): BrandingSettings => {
+    const reset: BrandingSettings = {
+      ...DEFAULT_BRANDING_SETTINGS,
+      updated_at: new Date().toISOString(),
+      version: Date.now(),
+    };
+    setStoredItem(STORAGE_KEYS.BRANDING_SETTINGS, reset);
+    mockDb.addAuditLog('Branding and theme colors reset to factory defaults', 'cms', 'branding');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_branding_updated', { detail: reset }));
+    }
+    return reset;
+  },
+
   // HOMEPAGE CMS SECTIONS
   getHomepageSections: (): HomepageSection[] => {
     return getStoredItem<HomepageSection[]>(STORAGE_KEYS.HOMEPAGE_SECTIONS, INITIAL_HOMEPAGE_SECTIONS);
@@ -357,6 +854,18 @@ export const mockDb = {
   updateHomepageSections: (sections: HomepageSection[]): void => {
     setStoredItem(STORAGE_KEYS.HOMEPAGE_SECTIONS, sections);
     mockDb.addAuditLog('Homepage sections modified and saved', 'cms', 'homepage');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_homepage_updated', { detail: sections }));
+    }
+  },
+
+  resetHomepageSections: (): HomepageSection[] => {
+    setStoredItem(STORAGE_KEYS.HOMEPAGE_SECTIONS, INITIAL_HOMEPAGE_SECTIONS);
+    mockDb.addAuditLog('Homepage sections reset to default catalog layout', 'cms', 'homepage');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_homepage_updated', { detail: INITIAL_HOMEPAGE_SECTIONS }));
+    }
+    return INITIAL_HOMEPAGE_SECTIONS;
   },
 
   // CMS PAGES
@@ -381,6 +890,23 @@ export const mockDb = {
     }
     setStoredItem(STORAGE_KEYS.CMS_PAGES, pages);
     mockDb.addAuditLog(`Saved CMS page: ${page.title}`, 'cms', page.id);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_cms_pages_updated'));
+    }
+  },
+
+  deleteCMSPage: (id: string): boolean => {
+    const pages = mockDb.getCMSPages();
+    const toDelete = pages.find(p => p.id === id);
+    const filtered = pages.filter(p => p.id !== id);
+    setStoredItem(STORAGE_KEYS.CMS_PAGES, filtered);
+    if (toDelete) {
+      mockDb.addAuditLog(`Deleted CMS page: ${toDelete.title}`, 'cms', id);
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_cms_pages_updated'));
+    }
+    return true;
   },
 
   // REVIEWS
@@ -403,7 +929,7 @@ export const mockDb = {
         user_name: 'Priya Nambiar',
         rating: 5,
         title: 'True Galaxy Koi colours! Exactly as shown in photos',
-        comment: 'I was hesitant about ordering live fish online, but Betta Aquatics delivered the EXACT specimen from the listing. Will definitely purchase again.',
+        comment: 'I was nervous to buy a fish online, but Betta Aquatics sent the exact fish from the photo. Healthy, active, and beautiful!',
         is_verified: true,
         status: 'approved',
         created_at: '2026-03-14T15:30:00Z',
@@ -439,6 +965,10 @@ export const mockDb = {
 
     if (!coupon) {
       return { valid: false, discount: 0, message: 'Invalid or expired coupon code' };
+    }
+
+    if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+      return { valid: false, discount: 0, message: 'This coupon has expired' };
     }
 
     if (subtotal < coupon.min_order_amount) {
@@ -512,5 +1042,227 @@ export const mockDb = {
     };
     logs.unshift(newLog);
     setStoredItem(STORAGE_KEYS.AUDIT_LOGS, logs.slice(0, 100)); // Keep last 100 logs
+  },
+
+  // BLOG POSTS / GUIDES
+  getBlogPosts: (publishedOnly: boolean = false): BlogPost[] => {
+    const posts = getStoredItem<BlogPost[]>(STORAGE_KEYS.BLOG_POSTS, INITIAL_BLOG_POSTS);
+    if (publishedOnly) {
+      return posts.filter(p => p.is_published);
+    }
+    return posts;
+  },
+
+  getBlogPostBySlug: (slug: string): BlogPost | undefined => {
+    const posts = mockDb.getBlogPosts();
+    return posts.find(p => p.slug === slug);
+  },
+
+  saveBlogPost: (postData: Partial<BlogPost>): BlogPost => {
+    const posts = mockDb.getBlogPosts();
+    const now = new Date().toISOString();
+
+    if (postData.id) {
+      const index = posts.findIndex(p => p.id === postData.id);
+      if (index !== -1) {
+        const updated: BlogPost = {
+          ...posts[index],
+          ...postData,
+          updated_at: now,
+        };
+        posts[index] = updated;
+        setStoredItem(STORAGE_KEYS.BLOG_POSTS, posts);
+        mockDb.addAuditLog('Blog Post Updated', 'blog', updated.id, `Updated article: ${updated.title}`);
+        return updated;
+      }
+    }
+
+    // New blog post
+    const newPost: BlogPost = {
+      id: 'post-' + Date.now(),
+      slug: postData.slug || ('post-' + Date.now()),
+      title: postData.title || 'Untitled Post',
+      excerpt: postData.excerpt || '',
+      content_html: postData.content_html || '',
+      featured_image: postData.featured_image || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80',
+      category: postData.category || 'Betta Care & Acclimation',
+      tags: postData.tags || ['Betta Care'],
+      author: postData.author || {
+        name: 'Dr. Anand Raman',
+        role: 'Chief Marine Biologist & Founder',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      },
+      read_time_minutes: postData.read_time_minutes || 5,
+      is_published: postData.is_published ?? true,
+      views_count: postData.views_count || 1,
+      published_at: postData.published_at || now,
+      updated_at: now,
+      meta_title: postData.meta_title,
+      meta_description: postData.meta_description,
+    };
+
+    posts.unshift(newPost);
+    setStoredItem(STORAGE_KEYS.BLOG_POSTS, posts);
+    mockDb.addAuditLog('Blog Post Created', 'blog', newPost.id, `Created article: ${newPost.title}`);
+    return newPost;
+  },
+
+  deleteBlogPost: (id: string): boolean => {
+    const posts = mockDb.getBlogPosts();
+    const toDelete = posts.find(p => p.id === id);
+    const filtered = posts.filter(p => p.id !== id);
+    setStoredItem(STORAGE_KEYS.BLOG_POSTS, filtered);
+    if (toDelete) {
+      mockDb.addAuditLog('Blog Post Deleted', 'blog', id, `Deleted article: ${toDelete.title}`);
+    }
+    return true;
+  },
+
+  incrementBlogPostViews: (id: string): void => {
+    const posts = mockDb.getBlogPosts();
+    const index = posts.findIndex(p => p.id === id);
+    if (index !== -1) {
+      posts[index].views_count = (posts[index].views_count || 0) + 1;
+      setStoredItem(STORAGE_KEYS.BLOG_POSTS, posts);
+    }
+  },
+
+  // MEDIA ASSETS LIBRARY
+  getMediaAssets: (): MediaAsset[] => {
+    const assets = getStoredItem<MediaAsset[]>(STORAGE_KEYS.MEDIA_ASSETS, INITIAL_MEDIA_ASSETS);
+    const missing = INITIAL_MEDIA_ASSETS.filter(init => !assets.some(a => a.id === init.id));
+    if (missing.length > 0) {
+      const merged = [...assets, ...missing];
+      setStoredItem(STORAGE_KEYS.MEDIA_ASSETS, merged);
+      return merged;
+    }
+    return assets;
+  },
+
+  saveMediaAsset: (assetData: Partial<MediaAsset>): MediaAsset => {
+    const assets = mockDb.getMediaAssets();
+    const newAsset: MediaAsset = {
+      id: assetData.id || ('med-' + Date.now()),
+      filename: assetData.filename || 'uploaded-image.jpg',
+      url: assetData.url || '',
+      alt_text: assetData.alt_text || 'Aquarium Store Media Asset',
+      file_size_bytes: assetData.file_size_bytes || 150000,
+      mime_type: assetData.mime_type || 'image/jpeg',
+      category: assetData.category || 'general',
+      thumbnail_url: assetData.thumbnail_url,
+      duration_seconds: assetData.duration_seconds,
+      dimensions: assetData.dimensions,
+      created_at: assetData.created_at || new Date().toISOString(),
+    };
+    assets.unshift(newAsset);
+    setStoredItem(STORAGE_KEYS.MEDIA_ASSETS, assets);
+    mockDb.addAuditLog(`Uploaded media asset: ${newAsset.filename}`, 'media', newAsset.id);
+    return newAsset;
+  },
+
+  deleteMediaAsset: (id: string): boolean => {
+    const assets = mockDb.getMediaAssets();
+    const asset = assets.find(a => a.id === id);
+    const filtered = assets.filter(a => a.id !== id);
+    setStoredItem(STORAGE_KEYS.MEDIA_ASSETS, filtered);
+    if (asset) {
+      mockDb.addAuditLog(`Deleted media asset: ${asset.filename}`, 'media', id);
+    }
+    return true;
+  },
+
+  // USER ACCOUNTS & AUTHENTICATION (SECURE SEPARATION)
+  getUsers: (): StoredUser[] => {
+    return getStoredItem<StoredUser[]>(STORAGE_KEYS.USERS, INITIAL_USERS);
+  },
+
+  getUserByEmail: (email: string): StoredUser | undefined => {
+    const users = mockDb.getUsers();
+    return users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+  },
+
+  authenticateCustomer: (email: string, password?: string): { success: boolean; user?: UserProfile; message?: string } => {
+    const user = mockDb.getUserByEmail(email);
+    if (!user) {
+      return { success: false, message: 'No registered customer account found with this email. Please register.' };
+    }
+    // In mock mode, check password if provided
+    if (password && user.password_hash && password !== user.password_hash) {
+      return { success: false, message: 'Invalid email address or password. Please verify your credentials.' };
+    }
+    const profile: UserProfile = {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      phone: user.phone,
+      role: 'customer', // strictly customer
+      created_at: user.created_at,
+    };
+    return { success: true, user: profile };
+  },
+
+  authenticateAdmin: (email: string, password?: string): { success: boolean; user?: UserProfile; message?: string } => {
+    const user = mockDb.getUserByEmail(email);
+    if (!user) {
+      return { success: false, message: 'Access Denied: Invalid staff credentials.' };
+    }
+    if (user.role === 'customer') {
+      return { success: false, message: 'Access Denied: Customer accounts cannot access the executive admin portal.' };
+    }
+    if (password && user.password_hash && password !== user.password_hash) {
+      return { success: false, message: 'Access Denied: Invalid staff credentials.' };
+    }
+    const adminProfile: UserProfile = {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      phone: user.phone,
+      role: user.role,
+      created_at: user.created_at,
+    };
+    mockDb.addAuditLog(`Staff Login Successful: ${adminProfile.email} (${adminProfile.role})`, 'security', adminProfile.id, 'Staff member authenticated to management console');
+    return { success: true, user: adminProfile };
+  },
+
+  registerCustomer: (name: string, email: string, password?: string, phone?: string): { success: boolean; user?: UserProfile; message?: string } => {
+    const existing = mockDb.getUserByEmail(email);
+    if (existing) {
+      return { success: false, message: 'An account with this email address already exists. Please log in.' };
+    }
+
+    const users = mockDb.getUsers();
+    const newUser: StoredUser = {
+      id: 'usr-' + Date.now(),
+      email: email.trim().toLowerCase(),
+      full_name: name.trim(),
+      phone: phone?.trim() || '+91 99999 00000',
+      role: 'customer', // Non-negotiable: Public registration is always customer role
+      password_hash: password || 'Customer@123',
+      created_at: new Date().toISOString(),
+    };
+    users.push(newUser);
+    setStoredItem(STORAGE_KEYS.USERS, users);
+
+    const profile: UserProfile = {
+      id: newUser.id,
+      email: newUser.email,
+      full_name: newUser.full_name,
+      phone: newUser.phone,
+      role: 'customer',
+      created_at: newUser.created_at,
+    };
+    return { success: true, user: profile };
+  },
+
+  requestPasswordReset: (email: string): { success: boolean; message: string } => {
+    const user = mockDb.getUserByEmail(email);
+    if (user) {
+      mockDb.addAuditLog(`Password reset requested for: ${user.email}`, 'security', user.id);
+    }
+    // Return generic safe message to prevent email enumeration
+    return { 
+      success: true, 
+      message: 'If an account exists with this email address, password reset instructions have been dispatched.' 
+    };
   }
 };

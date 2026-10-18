@@ -49,10 +49,10 @@ export const CartPage: React.FC = () => {
         </p>
         <Link
           to="/shop"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-ocean-900 text-white font-bold text-xs rounded-xl hover:bg-ocean-800 transition-colors shadow-md"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-900 text-white font-bold text-xs rounded-xl hover:bg-blue-800 transition-colors shadow-md"
         >
           <span>Discover Living Specimens</span>
-          <ArrowRight className="w-4 h-4 text-aqua-400" />
+          <ArrowRight className="w-4 h-4 text-red-400" />
         </Link>
       </div>
     );
@@ -62,12 +62,12 @@ export const CartPage: React.FC = () => {
     <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-ocean-950 font-display">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">
             Shopping Cart ({items.length} {items.length === 1 ? 'Item' : 'Items'})
           </h1>
           <button
             onClick={clearCart}
-            className="text-xs text-rose-600 hover:underline font-semibold"
+            className="text-xs text-red-600 hover:underline font-semibold"
           >
             Clear Cart
           </button>
@@ -79,11 +79,11 @@ export const CartPage: React.FC = () => {
             <span>
               {freeShippingRemaining > 0 ? (
                 <span className="text-slate-700">
-                  Add <strong className="text-ocean-950">{formatCurrency(freeShippingRemaining)}</strong> more for <strong>FREE Live Air Delivery</strong>!
+                  Add <strong className="text-blue-900">{formatCurrency(freeShippingRemaining)}</strong> more for <strong>FREE Live Air Delivery</strong>!
                 </span>
               ) : (
-                <span className="text-emerald-700 flex items-center gap-1 font-bold">
-                  <Check className="w-4 h-4 text-emerald-600" />
+                <span className="text-blue-700 flex items-center gap-1 font-bold">
+                  <Check className="w-4 h-4 text-blue-600" />
                   Congratulations! You unlocked FREE Delivery.
                 </span>
               )}
@@ -92,7 +92,7 @@ export const CartPage: React.FC = () => {
           </div>
           <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-aqua-500 to-teal-500 rounded-full transition-all duration-500"
+              className="h-full bg-blue-600 rounded-full transition-all duration-500"
               style={{ width: `${freeShippingProgress}%` }}
             />
           </div>
@@ -117,25 +117,25 @@ export const CartPage: React.FC = () => {
                     <div>
                       <Link
                         to={`/product/${product.slug}`}
-                        className="font-bold text-xs sm:text-sm text-slate-900 hover:text-aqua-700 transition-colors line-clamp-1"
+                        className="font-bold text-xs sm:text-sm text-slate-900 hover:text-blue-700 transition-colors line-clamp-1"
                       >
                         {product.name}
                       </Link>
                       <div className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
                         <span>{product.category_name}</span>
                         {product.strain && (
-                          <span className="text-aqua-700 font-semibold">• {product.strain}</span>
+                          <span className="text-blue-700 font-semibold">• {product.strain}</span>
                         )}
                       </div>
 
                       {product.is_unique_specimen && (
-                        <div className="inline-flex items-center gap-1 text-[10px] text-aqua-800 bg-aqua-50 px-2 py-0.5 rounded-full mt-1 border border-aqua-200">
-                          <Sparkles className="w-3 h-3 text-aqua-600" />
+                        <div className="inline-flex items-center gap-1 text-[10px] text-blue-800 bg-blue-50 px-2 py-0.5 rounded-full mt-1 border border-blue-200">
+                          <Sparkles className="w-3 h-3 text-blue-600" />
                           <span>Exact Unique Specimen</span>
                         </div>
                       )}
 
-                      <div className="text-xs font-bold text-ocean-950 mt-1 sm:hidden">
+                      <div className="text-xs font-bold text-slate-900 mt-1 sm:hidden">
                         {formatCurrency(product.price * quantity)}
                       </div>
                     </div>
@@ -170,7 +170,7 @@ export const CartPage: React.FC = () => {
                     )}
 
                     <div className="text-right hidden sm:block">
-                      <div className="font-bold text-sm text-ocean-950 font-display">
+                      <div className="font-bold text-sm text-blue-950 font-display">
                         {formatCurrency(product.price * quantity)}
                       </div>
                       {quantity > 1 && (
@@ -182,7 +182,7 @@ export const CartPage: React.FC = () => {
 
                     <button
                       onClick={() => removeFromCart(product.id)}
-                      className="text-slate-400 hover:text-rose-600 p-1.5 transition-colors"
+                      className="text-slate-400 hover:text-red-600 p-1.5 transition-colors"
                       title="Remove item"
                       aria-label="Remove item"
                     >
@@ -199,18 +199,18 @@ export const CartPage: React.FC = () => {
             {/* Promo Code Card */}
             <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 mb-2">
-                <Tag className="w-4 h-4 text-aqua-600" />
+                <Tag className="w-4 h-4 text-blue-600" />
                 <span>Apply Promo Code</span>
               </div>
               {appliedCoupon ? (
-                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl">
+                <div className="flex items-center justify-between bg-blue-50 border border-blue-200 p-2.5 rounded-xl">
                   <div>
-                    <span className="font-mono font-bold text-xs text-emerald-800">{appliedCoupon.code}</span>
-                    <span className="text-[11px] text-emerald-600 block">{appliedCoupon.description}</span>
+                    <span className="font-mono font-bold text-xs text-blue-900">{appliedCoupon.code}</span>
+                    <span className="text-[11px] text-blue-700 block">{appliedCoupon.description}</span>
                   </div>
                   <button
                     onClick={removeCoupon}
-                    className="text-xs text-rose-600 hover:underline font-semibold"
+                    className="text-xs text-red-600 hover:underline font-semibold"
                   >
                     Remove
                   </button>
@@ -218,15 +218,17 @@ export const CartPage: React.FC = () => {
               ) : (
                 <form onSubmit={handleApplyCoupon} className="flex gap-2">
                   <input
+                    id="cart-coupon-input"
                     type="text"
+                    aria-label="Enter promotional coupon code"
                     value={couponInput}
                     onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                     placeholder="Enter AQUA10 or FIRSTFISH"
-                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 uppercase font-mono outline-none focus:border-aqua-500"
+                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 uppercase font-mono outline-none focus:border-blue-500"
                   />
                   <button
                     type="submit"
-                    className="bg-ocean-900 hover:bg-ocean-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shrink-0"
+                    className="bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shrink-0"
                   >
                     Apply
                   </button>
@@ -249,7 +251,7 @@ export const CartPage: React.FC = () => {
                 <div className="flex justify-between text-xs text-slate-600">
                   <span className="flex items-center gap-1">
                     <span>Medical Oxygen Insulated Packing</span>
-                    <span className="text-[10px] text-aqua-700 font-bold bg-aqua-50 px-1 rounded">Live Fish</span>
+                    <span className="text-[10px] text-blue-800 font-bold bg-blue-50 px-1 rounded">Live Fish</span>
                   </span>
                   <span className="font-semibold text-slate-900">{formatCurrency(packingCharge)}</span>
                 </div>
@@ -259,7 +261,7 @@ export const CartPage: React.FC = () => {
                 <span>Express Air Delivery</span>
                 <span>
                   {deliveryFee === 0 ? (
-                    <span className="text-emerald-600 font-bold">FREE</span>
+                    <span className="text-blue-700 font-bold">FREE</span>
                   ) : (
                     formatCurrency(deliveryFee)
                   )}
@@ -267,7 +269,7 @@ export const CartPage: React.FC = () => {
               </div>
 
               {discountAmount > 0 && (
-                <div className="flex justify-between text-xs text-emerald-700 font-semibold">
+                <div className="flex justify-between text-xs text-red-600 font-semibold">
                   <span>Coupon Savings ({appliedCoupon?.code})</span>
                   <span>-{formatCurrency(discountAmount)}</span>
                 </div>
@@ -275,21 +277,21 @@ export const CartPage: React.FC = () => {
 
               <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
                 <span className="font-bold text-sm text-slate-900">Total Payable</span>
-                <span className="font-extrabold text-xl text-ocean-950 font-display">
+                <span className="font-extrabold text-xl text-blue-950 font-display">
                   {formatCurrency(total)}
                 </span>
               </div>
 
               <button
                 onClick={() => navigate('/checkout')}
-                className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
+                className="w-full py-3.5 bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm rounded-xl transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 mt-4"
               >
                 <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4 text-teal-400" />
+                <ArrowRight className="w-4 h-4 text-red-400" />
               </button>
 
               <div className="pt-3 flex items-center justify-center gap-2 text-[11px] text-slate-400">
-                <ShieldCheck className="w-4 h-4 text-aqua-600" />
+                <ShieldCheck className="w-4 h-4 text-blue-600" />
                 <span>Safe Manual UPI Verification on Checkout</span>
               </div>
             </div>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, ShoppingCart, Sparkles, Heart, ShieldCheck, Truck, ExternalLink } from 'lucide-react';
+import { X, Check, ShoppingCart, Sparkles, Heart, ShieldCheck, Truck, ExternalLink, Play, Film } from 'lucide-react';
 import { Product } from '../../lib/types';
 import { formatCurrency, calculateDiscount } from '../../lib/utils';
 import { useCart } from '../../contexts/CartContext';
@@ -17,8 +17,27 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [selectedImg, setSelectedImg] = useState(0);
+  const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
+  const [selectedVideo, setSelectedVideo] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+
+  useEffect(() => {
+    setSelectedImg(0);
+    setMediaType('image');
+    setSelectedVideo(0);
+  }, [product?.id]);
+
+  useEffect(() => {
+    if (!product) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [product, onClose]);
 
   if (!product) return null;
 
@@ -47,11 +66,14 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-ocean-950/70 backdrop-blur-sm"
+          className="fixed inset-0 bg-blue-950/70 backdrop-blur-sm"
         />
 
         {/* Modal Window */}
         <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="quick-view-product-name"
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -60,7 +82,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-100/80 hover:bg-slate-200 text-slate-600 transition-colors"
+            className="btn-icon absolute top-4 right-4 z-20 bg-slate-100 hover:bg-slate-200"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -69,32 +91,76 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
           <div className="grid grid-cols-1 md:grid-cols-2 max-h-[85vh] overflow-y-auto">
             {/* Gallery Left */}
             <div className="p-4 sm:p-6 bg-slate-50 flex flex-col justify-between">
-              <div className="aspect-square bg-white rounded-2xl overflow-hidden border border-slate-200/80 relative shadow-inner mb-3">
-                <img
-                  src={product.images[selectedImg] || product.images[0]}
-                  alt={product.name}
-                  className="w-full h-full object-cover object-center"
-                />
-                {product.is_unique_specimen && (
-                  <div className="absolute top-3 left-3 bg-ocean-950/90 text-aqua-300 border border-aqua-400/40 text-xs font-semibold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-aqua-400" />
-                    <span>Exact Specimen Shown</span>
+              <div className="aspect-square bg-slate-950 rounded-2xl overflow-hidden border border-slate-200/80 relative shadow-inner mb-3 flex items-center justify-center">
+                {mediaType === 'image' ? (
+                  <>
+                    <img
+                      src={product.images[selectedImg] || product.images[0]}
+                      alt={product.name}
+                      className="w-full h-full object-cover object-center"
+                    />
+                    {product.is_unique_specimen && (
+                      <div className="absolute top-3 left-3 bg-blue-900 text-white border border-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                        <span>Exact Specimen Shown</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full h-full bg-black relative flex items-center justify-center">
+                    <video
+                      key={product.videos?.[selectedVideo]?.url}
+                      src={product.videos?.[selectedVideo]?.url}
+                      controls
+                      autoPlay
+                      playsInline
+                      className="w-full h-full object-contain"
+                    />
+                    <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs flex items-center gap-1 pointer-events-none">
+                      <Film className="w-3 h-3" />
+                      <span>Live Video</span>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Thumbnails */}
-              {product.images.length > 1 && (
-                <div className="flex gap-2">
+              {/* Thumbnails (Images + Videos) */}
+              {(product.images.length > 1 || (product.videos && product.videos.length > 0)) && (
+                <div className="flex gap-2 overflow-x-auto pb-1">
                   {product.images.map((img, idx) => (
                     <button
-                      key={idx}
-                      onClick={() => setSelectedImg(idx)}
-                      className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
-                        selectedImg === idx ? 'border-aqua-500 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'
+                      key={`img-${idx}`}
+                      type="button"
+                      onClick={() => {
+                        setMediaType('image');
+                        setSelectedImg(idx);
+                      }}
+                      className={`w-14 h-14 rounded-lg overflow-hidden border-2 shrink-0 transition-all ${
+                        mediaType === 'image' && selectedImg === idx ? 'border-blue-900 shadow-md ring-2 ring-blue-900/30' : 'border-transparent opacity-70 hover:opacity-100'
                       }`}
+                      aria-label={`View photo ${idx + 1}`}
                     >
                       <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+
+                  {product.videos && product.videos.map((vid, vIdx) => (
+                    <button
+                      key={`vid-${vid.id || vIdx}`}
+                      type="button"
+                      onClick={() => {
+                        setMediaType('video');
+                        setSelectedVideo(vIdx);
+                      }}
+                      className={`w-14 h-14 rounded-lg overflow-hidden border-2 shrink-0 relative bg-slate-900 transition-all ${
+                        mediaType === 'video' && selectedVideo === vIdx ? 'border-red-600 shadow-md ring-2 ring-red-600/30' : 'border-transparent opacity-75 hover:opacity-100'
+                      }`}
+                      aria-label={`Play video: ${vid.title || 'Live Video'}`}
+                    >
+                      <img src={vid.thumbnail_url || product.images[0]} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <Play className="w-4 h-4 text-white fill-white" />
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -105,17 +171,17 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
             <div className="p-4 sm:p-6 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-aqua-700 bg-aqua-50 px-2.5 py-0.5 rounded-full">
+                  <span className="text-xs font-semibold text-blue-900 bg-blue-50 px-2.5 py-0.5 rounded-full">
                     {product.category_name || 'Ornamental Fish'}
                   </span>
                   {product.strain && (
-                    <span className="text-xs text-slate-500 font-medium">
+                    <span className="text-xs text-slate-600 font-medium">
                       Strain: {product.strain}
                     </span>
                   )}
                 </div>
 
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug mb-2 font-display">
+                <h2 id="quick-view-product-name" className="text-lg sm:text-xl font-bold text-slate-900 leading-snug mb-2 font-display">
                   {product.name}
                 </h2>
 
@@ -127,7 +193,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
 
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-2xl font-bold text-ocean-950 font-display">
+                  <span className="text-2xl font-bold text-slate-900 font-display">
                     {formatCurrency(product.price)}
                   </span>
                   {product.compare_at_price && product.compare_at_price > product.price && (
@@ -135,7 +201,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                       <span className="text-sm text-slate-400 line-through">
                         {formatCurrency(product.compare_at_price)}
                       </span>
-                      <span className="text-xs font-bold text-coral-600 bg-coral-50 px-2 py-0.5 rounded-md">
+                      <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-md">
                         {discount}% OFF
                       </span>
                     </>
@@ -150,19 +216,19 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                 <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200/60 mb-4">
                   <div>
                     <span className="text-slate-400 block">Care Level:</span>
-                    <span className="font-semibold text-slate-800">{product.care_level || 'Moderate'}</span>
+                    <span className="font-semibold text-slate-900">{product.care_level || 'Moderate'}</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">Water Temp:</span>
-                    <span className="font-semibold text-slate-800">{product.temperature_range || '24°C - 28°C'}</span>
+                    <span className="font-semibold text-slate-900">{product.temperature_range || '24°C - 28°C'}</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">Gender:</span>
-                    <span className="font-semibold text-slate-800">{product.gender || 'Single Male'}</span>
+                    <span className="font-semibold text-slate-900">{product.gender || 'Single Male'}</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">Availability:</span>
-                    <span className={`font-semibold ${product.stock_quantity > 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                    <span className={`font-semibold ${product.stock_quantity > 0 ? 'text-blue-900' : 'text-red-600'}`}>
                       {product.stock_quantity > 0 ? `${product.stock_quantity} In Stock` : 'Out of Stock'}
                     </span>
                   </div>
@@ -171,11 +237,11 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                 {/* Trust mini pills */}
                 <div className="flex flex-col gap-1.5 text-xs text-slate-600 mb-5">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-aqua-600 shrink-0" />
+                    <ShieldCheck className="w-4 h-4 text-blue-900 shrink-0" />
                     <span>100% Live Arrival Guarantee with thermal box</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-aqua-600 shrink-0" />
+                    <Truck className="w-4 h-4 text-blue-900 shrink-0" />
                     <span>Overnight Express Air Cargo direct to door</span>
                   </div>
                 </div>
@@ -188,17 +254,17 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                     <div className="flex items-center border border-slate-300 rounded-xl overflow-hidden h-11 shrink-0">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold"
+                        className="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold"
                         aria-label="Decrease quantity"
                       >
                         -
                       </button>
-                      <span className="px-3 py-1 font-semibold text-sm text-slate-800">
+                      <span className="px-3 py-1 font-semibold text-sm text-slate-900">
                         {quantity}
                       </span>
                       <button
                         onClick={() => setQuantity(Math.min(product.stock_quantity, quantity + 1))}
-                        className="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold"
+                        className="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold"
                         aria-label="Increase quantity"
                       >
                         +
@@ -209,22 +275,20 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                   <button
                     onClick={handleAddToCart}
                     disabled={isOutOfStock}
-                    className={`flex-1 h-11 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-md ${
+                    className={`btn-primary flex-1 ${
                       isOutOfStock
-                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-                        : isAdded
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-ocean-900 hover:bg-ocean-800 text-white active:scale-[0.98]'
+                        ? 'opacity-60 cursor-not-allowed bg-slate-200 text-slate-600 border border-slate-300 hover:bg-slate-200'
+                        : ''
                     }`}
                   >
                     {isAdded ? (
                       <>
-                        <Check className="w-4 h-4 text-emerald-200" />
+                        <Check className="w-4 h-4 text-white" />
                         <span>Added to Cart!</span>
                       </>
                     ) : (
                       <>
-                        <ShoppingCart className="w-4 h-4 text-aqua-400" />
+                        <ShoppingCart className="w-4 h-4 text-white" />
                         <span>Add to Cart ({formatCurrency(product.price * quantity)})</span>
                       </>
                     )}
@@ -232,21 +296,19 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
 
                   <button
                     onClick={() => toggleWishlist(product.id)}
-                    className={`h-11 w-11 rounded-xl border flex items-center justify-center transition-colors shrink-0 ${
-                      isWishlisted
-                        ? 'bg-rose-50 text-rose-500 border-rose-200'
-                        : 'border-slate-300 text-slate-600 hover:text-rose-500 hover:bg-slate-50'
+                    className={`btn-icon shrink-0 ${
+                      isWishlisted ? 'text-red-600' : 'text-slate-600 hover:text-red-600'
                     }`}
                     aria-label={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
                   >
-                    <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-rose-500' : ''}`} />
+                    <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-600 text-red-600' : ''}`} />
                   </button>
                 </div>
 
                 <Link
                   to={`/product/${product.slug}`}
                   onClick={onClose}
-                  className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-aqua-700 hover:text-aqua-800 py-1"
+                  className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-blue-900 hover:underline py-1"
                 >
                   <span>View Full Product Specifications & Care Guide</span>
                   <ExternalLink className="w-3.5 h-3.5" />

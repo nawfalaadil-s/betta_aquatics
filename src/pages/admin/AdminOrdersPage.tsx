@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, Filter, CheckCircle2, AlertCircle, 
   Clock, Truck, Package, X, Copy, ExternalLink, 
@@ -41,6 +41,20 @@ export const AdminOrdersPage: React.FC = () => {
 
   // Tax invoice preview
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+
+  // Keyboard Escape listener for all modals & drawers
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (zoomedImage) setZoomedImage(null);
+        else if (isRejectModalOpen) setIsRejectModalOpen(false);
+        else if (isShipModalOpen) setIsShipModalOpen(false);
+        else if (selectedOrder) setSelectedOrder(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [zoomedImage, isRejectModalOpen, isShipModalOpen, selectedOrder]);
 
   const refreshOrders = () => {
     setOrders(mockDb.getOrders());
@@ -127,7 +141,7 @@ export const AdminOrdersPage: React.FC = () => {
       {/* Page Title & Stats */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-aqua-700 font-mono">
+          <span className="text-xs font-bold uppercase tracking-wider text-blue-900 font-mono">
             Fulfillment & Verification
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">
@@ -139,7 +153,7 @@ export const AdminOrdersPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-200">
+          <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-red-50 text-red-700 border border-red-200">
             {orders.filter(o => o.payment_status === 'pending').length} Pending Review
           </span>
           <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-200">
@@ -157,14 +171,16 @@ export const AdminOrdersPage: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by Order #, Customer, Phone, or UTR..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-aqua-500 focus:bg-white transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-600 focus:bg-white transition-all"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
-            <span className="text-slate-500 font-semibold text-[11px]">Payment:</span>
+            <label htmlFor="order-filter-payment" className="text-slate-500 font-semibold text-[11px]">Payment:</label>
             <select
+              id="order-filter-payment"
+              aria-label="Filter orders by payment status"
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
               className="bg-transparent text-slate-900 font-bold outline-none cursor-pointer text-xs"
@@ -177,8 +193,10 @@ export const AdminOrdersPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
-            <span className="text-slate-500 font-semibold text-[11px]">Fulfillment:</span>
+            <label htmlFor="order-filter-fulfillment" className="text-slate-500 font-semibold text-[11px]">Fulfillment:</label>
             <select
+              id="order-filter-fulfillment"
+              aria-label="Filter orders by fulfillment status"
               value={fulfillmentFilter}
               onChange={(e) => setFulfillmentFilter(e.target.value)}
               className="bg-transparent text-slate-900 font-bold outline-none cursor-pointer text-xs"
@@ -198,16 +216,17 @@ export const AdminOrdersPage: React.FC = () => {
         {/* Desktop Data Table (hidden on mobile) */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
+            <caption className="sr-only">Customer Consignment Orders and Payment Verification Ledger</caption>
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10px] uppercase tracking-wider font-semibold">
               <tr>
-                <th className="py-3 px-4">Order Ref</th>
-                <th className="py-3 px-4">Customer Details</th>
-                <th className="py-3 px-4">Payment Method & UTR</th>
-                <th className="py-3 px-4">Proof</th>
-                <th className="py-3 px-4">Pay Status</th>
-                <th className="py-3 px-4">Fulfillment</th>
-                <th className="py-3 px-4">Amount</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th scope="col" className="py-3 px-4">Order Ref</th>
+                <th scope="col" className="py-3 px-4">Customer Details</th>
+                <th scope="col" className="py-3 px-4">Payment Method & UTR</th>
+                <th scope="col" className="py-3 px-4">Proof</th>
+                <th scope="col" className="py-3 px-4">Pay Status</th>
+                <th scope="col" className="py-3 px-4">Fulfillment</th>
+                <th scope="col" className="py-3 px-4">Amount</th>
+                <th scope="col" className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -226,7 +245,7 @@ export const AdminOrdersPage: React.FC = () => {
                     <tr 
                       key={order.id} 
                       className={`hover:bg-slate-50/80 transition-colors ${
-                        isPending ? 'bg-amber-50/30' : ''
+                        isPending ? 'bg-red-50/20' : ''
                       }`}
                     >
                       {/* Order Number */}
@@ -254,7 +273,7 @@ export const AdminOrdersPage: React.FC = () => {
                           {order.payment_details?.upi_reference && (
                             <button
                               onClick={() => handleCopy(order.payment_details!.upi_reference!, 'UTR')}
-                              className="text-slate-400 hover:text-aqua-700"
+                              className="text-slate-400 hover:text-blue-700"
                               title="Copy UTR"
                             >
                               <Copy className="w-3 h-3" />
@@ -269,7 +288,7 @@ export const AdminOrdersPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setZoomedImage(order.payment_details!.proof_image_url!)}
-                            className="relative group block rounded-lg overflow-hidden border border-slate-200 shadow-xs hover:border-aqua-500 transition-colors"
+                            className="relative group block rounded-lg overflow-hidden border border-slate-200 shadow-xs hover:border-blue-600 transition-colors"
                             title="Click to zoom screenshot"
                           >
                             <img
@@ -277,7 +296,7 @@ export const AdminOrdersPage: React.FC = () => {
                               alt="Proof"
                               className="w-10 h-10 object-cover"
                             />
-                            <div className="absolute inset-0 bg-ocean-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                            <div className="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
                               <ZoomIn className="w-3.5 h-3.5" />
                             </div>
                           </button>
@@ -291,10 +310,10 @@ export const AdminOrdersPage: React.FC = () => {
                         <span
                           className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
                             order.payment_status === 'verified'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              ? 'bg-blue-50 text-blue-700 border-blue-200'
                               : order.payment_status === 'rejected'
-                              ? 'bg-rose-50 text-rose-700 border-rose-200'
-                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                              ? 'bg-red-50 text-red-700 border-red-200'
+                              : 'bg-red-50 text-red-800 border-red-200'
                           }`}
                         >
                           {order.payment_status}
@@ -306,9 +325,9 @@ export const AdminOrdersPage: React.FC = () => {
                         <span
                           className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
                             order.fulfillment_status === 'shipped'
-                              ? 'bg-sky-50 text-sky-800 border-sky-200'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200'
                               : order.fulfillment_status === 'delivered'
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              ? 'bg-blue-100 text-blue-900 border-blue-300'
                               : 'bg-slate-100 text-slate-700 border-slate-200'
                           }`}
                         >
@@ -327,18 +346,20 @@ export const AdminOrdersPage: React.FC = () => {
                           {isPending && (
                             <button
                               onClick={() => handleApprovePayment(order.id)}
-                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-2xs"
+                              className="px-2.5 py-1 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs font-bold transition-colors shadow-2xs focus-visible:ring-2 focus-visible:ring-blue-900"
                               title="Approve Bank Credit"
+                              aria-label={`Approve bank credit for order ${order.order_number} for customer ${order.customer_name}`}
                             >
                               Approve
                             </button>
                           )}
                           <button
                             onClick={() => setSelectedOrder(order)}
-                            className="p-1.5 text-slate-600 hover:text-ocean-950 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-600 hover:text-blue-950 hover:bg-slate-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-blue-900"
                             title="Inspect Consignment"
+                            aria-label={`Inspect consignment ${order.order_number} for customer ${order.customer_name}`}
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-4 h-4" aria-hidden="true" />
                           </button>
                         </div>
                       </td>
@@ -365,7 +386,7 @@ export const AdminOrdersPage: React.FC = () => {
                 <div
                   key={order.id}
                   className={`p-4 space-y-3 transition-colors ${
-                    isPending ? 'bg-amber-50/30' : 'bg-white'
+                    isPending ? 'bg-red-50/20' : 'bg-white'
                   }`}
                 >
                   {/* Top Bar: Order ID, Date, Amount */}
@@ -402,10 +423,10 @@ export const AdminOrdersPage: React.FC = () => {
                     <span
                       className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
                         order.payment_status === 'verified'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
                           : order.payment_status === 'rejected'
-                          ? 'bg-rose-50 text-rose-700 border-rose-200'
-                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                          ? 'bg-red-50 text-red-700 border-red-200'
+                          : 'bg-red-50 text-red-800 border-red-200'
                       }`}
                     >
                       Pay: {order.payment_status}
@@ -413,9 +434,9 @@ export const AdminOrdersPage: React.FC = () => {
                     <span
                       className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
                         order.fulfillment_status === 'shipped'
-                          ? 'bg-sky-50 text-sky-800 border-sky-200'
+                          ? 'bg-blue-50 text-blue-800 border-blue-200'
                           : order.fulfillment_status === 'delivered'
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          ? 'bg-blue-100 text-blue-900 border-blue-300'
                           : 'bg-slate-100 text-slate-700 border-slate-200'
                       }`}
                     >
@@ -432,7 +453,7 @@ export const AdminOrdersPage: React.FC = () => {
                         {order.payment_details?.upi_reference && (
                           <button
                             onClick={() => handleCopy(order.payment_details!.upi_reference!, 'UTR')}
-                            className="text-slate-400 hover:text-aqua-700 p-1"
+                            className="text-slate-400 hover:text-blue-700 p-1"
                           >
                             <Copy className="w-3.5 h-3.5" />
                           </button>
@@ -462,7 +483,7 @@ export const AdminOrdersPage: React.FC = () => {
                     {isPending && (
                       <button
                         onClick={() => handleApprovePayment(order.id)}
-                        className="flex-1 min-h-[40px] py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center justify-center gap-1.5"
+                        className="flex-1 min-h-[40px] py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center justify-center gap-1.5"
                       >
                         <Check className="w-4 h-4" />
                         <span>Approve Payment</span>
@@ -509,7 +530,7 @@ export const AdminOrdersPage: React.FC = () => {
                     className="p-2 text-slate-600 hover:text-slate-900 hover:bg-white rounded-xl border border-slate-200 transition-colors shadow-2xs"
                     title="View & Print Tax Invoice"
                   >
-                    <FileText className="w-4 h-4 text-aqua-600" />
+                    <FileText className="w-4 h-4 text-blue-700" />
                   </button>
                   <button
                     onClick={() => setSelectedOrder(null)}
@@ -526,16 +547,16 @@ export const AdminOrdersPage: React.FC = () => {
                 <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                      <ShieldCheck className="w-5 h-5 text-aqua-600" />
+                      <ShieldCheck className="w-5 h-5 text-blue-700" />
                       <span>Payment Verification Desk</span>
                     </div>
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
                         selectedOrder.payment_status === 'verified'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
                           : selectedOrder.payment_status === 'rejected'
-                          ? 'bg-rose-50 text-rose-700 border-rose-200'
-                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                          ? 'bg-red-50 text-red-700 border-red-200'
+                          : 'bg-red-50 text-red-800 border-red-200'
                       }`}
                     >
                       {selectedOrder.payment_status}
@@ -572,7 +593,7 @@ export const AdminOrdersPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setZoomedImage(selectedOrder.payment_details!.proof_image_url!)}
-                          className="absolute inset-0 bg-ocean-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity gap-1.5 text-xs font-bold"
+                          className="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity gap-1.5 text-xs font-bold"
                         >
                           <ZoomIn className="w-4 h-4" />
                           <span>Click to Zoom & Inspect</span>
@@ -586,14 +607,14 @@ export const AdminOrdersPage: React.FC = () => {
                     <div className="pt-2 flex flex-wrap gap-2">
                       <button
                         onClick={() => handleApprovePayment(selectedOrder.id)}
-                        className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+                        className="px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors shadow-xs"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         <span>Approve Payment & Credit</span>
                       </button>
                       <button
                         onClick={() => setIsRejectModalOpen(true)}
-                        className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors"
+                        className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors"
                       >
                         <AlertCircle className="w-4 h-4" />
                         <span>Reject Payment</span>
@@ -602,7 +623,7 @@ export const AdminOrdersPage: React.FC = () => {
                   )}
 
                   {selectedOrder.payment_status === 'rejected' && selectedOrder.payment_details?.rejection_reason && (
-                    <div className="p-3 bg-rose-50 rounded-xl border border-rose-200 text-rose-800">
+                    <div className="p-3 bg-red-50 rounded-xl border border-red-200 text-red-800">
                       <strong>Rejection Note:</strong> {selectedOrder.payment_details.rejection_reason}
                     </div>
                   )}
@@ -612,7 +633,7 @@ export const AdminOrdersPage: React.FC = () => {
                 <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                      <Truck className="w-5 h-5 text-sky-600" />
+                      <Truck className="w-5 h-5 text-blue-700" />
                       <span>Courier & Air Cargo Dispatch</span>
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-200 text-slate-800">
@@ -629,24 +650,24 @@ export const AdminOrdersPage: React.FC = () => {
                         </div>
                         <div>
                           <span className="text-slate-400 block text-[11px]">Tracking AWB:</span>
-                          <strong className="font-mono text-sky-800">{selectedOrder.shipment_details.tracking_number}</strong>
+                          <strong className="font-mono text-blue-900">{selectedOrder.shipment_details.tracking_number}</strong>
                         </div>
                       </div>
                       <div>
                         <span className="text-slate-400 block text-[11px]">External Tracking Link:</span>
                         <a
-                          href={selectedOrder.shipment_details.tracking_url}
+                          href={/^https?:\/\//i.test(selectedOrder.shipment_details.tracking_url || '') ? selectedOrder.shipment_details.tracking_url : '#'}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-aqua-700 hover:underline flex items-center gap-1 mt-0.5"
+                          className="text-blue-700 hover:underline flex items-center gap-1 mt-0.5"
                         >
                           <span className="truncate">{selectedOrder.shipment_details.tracking_url}</span>
-                          <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                          <ExternalLink className="w-3.5 h-3.5 shrink-0 text-red-600" />
                         </a>
                       </div>
                       <button
                         onClick={() => setIsShipModalOpen(true)}
-                        className="text-xs text-sky-700 hover:underline font-semibold"
+                        className="text-xs text-blue-800 hover:underline font-semibold"
                       >
                         Edit Tracking Information
                       </button>
@@ -658,7 +679,7 @@ export const AdminOrdersPage: React.FC = () => {
                       </p>
                       <button
                         onClick={() => setIsShipModalOpen(true)}
-                        className="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-colors shadow-xs"
+                        className="px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-colors shadow-xs"
                       >
                         <Truck className="w-4 h-4" />
                         <span>Enter Courier Tracking & Mark Shipped</span>
@@ -732,13 +753,13 @@ export const AdminOrdersPage: React.FC = () => {
                 onClick={() => setIsInvoiceOpen(true)}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl text-xs font-bold transition-colors shadow-2xs"
               >
-                <FileText className="w-3.5 h-3.5 text-aqua-600" />
+                <FileText className="w-3.5 h-3.5 text-blue-700" />
                 <span>View GST Tax Invoice</span>
               </button>
 
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="px-4 py-2 bg-ocean-900 text-white rounded-xl text-xs font-bold hover:bg-ocean-800"
+                className="px-4 py-2 bg-blue-900 text-white rounded-xl text-xs font-bold hover:bg-blue-800"
               >
                 Close Drawer
               </button>
@@ -749,42 +770,62 @@ export const AdminOrdersPage: React.FC = () => {
 
       {/* REJECTION REASON MODAL */}
       {isRejectModalOpen && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-2xs">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-slate-200 shadow-2xl space-y-4">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-2xs"
+          onClick={() => setIsRejectModalOpen(false)}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reject-modal-title"
+            aria-describedby="reject-modal-desc"
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl p-6 max-w-md w-full border border-slate-200 shadow-2xl space-y-4"
+          >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
-                <AlertCircle className="w-5 h-5" />
-                <span>Reject Payment Verification</span>
+              <div className="flex items-center gap-2 text-red-700 font-bold text-sm">
+                <AlertCircle className="w-5 h-5 text-red-600" aria-hidden="true" />
+                <h2 id="reject-modal-title">Reject Payment Verification</h2>
               </div>
-              <button onClick={() => setIsRejectModalOpen(false)}>
-                <X className="w-5 h-5 text-slate-400" />
+              <button 
+                type="button" 
+                onClick={() => setIsRejectModalOpen(false)}
+                aria-label="Close rejection dialog"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-red-600"
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p id="reject-modal-desc" className="text-xs text-slate-600 leading-relaxed">
               Order <strong>#{selectedOrder.order_number}</strong> will be marked as <strong>Rejected</strong>. The customer will see this reason in their account and can submit a corrected UTR reference.
             </p>
 
             <div>
-              <label className="block text-slate-700 font-semibold mb-1 text-xs">Rejection Note to Customer:</label>
+              <label htmlFor="rejection-reason-textarea" className="block text-slate-700 font-semibold mb-1 text-xs">
+                Rejection Note to Customer:
+              </label>
               <textarea
+                id="rejection-reason-textarea"
                 rows={3}
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 outline-none focus:border-rose-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 outline-none focus:border-red-500 focus-visible:ring-2 focus-visible:ring-red-500"
               />
             </div>
 
             <div className="flex gap-2 pt-2">
               <button
+                type="button"
                 onClick={handleConfirmReject}
-                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors focus-visible:ring-2 focus-visible:ring-red-600"
               >
                 Confirm Rejection
               </button>
               <button
+                type="button"
                 onClick={() => setIsRejectModalOpen(false)}
-                className="px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl"
+                className="px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 Cancel
               </button>
@@ -795,25 +836,42 @@ export const AdminOrdersPage: React.FC = () => {
 
       {/* DISPATCH / FULFILLMENT MODAL */}
       {isShipModalOpen && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-2xs">
-          <div className="bg-white rounded-3xl p-6 max-w-lg w-full border border-slate-200 shadow-2xl space-y-4 text-xs">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-2xs"
+          onClick={() => setIsShipModalOpen(false)}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="ship-modal-title"
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl p-6 max-w-lg w-full border border-slate-200 shadow-2xl space-y-4 text-xs"
+          >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2 text-sky-800 font-bold text-sm">
-                <Truck className="w-5 h-5 text-sky-600" />
-                <span>Assign Air Courier Tracking</span>
+              <div className="flex items-center gap-2 text-blue-900 font-bold text-sm">
+                <Truck className="w-5 h-5 text-blue-700" aria-hidden="true" />
+                <h2 id="ship-modal-title">Assign Air Courier Tracking</h2>
               </div>
-              <button onClick={() => setIsShipModalOpen(false)}>
-                <X className="w-5 h-5 text-slate-400" />
+              <button 
+                type="button"
+                onClick={() => setIsShipModalOpen(false)}
+                aria-label="Close dispatch dialog"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-900"
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
             <form onSubmit={handleConfirmShipment} className="space-y-4">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Select Courier Partner</label>
+                <label htmlFor="courier-preset-select" className="block font-semibold text-slate-700 mb-1">
+                  Select Courier Partner
+                </label>
                 <select
+                  id="courier-preset-select"
                   value={selectedCourierIndex}
                   onChange={(e) => setSelectedCourierIndex(Number(e.target.value))}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
                 >
                   {COURIER_PRESETS.map((p, idx) => (
                     <option key={p.name} value={idx}>{p.name}</option>
@@ -823,48 +881,58 @@ export const AdminOrdersPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">AWB / Air Tracking Number *</label>
+                <label htmlFor="tracking-number-input" className="block font-semibold text-slate-700 mb-1">
+                  AWB / Air Tracking Number *
+                </label>
                 <input
+                  id="tracking-number-input"
                   type="text"
                   required
+                  aria-required="true"
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
                   placeholder="e.g. BLUEDART-98472918"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-sky-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-blue-600 focus-visible:ring-2 focus-visible:ring-blue-900"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Estimated Arrival Date (Optional)</label>
+                <label htmlFor="estimated-delivery-input" className="block font-semibold text-slate-700 mb-1">
+                  Estimated Arrival Date (Optional)
+                </label>
                 <input
+                  id="estimated-delivery-input"
                   type="date"
                   value={estimatedDelivery}
                   onChange={(e) => setEstimatedDelivery(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Special Package Handling Notes</label>
+                <label htmlFor="shipment-notes-input" className="block font-semibold text-slate-700 mb-1">
+                  Special Package Handling Notes
+                </label>
                 <textarea
+                  id="shipment-notes-input"
                   rows={2}
                   value={shipmentNotes}
                   onChange={(e) => setShipmentNotes(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 outline-none"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
                 />
               </div>
 
               <div className="flex gap-2 pt-2">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                  className="flex-1 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors focus-visible:ring-2 focus-visible:ring-blue-900"
                 >
                   Save Dispatch & Notify Customer
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsShipModalOpen(false)}
-                  className="px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl"
+                  className="px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl focus-visible:ring-2 focus-visible:ring-slate-400"
                 >
                   Cancel
                 </button>
@@ -876,16 +944,26 @@ export const AdminOrdersPage: React.FC = () => {
 
       {/* SCREENSHOT FULL-RESOLUTION LIGHTBOX */}
       {zoomedImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="relative max-w-2xl w-full bg-white rounded-3xl p-4 shadow-2xl border border-slate-200">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+          onClick={() => setZoomedImage(null)}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-label="Payment Screenshot Inspection"
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-2xl w-full bg-white rounded-3xl p-4 shadow-2xl border border-slate-200"
+          >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <span className="font-bold text-sm text-slate-900">Payment Screenshot Inspection</span>
+              <h2 className="font-bold text-sm text-slate-900">Payment Screenshot Inspection</h2>
               <button
                 type="button"
                 onClick={() => setZoomedImage(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+                aria-label="Close payment screenshot inspection"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-900"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
             <div className="overflow-auto max-h-[75vh] flex items-center justify-center bg-slate-50 rounded-2xl p-2">

@@ -24,32 +24,32 @@ export const AnnouncementBar: React.FC = () => {
   return (
     <aside 
       aria-label="Promotional announcement"
-      className="bg-slate-900 text-slate-100 border-b border-slate-800 text-xs py-2 px-3 sm:px-4 relative z-40"
+      className="bg-blue-950 text-white border-b border-blue-900 text-xs py-2 px-3 sm:px-4 relative z-40"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
         <div className="flex-1 flex items-center justify-center gap-2 sm:gap-3 text-center flex-wrap">
-          <span className="inline-flex items-center gap-1.5 font-semibold text-teal-400">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-white">
             <Tag className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">OFFER:</span>
           </span>
-          <span className="text-slate-200 text-xs">
+          <span className="text-white text-xs">
             {settings.announcement_text}
           </span>
           {settings.announcement_code && (
             <button
               onClick={copyCode}
-              className="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 px-2 py-0.5 rounded text-[11px] font-mono font-semibold tracking-wide transition-colors"
+              className="btn-primary font-mono"
               title="Click to copy coupon code"
               aria-label={`Copy coupon code ${settings.announcement_code}`}
             >
               <span>{settings.announcement_code}</span>
-              <Copy className="w-3 h-3" />
+              <Copy className="w-3 h-3 text-white" />
             </button>
           )}
           {settings.announcement_link && (
             <Link
               to={settings.announcement_link}
-              className="inline-flex items-center gap-0.5 text-xs text-teal-300 hover:text-teal-200 underline underline-offset-2 font-medium"
+              className="inline-flex items-center gap-0.5 text-xs text-white hover:underline underline-offset-2 font-medium"
             >
               Shop Now <ArrowRight className="w-3 h-3 ml-0.5" />
             </Link>
@@ -57,7 +57,7 @@ export const AnnouncementBar: React.FC = () => {
         </div>
         <button
           onClick={dismissAnnouncement}
-          className="text-slate-400 hover:text-white p-1 rounded-md transition-colors shrink-0"
+          className="btn-icon text-white hover:text-white hover:bg-blue-900 shrink-0"
           aria-label="Dismiss announcement"
         >
           <X className="w-4 h-4" />

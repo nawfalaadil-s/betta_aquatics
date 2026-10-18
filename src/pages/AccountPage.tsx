@@ -15,7 +15,7 @@ import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
 import { Order } from '../lib/types';
 
 export const AccountPage: React.FC = () => {
-  const { user, isAdmin, addresses, addAddress, deleteAddress, setDefaultAddress, logout, switchRole } = useAuth();
+  const { user, isAdmin, addresses, addAddress, deleteAddress, logout } = useAuth();
   const { showToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<'orders' | 'billing' | 'addresses' | 'profile'>('orders');
@@ -29,41 +29,46 @@ export const AccountPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [street, setStreet] = useState('');
   const [landmark, setLandmark] = useState('');
-  const [city, setCity] = useState('Bengaluru');
-  const [state, setState] = useState('Karnataka');
-  const [pincode, setPincode] = useState('560038');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [pincode, setPincode] = useState('');
 
   // Profile form state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [profileName, setProfileName] = useState(user?.full_name || 'Rahul Sharma');
-  const [profilePhone, setProfilePhone] = useState(user?.phone || '+91 98450 12345');
+  const [profileName, setProfileName] = useState(user?.full_name || 'Customer');
+  const [profilePhone, setProfilePhone] = useState(user?.phone || '');
   const [profileNotes, setProfileNotes] = useState('Prefer weekend delivery for live fish shipments. Call before arrival.');
 
-  const userOrders = mockDb.getOrdersByUserId(user?.id || 'usr-customer-demo');
-  const allOrders = userOrders.length > 0 ? userOrders : mockDb.getOrders();
+  // Strict Customer Data Isolation: only show orders belonging to this user
+  const allOrders = user 
+    ? mockDb.getOrders().filter(o => o.user_id === user.id || o.customer_email.toLowerCase() === user.email.toLowerCase())
+    : [];
   const totalSpent = allOrders.reduce((sum, o) => sum + o.total_amount, 0);
 
   const handleAddAddress = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !phone || !street || !city || !state || !pincode) {
+    if (!name.trim() || !phone.trim() || !street.trim() || !city.trim() || !state.trim() || !pincode.trim()) {
       showToast('Please fill out all address fields', 'error');
       return;
     }
     addAddress({
-      full_name: name,
-      phone,
-      street_address: street,
-      landmark: landmark || undefined,
-      city,
-      state,
-      postal_code: pincode,
-      is_default: addresses.length === 0,
+      full_name: name.trim(),
+      phone: phone.trim(),
+      street_address: street.trim(),
+      landmark: landmark.trim() || undefined,
+      city: city.trim(),
+      state: state.trim(),
+      postal_code: pincode.trim(),
+      is_default: false,
     });
     showToast('New delivery address saved!', 'success');
     setName('');
     setPhone('');
     setStreet('');
     setLandmark('');
+    setCity('');
+    setState('');
+    setPincode('');
     setIsAddingAddress(false);
   };
 
@@ -72,6 +77,40 @@ export const AccountPage: React.FC = () => {
     setIsEditingProfile(false);
     showToast('Profile and dispatch preferences updated successfully!', 'success');
   };
+
+  if (!user) {
+    return (
+      <div className="bg-slate-50 min-h-screen py-16 px-4">
+        <SEO 
+          title="Sign In | Betta Aquatics" 
+          description="Sign in to view your account, orders, and addresses." 
+        />
+        <div className="max-w-md mx-auto bg-white rounded-3xl p-8 border border-slate-200 shadow-sm text-center">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-900 flex items-center justify-center mx-auto mb-4 border border-blue-100">
+            <User className="w-8 h-8 text-blue-900" />
+          </div>
+          <h1 className="text-xl font-bold text-slate-900 font-display">Sign In Required</h1>
+          <p className="text-sm text-slate-600 mt-2 mb-6">
+            Please sign in to your Betta Aquatics account to view your consignments, delivery addresses, and GST tax invoices.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link
+              to="/login?redirect=/account"
+              className="w-full py-3 px-4 bg-blue-950 text-white rounded-xl font-semibold text-sm hover:bg-blue-900 transition-colors shadow-sm text-center"
+            >
+              Sign In to Your Account
+            </Link>
+            <Link
+              to="/catalogue"
+              className="w-full py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-colors text-center"
+            >
+              Browse Catalogue
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen py-6 sm:py-10 pb-24 md:pb-12">
@@ -84,33 +123,36 @@ export const AccountPage: React.FC = () => {
         {/* Profile Card Header */}
         <div className="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 shadow-sm mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xl sm:text-2xl font-bold font-display shadow-xs shrink-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-950 text-white border border-blue-900 flex items-center justify-center text-xl sm:text-2xl font-bold font-display shadow-xs shrink-0">
               {profileName.charAt(0) || 'U'}
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-lg sm:text-2xl font-bold text-ocean-950 font-display">
+                <h1 className="text-lg sm:text-2xl font-bold text-blue-950 font-display">
                   {profileName}
                 </h1>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-aqua-100 text-aqua-800">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
                   {user?.role === 'admin' ? 'Store Administrator' : 'Verified Hobbyist'}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">{user?.email || 'customer@bettaaquatics.in'}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{user?.email}</p>
               <p className="text-xs text-slate-400 mt-0.5">{profilePhone}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 self-end sm:self-auto">
-            <button
-              onClick={() => switchRole(isAdmin ? 'customer' : 'admin')}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-ocean-900 text-aqua-300 border border-ocean-800 hover:bg-ocean-800 transition-colors"
-            >
-              {isAdmin ? 'Customer View' : 'Admin Console'}
-            </button>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-blue-900 text-white border border-blue-800 hover:bg-blue-800 transition-colors inline-flex items-center gap-1.5"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-300" />
+                Admin Console
+              </Link>
+            )}
             <button
               onClick={logout}
-              className="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+              className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
               title="Sign Out"
               aria-label="Sign Out"
             >
@@ -127,7 +169,7 @@ export const AccountPage: React.FC = () => {
           </div>
           <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
             <span className="text-[11px] text-slate-400 block font-medium">Total Billed</span>
-            <strong className="text-lg sm:text-xl text-ocean-950 font-display">{formatCurrency(totalSpent)}</strong>
+            <strong className="text-lg sm:text-xl text-blue-950 font-display">{formatCurrency(totalSpent)}</strong>
           </div>
           <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
             <span className="text-[11px] text-slate-400 block font-medium">Saved Addresses</span>
@@ -135,7 +177,7 @@ export const AccountPage: React.FC = () => {
           </div>
           <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
             <span className="text-[11px] text-slate-400 block font-medium">Live Guarantee</span>
-            <strong className="text-lg sm:text-xl text-emerald-600 font-display">100% Covered</strong>
+            <strong className="text-lg sm:text-xl text-blue-700 font-display">100% Covered</strong>
           </div>
         </div>
 
@@ -145,11 +187,11 @@ export const AccountPage: React.FC = () => {
             onClick={() => setActiveTab('orders')}
             className={`min-h-[44px] px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === 'orders'
-                ? 'bg-ocean-900 text-white shadow-md'
+                ? 'bg-blue-900 text-white shadow-md'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <Package className="w-4 h-4 text-aqua-400" />
+            <Package className="w-4 h-4 text-red-400" />
             <span>Consignments & Orders ({allOrders.length})</span>
           </button>
 
@@ -157,11 +199,11 @@ export const AccountPage: React.FC = () => {
             onClick={() => setActiveTab('billing')}
             className={`min-h-[44px] px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === 'billing'
-                ? 'bg-ocean-900 text-white shadow-md'
+                ? 'bg-blue-900 text-white shadow-md'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <FileText className="w-4 h-4 text-aqua-400" />
+            <FileText className="w-4 h-4 text-red-400" />
             <span>Bills & Tax Invoices</span>
           </button>
 
@@ -169,11 +211,11 @@ export const AccountPage: React.FC = () => {
             onClick={() => setActiveTab('addresses')}
             className={`min-h-[44px] px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === 'addresses'
-                ? 'bg-ocean-900 text-white shadow-md'
+                ? 'bg-blue-900 text-white shadow-md'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <MapPin className="w-4 h-4 text-aqua-400" />
+            <MapPin className="w-4 h-4 text-red-400" />
             <span>Saved Addresses ({addresses.length})</span>
           </button>
 
@@ -181,11 +223,11 @@ export const AccountPage: React.FC = () => {
             onClick={() => setActiveTab('profile')}
             className={`min-h-[44px] px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === 'profile'
-                ? 'bg-ocean-900 text-white shadow-md'
+                ? 'bg-blue-900 text-white shadow-md'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <User className="w-4 h-4 text-aqua-400" />
+            <User className="w-4 h-4 text-red-400" />
             <span>Profile & Care Notes</span>
           </button>
         </div>
@@ -196,14 +238,14 @@ export const AccountPage: React.FC = () => {
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
                 <div>
-                  <h2 className="text-base font-bold text-ocean-950 font-display">
+                  <h2 className="text-base font-bold text-blue-950 font-display">
                     Your Live Consignment Orders
                   </h2>
                   <p className="text-xs text-slate-500">Live air-transit and payment verification status</p>
                 </div>
                 <Link
                   to="/shop"
-                  className="text-xs font-bold text-aqua-700 hover:underline inline-flex items-center gap-1"
+                  className="text-xs font-bold text-blue-700 hover:underline inline-flex items-center gap-1"
                 >
                   <span>Explore Catalog</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -220,12 +262,12 @@ export const AccountPage: React.FC = () => {
                   {allOrders.map((order) => (
                     <div
                       key={order.id}
-                      className="p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-aqua-400 transition-all bg-slate-50/50 space-y-3"
+                      className="p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-blue-400 transition-all bg-slate-50/50 space-y-3"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200/70 text-xs">
                         <div>
                           <div className="flex items-center gap-2">
-                            <strong className="font-mono text-sm text-ocean-950 font-bold">
+                            <strong className="font-mono text-sm text-blue-950 font-bold">
                               #{order.order_number}
                             </strong>
                             <span className="text-slate-400">&bull;</span>
@@ -239,15 +281,15 @@ export const AccountPage: React.FC = () => {
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase border ${
                             order.payment_status === 'verified'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              ? 'bg-blue-50 text-blue-700 border-blue-200'
                               : order.payment_status === 'rejected'
-                              ? 'bg-rose-50 text-rose-700 border-rose-200'
-                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                              ? 'bg-red-50 text-red-700 border-red-200'
+                              : 'bg-red-50 text-red-700 border-red-200'
                           }`}>
                             Payment: {order.payment_status}
                           </span>
 
-                          <span className="px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase border bg-ocean-950 text-aqua-300 border-ocean-800">
+                          <span className="px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase border bg-blue-950 text-white border-blue-900">
                             Status: {order.fulfillment_status}
                           </span>
                         </div>
@@ -277,7 +319,7 @@ export const AccountPage: React.FC = () => {
 
                       {/* Action Bar */}
                       <div className="pt-3 border-t border-slate-200/70 flex flex-wrap items-center justify-between gap-3 text-xs">
-                        <div className="font-bold text-ocean-950">
+                        <div className="font-bold text-blue-950">
                           Total Amount: <span className="text-base font-extrabold">{formatCurrency(order.total_amount)}</span>
                         </div>
 
@@ -286,16 +328,16 @@ export const AccountPage: React.FC = () => {
                             onClick={() => setSelectedInvoiceOrder(order)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-white text-slate-700 font-bold transition-colors"
                           >
-                            <FileText className="w-3.5 h-3.5 text-aqua-600" />
+                            <FileText className="w-3.5 h-3.5 text-blue-600" />
                             <span>Tax Invoice</span>
                           </button>
 
                           <Link
                             to={`/account/orders/${order.id}`}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-ocean-900 hover:bg-ocean-800 text-white font-bold transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold transition-colors"
                           >
                             <span>Order & Courier Tracking</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-3.5 h-3.5 text-red-400" />
                           </Link>
                         </div>
                       </div>
@@ -313,7 +355,7 @@ export const AccountPage: React.FC = () => {
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100 mb-6">
                 <div>
-                  <h2 className="text-base font-bold text-ocean-950 font-display">
+                  <h2 className="text-base font-bold text-blue-950 font-display">
                     Official GST Tax Invoices & Billing Records
                   </h2>
                   <p className="text-xs text-slate-500">
@@ -332,12 +374,12 @@ export const AccountPage: React.FC = () => {
                   return (
                     <div
                       key={order.id}
-                      className="p-4 rounded-2xl border border-slate-200 hover:border-aqua-400 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all text-xs"
+                      className="p-4 rounded-2xl border border-slate-200 hover:border-blue-400 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all text-xs"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-sm text-ocean-950">{invNum}</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-emerald-100 text-emerald-800">
+                          <span className="font-mono font-bold text-sm text-blue-950">{invNum}</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-blue-100 text-blue-800">
                             Tax Paid
                           </span>
                         </div>
@@ -352,16 +394,16 @@ export const AccountPage: React.FC = () => {
                       <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200">
                         <div className="sm:text-right">
                           <span className="text-[10px] text-slate-400 block uppercase">Total Invoice Value</span>
-                          <span className="font-extrabold text-base text-ocean-950 font-display">
+                          <span className="font-extrabold text-base text-blue-950 font-display">
                             {formatCurrency(order.total_amount)}
                           </span>
                         </div>
 
                         <button
                           onClick={() => setSelectedInvoiceOrder(order)}
-                          className="flex items-center gap-1.5 px-4 py-2 bg-ocean-900 hover:bg-ocean-800 text-white rounded-xl font-bold transition-all shadow-sm active:scale-95"
+                          className="flex items-center gap-1.5 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-bold transition-all shadow-sm active:scale-95"
                         >
-                          <Printer className="w-3.5 h-3.5 text-aqua-400" />
+                          <Printer className="w-3.5 h-3.5 text-red-400" />
                           <span>View & Print</span>
                         </button>
                       </div>
@@ -371,12 +413,12 @@ export const AccountPage: React.FC = () => {
               </div>
 
               {/* Informative Tax Note */}
-              <div className="mt-6 p-4 bg-sky-50/70 rounded-2xl border border-sky-200 text-xs text-sky-950 space-y-1.5">
+              <div className="mt-6 p-4 bg-blue-50/70 rounded-2xl border border-blue-200 text-xs text-blue-950 space-y-1.5">
                 <div className="font-bold flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-sky-600" />
+                  <ShieldCheck className="w-4 h-4 text-blue-600" />
                   <span>Tax Invoice & Accounting Notes</span>
                 </div>
-                <p className="text-sky-800 text-[11px] leading-relaxed">
+                <p className="text-blue-800 text-[11px] leading-relaxed">
                   All invoices generated above are legally valid under Indian law. Live ornamental fish (HSN 0301) carry 0% GST. Insulated oxygen packing and courier freight are billed transparently on the receipt.
                 </p>
               </div>
@@ -390,16 +432,16 @@ export const AccountPage: React.FC = () => {
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
                 <div>
-                  <h2 className="text-base font-bold text-ocean-950 font-display">
+                  <h2 className="text-base font-bold text-blue-950 font-display">
                     Saved Delivery Addresses
                   </h2>
                   <p className="text-xs text-slate-500">Destination addresses for oxygen-insulated consignments</p>
                 </div>
                 <button
                   onClick={() => setIsAddingAddress(!isAddingAddress)}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-ocean-900 text-white font-bold text-xs rounded-xl hover:bg-ocean-800 transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-900 text-white font-bold text-xs rounded-xl hover:bg-blue-800 transition-colors"
                 >
-                  <Plus className="w-4 h-4 text-aqua-400" />
+                  <Plus className="w-4 h-4 text-red-400" />
                   <span>Add New</span>
                 </button>
               </div>
@@ -417,8 +459,8 @@ export const AccountPage: React.FC = () => {
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Rahul Sharma"
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                        placeholder="Recipient's full name"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                       />
                     </div>
                     <div>
@@ -428,8 +470,8 @@ export const AccountPage: React.FC = () => {
                         required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+91 98450 12345"
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                        placeholder="10-digit mobile number for courier"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -441,8 +483,8 @@ export const AccountPage: React.FC = () => {
                       required
                       value={street}
                       onChange={(e) => setStreet(e.target.value)}
-                      placeholder="Apartment, building, and street name"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                      placeholder="Flat / House No., Building Name, Street"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                     />
                   </div>
 
@@ -452,8 +494,8 @@ export const AccountPage: React.FC = () => {
                       type="text"
                       value={landmark}
                       onChange={(e) => setLandmark(e.target.value)}
-                      placeholder="e.g. Near Metro Station / Behind Temple"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                      placeholder="Nearby landmark (optional)"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                     />
                   </div>
 
@@ -465,7 +507,8 @@ export const AccountPage: React.FC = () => {
                         required
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                        placeholder="City / Town"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                       />
                     </div>
                     <div>
@@ -475,7 +518,8 @@ export const AccountPage: React.FC = () => {
                         required
                         value={state}
                         onChange={(e) => setState(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                        placeholder="State / Province"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                       />
                     </div>
                     <div>
@@ -486,7 +530,8 @@ export const AccountPage: React.FC = () => {
                         maxLength={6}
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                        placeholder="6-digit PIN code"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -494,7 +539,7 @@ export const AccountPage: React.FC = () => {
                   <div className="flex gap-2 pt-2">
                     <button
                       type="submit"
-                      className="px-5 py-2 bg-ocean-900 text-white font-bold text-xs rounded-xl hover:bg-ocean-800"
+                      className="px-5 py-2 bg-blue-900 text-white font-bold text-xs rounded-xl hover:bg-blue-800 transition-colors"
                     >
                       Save Address
                     </button>
@@ -510,50 +555,44 @@ export const AccountPage: React.FC = () => {
               )}
 
               {/* Addresses Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {addresses.map((addr) => (
-                  <div
-                    key={addr.id}
-                    className={`p-4 rounded-2xl border text-xs flex flex-col justify-between ${
-                      addr.is_default ? 'border-aqua-500 bg-aqua-50/20 ring-1 ring-aqua-500' : 'border-slate-200'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-slate-900 text-sm">{addr.full_name}</span>
-                        {addr.is_default && (
-                          <span className="text-[10px] font-bold bg-aqua-100 text-aqua-800 px-2 py-0.5 rounded-full">
-                            Default
-                          </span>
-                        )}
+              {addresses.length === 0 ? (
+                <div className="text-center py-10 border border-dashed border-slate-300 rounded-2xl bg-slate-50/50">
+                  <MapPin className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-slate-700">No saved delivery addresses</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Click "Add New" above to save a delivery address for your live fish shipments.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {addresses.map((addr) => (
+                    <div
+                      key={addr.id}
+                      className="p-4 rounded-2xl border text-xs flex flex-col justify-between border-slate-200 bg-white"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-bold text-slate-900 text-sm">{addr.full_name}</span>
+                        </div>
+                        <div className="text-slate-500 mb-2">Ph: {addr.phone}</div>
+                        <p className="text-slate-600 leading-relaxed">
+                          {addr.street_address}, {addr.landmark && `${addr.landmark}, `}{addr.city}, {addr.state} - <strong>{addr.postal_code}</strong>
+                        </p>
                       </div>
-                      <div className="text-slate-500 mb-2">Ph: {addr.phone}</div>
-                      <p className="text-slate-600 leading-relaxed">
-                        {addr.street_address}, {addr.landmark && `${addr.landmark}, `}{addr.city}, {addr.state} - <strong>{addr.postal_code}</strong>
-                      </p>
-                    </div>
 
-                    <div className="pt-3 border-t border-slate-100 mt-4 flex items-center justify-between">
-                      {!addr.is_default && (
+                      <div className="pt-3 border-t border-slate-100 mt-4 flex items-center justify-end">
                         <button
-                          onClick={() => setDefaultAddress(addr.id)}
-                          className="text-aqua-700 hover:underline font-semibold"
+                          onClick={() => deleteAddress(addr.id)}
+                          className="text-slate-400 hover:text-red-600 inline-flex items-center gap-1 text-xs"
+                          title="Delete address"
+                          aria-label="Delete address"
                         >
-                          Set as Default
+                          <Trash2 className="w-4 h-4" />
+                          <span>Remove</span>
                         </button>
-                      )}
-                      <button
-                        onClick={() => deleteAddress(addr.id)}
-                        className="text-slate-400 hover:text-rose-600 ml-auto p-1"
-                        title="Delete address"
-                        aria-label="Delete address"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -564,7 +603,7 @@ export const AccountPage: React.FC = () => {
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
                 <div>
-                  <h2 className="text-base font-bold text-ocean-950 font-display">
+                  <h2 className="text-base font-bold text-blue-950 font-display">
                     Hobbyist Profile & Delivery Preferences
                   </h2>
                   <p className="text-xs text-slate-500">Personalize your customer account details and dispatch notes</p>
@@ -573,7 +612,7 @@ export const AccountPage: React.FC = () => {
                   onClick={() => setIsEditingProfile(!isEditingProfile)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                 >
-                  <Edit3 className="w-3.5 h-3.5 text-aqua-600" />
+                  <Edit3 className="w-3.5 h-3.5 text-blue-600" />
                   <span>{isEditingProfile ? 'Cancel' : 'Edit Profile'}</span>
                 </button>
               </div>
@@ -587,7 +626,7 @@ export const AccountPage: React.FC = () => {
                       required
                       value={profileName}
                       onChange={(e) => setProfileName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                     />
                   </div>
 
@@ -598,7 +637,7 @@ export const AccountPage: React.FC = () => {
                       required
                       value={profilePhone}
                       onChange={(e) => setProfilePhone(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                     />
                   </div>
 
@@ -608,16 +647,16 @@ export const AccountPage: React.FC = () => {
                       rows={3}
                       value={profileNotes}
                       onChange={(e) => setProfileNotes(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-aqua-500"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                       placeholder="e.g. Ring doorbell twice; I work from home and need to float fish immediately."
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-ocean-900 hover:bg-ocean-800 text-white font-bold rounded-xl text-xs flex items-center gap-2"
+                    className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-bold rounded-xl text-xs flex items-center gap-2"
                   >
-                    <Save className="w-4 h-4 text-aqua-400" />
+                    <Save className="w-4 h-4 text-red-400" />
                     <span>Save Changes</span>
                   </button>
                 </form>
@@ -638,7 +677,7 @@ export const AccountPage: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-slate-400 block text-[11px]">Membership Status</span>
-                      <strong className="text-emerald-700 font-semibold">Active Collector</strong>
+                      <strong className="text-blue-700 font-semibold">Active Collector</strong>
                     </div>
                   </div>
 

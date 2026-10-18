@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Truck, Sparkles, Send, Phone, Mail, Award, Check } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
+import { BrandLogo } from './BrandLogo';
 
 export const Footer: React.FC = () => {
   const { showToast } = useToast();
@@ -25,31 +26,31 @@ export const Footer: React.FC = () => {
         {/* Value Prop Highlights */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pb-10 border-b border-slate-800">
           <div className="flex items-center gap-3 p-3 bg-slate-800/60 rounded-2xl border border-slate-800">
-            <ShieldCheck className="w-7 h-7 text-teal-400 shrink-0" />
+            <ShieldCheck className="w-7 h-7 text-white shrink-0" />
             <div>
-              <div className="text-xs font-bold text-white uppercase tracking-wider">Live Arrival</div>
-              <div className="text-[11px] text-slate-400">100% Guaranteed DOA Policy</div>
+              <div className="text-xs font-bold text-white tracking-wide">Live Arrival</div>
+              <div className="text-xs text-slate-400">100% Guaranteed DOA Policy</div>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 bg-slate-800/60 rounded-2xl border border-slate-800">
-            <Truck className="w-7 h-7 text-teal-400 shrink-0" />
+            <Truck className="w-7 h-7 text-white shrink-0" />
             <div>
-              <div className="text-xs font-bold text-white uppercase tracking-wider">Express Air Cargo</div>
-              <div className="text-[11px] text-slate-400">Overnight 24-36h Delivery</div>
+              <div className="text-xs font-bold text-white tracking-wide">Express Air Cargo</div>
+              <div className="text-xs text-slate-400">Overnight 24-36h Delivery</div>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 bg-slate-800/60 rounded-2xl border border-slate-800">
-            <Sparkles className="w-7 h-7 text-teal-400 shrink-0" />
+            <Sparkles className="w-7 h-7 text-white shrink-0" />
             <div>
-              <div className="text-xs font-bold text-white uppercase tracking-wider">WYSIWYG Fish</div>
-              <div className="text-[11px] text-slate-400">Exact Specimen Pictured</div>
+              <div className="text-xs font-bold text-white tracking-wide">WYSIWYG Fish</div>
+              <div className="text-xs text-slate-400">Exact Specimen Pictured</div>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 bg-slate-800/60 rounded-2xl border border-slate-800">
-            <Award className="w-7 h-7 text-teal-400 shrink-0" />
+            <Award className="w-7 h-7 text-white shrink-0" />
             <div>
-              <div className="text-xs font-bold text-white uppercase tracking-wider">Health Quarantined</div>
-              <div className="text-[11px] text-slate-400">72h Tank Conditioned</div>
+              <div className="text-xs font-bold text-white tracking-wide">Health Quarantined</div>
+              <div className="text-xs text-slate-400">72h Tank Conditioned</div>
             </div>
           </div>
         </div>
@@ -59,22 +60,22 @@ export const Footer: React.FC = () => {
           {/* Brand Col */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-slate-800 p-1 flex items-center justify-center">
-                <img src="/logo-fish.svg" alt="Betta Aquatics" className="w-full h-full object-contain" />
+              <div className="w-8 h-8 rounded-xl bg-blue-900 p-1 flex items-center justify-center overflow-hidden shrink-0">
+                <BrandLogo variant="footer" className="w-full h-full" imgClassName="w-full h-full object-contain" />
               </div>
               <span className="font-display font-extrabold text-lg text-white tracking-tight">
-                BETTA <span className="text-teal-400">AQUATICS</span>
+                BETTA <span className="text-red-600">AQUATICS</span>
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed mb-4 max-w-sm font-normal">
-              Freshwater ornamental fish store based in Bengaluru. Healthy show Bettas, pure strain guppies, and tissue-cultured aquatic flora shipped safely across India.
+              Bengaluru’s trusted online fish store. We deliver healthy show Bettas, exotic guppies, and live plants safely across India.
             </p>
             <div className="flex flex-col gap-2 text-xs">
-              <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300">
+              <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-white hover:underline transition-colors">
                 <Phone className="w-4 h-4" />
                 <span>WhatsApp: +91 98765 43210</span>
               </a>
-              <a href="mailto:care@bettaaquatics.in" className="flex items-center gap-2 text-slate-400 hover:text-white">
+              <a href="mailto:care@bettaaquatics.in" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
                 <Mail className="w-4 h-4" />
                 <span>care@bettaaquatics.in</span>
               </a>
@@ -83,46 +84,49 @@ export const Footer: React.FC = () => {
 
           {/* Catalog Col */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3 font-display">Livestock</h4>
+            <h4 className="text-sm font-bold text-white mb-3 font-display">Livestock</h4>
             <ul className="space-y-2 text-xs">
-              <li><Link to="/shop?cat=cat-betta" className="hover:text-teal-400 transition-colors">Halfmoon & Plakat Bettas</Link></li>
-              <li><Link to="/shop?cat=cat-guppy" className="hover:text-teal-400 transition-colors">Imported Guppy Pairs</Link></li>
-              <li><Link to="/shop?cat=cat-pairs" className="hover:text-teal-400 transition-colors">Breeding Pairs</Link></li>
-              <li><Link to="/shop?cat=cat-plants" className="hover:text-teal-400 transition-colors">Live Aquarium Plants</Link></li>
-              <li><Link to="/shop?cat=cat-food" className="hover:text-teal-400 transition-colors">Fish Food & Pellets</Link></li>
-              <li><Link to="/shop?cat=cat-accessories" className="hover:text-teal-400 transition-colors">Indian Almond Leaves</Link></li>
+              <li><Link to="/shop?cat=cat-betta" className="hover:text-white transition-colors">Halfmoon & Plakat Bettas</Link></li>
+              <li><Link to="/shop?cat=cat-guppy" className="hover:text-white transition-colors">Imported Guppy Pairs</Link></li>
+              <li><Link to="/shop?cat=cat-pairs" className="hover:text-white transition-colors">Breeding Pairs</Link></li>
+              <li><Link to="/shop?cat=cat-plants" className="hover:text-white transition-colors">Live Aquarium Plants</Link></li>
+              <li><Link to="/shop?cat=cat-food" className="hover:text-white transition-colors">Fish Food & Pellets</Link></li>
+              <li><Link to="/shop?cat=cat-accessories" className="hover:text-white transition-colors">Indian Almond Leaves</Link></li>
             </ul>
           </div>
 
           {/* Guides Col */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3 font-display">Customer Support</h4>
+            <h4 className="text-sm font-bold text-white mb-3 font-display">Customer Support</h4>
             <ul className="space-y-2 text-xs">
-              <li><Link to="/page/shipping-acclimation" className="hover:text-teal-400 transition-colors">Acclimation & DOA Policy</Link></li>
-              <li><Link to="/page/faq" className="hover:text-teal-400 transition-colors">Frequently Asked Questions</Link></li>
-              <li><Link to="/account/orders" className="hover:text-teal-400 transition-colors">Track Consignment</Link></li>
-              <li><Link to="/page/about-us" className="hover:text-teal-400 transition-colors">About Our Facility</Link></li>
-              <li><Link to="/admin" className="text-amber-400/80 hover:text-amber-300 font-semibold">Admin Operations</Link></li>
+              <li><Link to="/blog" className="hover:text-white transition-colors font-semibold text-white">Care Guides & Research Journal</Link></li>
+              <li><Link to="/page/shipping-acclimation" className="hover:text-white transition-colors">Acclimation & DOA Policy</Link></li>
+              <li><Link to="/page/faq" className="hover:text-white transition-colors">Frequently Asked Questions</Link></li>
+              <li><Link to="/account/orders" className="hover:text-white transition-colors">Track Consignment</Link></li>
+              <li><Link to="/page/about-us" className="hover:text-white transition-colors">About Our Facility</Link></li>
+              <li><Link to="/admin" className="text-slate-400 hover:text-white transition-colors font-semibold">Admin Operations</Link></li>
             </ul>
           </div>
 
           {/* Newsletter Col */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-2 font-display">Livestock Alerts</h4>
+            <h4 className="text-sm font-bold text-white mb-2 font-display">Livestock Alerts</h4>
             <p className="text-xs text-slate-400 mb-3 font-normal">
               Receive updates when new show-class Bettas and rare imports arrive.
             </p>
             <form onSubmit={handleSubscribe} className="space-y-2">
               <input
+                id="footer-email-input"
                 type="email"
+                aria-label="Email address for livestock drop alerts"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-teal-500"
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-blue-600"
               />
               <button
                 type="submit"
-                className="w-full py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors"
+                className="btn-accent w-full"
               >
                 {subscribed ? (
                   <>
@@ -141,12 +145,12 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Disclaimer */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
           <div>
             © {new Date().getFullYear()} Betta Aquatics India Pvt Ltd. All rights reserved.
           </div>
-          <div className="text-[11px] text-slate-500 text-center sm:text-right">
-            <span>Live Arrival Policy: Video recording of unopened transit bag required within 2 hours of delivery for DOA coverage.</span>
+          <div className="text-xs text-slate-300 text-center sm:text-right">
+            <span>Live Arrival Guarantee: Record a short video of the unopened box within 2 hours of delivery for a fast replacement or refund.</span>
           </div>
         </div>
       </div>

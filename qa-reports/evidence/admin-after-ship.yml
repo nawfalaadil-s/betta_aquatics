@@ -1,0 +1,173 @@
+- generic [ref=f7e2]:
+  - main [ref=f7e4]:
+    - generic [ref=f7e5]:
+      - generic [ref=f7e6]:
+        - generic [ref=f7e7]:
+          - button "Toggle menu" [ref=f7e8] [cursor=pointer]
+          - link "Betta Aquatics BETTA ADMIN Executive Console & Operations" [ref=f7e10] [cursor=pointer]:
+            - /url: /admin
+            - img "Betta Aquatics" [ref=f7e12]
+            - generic [ref=f7e13]:
+              - generic [ref=f7e14]: BETTA ADMIN
+              - generic [ref=f7e15]: Executive Console & Operations
+        - generic [ref=f7e16]:
+          - link "View Live Store" [ref=f7e17] [cursor=pointer]:
+            - /url: /
+          - button "Switch to Customer View" [ref=f7e23] [cursor=pointer]
+          - button "Log Out" [ref=f7e28] [cursor=pointer]
+      - main [ref=f7e33]:
+        - generic [ref=f7e34]:
+          - generic [ref=f7e35]:
+            - generic [ref=f7e36]:
+              - text: Fulfillment & Verification
+              - heading "Orders & Live Consignment Desk" [level=1] [ref=f7e37]
+              - paragraph [ref=f7e38]: Audit customer UPI payment proofs, verify 12-digit UTR references, and generate external courier tracking links.
+            - generic [ref=f7e39]:
+              - generic [ref=f7e40]: 0 Pending Review
+              - generic [ref=f7e41]: Total 2 Consignments
+          - generic [ref=f7e42]:
+            - 'textbox "Search by Order #, Customer, Phone, or UTR..." [ref=f7e47]'
+            - generic [ref=f7e48]:
+              - generic [ref=f7e49]:
+                - generic [ref=f7e50]: "Payment:"
+                - combobox [ref=f7e51] [cursor=pointer]:
+                  - option "All (2)" [selected]
+                  - option "Pending (0)"
+                  - option "Verified (2)"
+                  - option "Rejected (0)"
+              - generic [ref=f7e52]:
+                - generic [ref=f7e53]: "Fulfillment:"
+                - combobox [ref=f7e54] [cursor=pointer]:
+                  - option "All" [selected]
+                  - option "Unfulfilled"
+                  - option "Processing"
+                  - option "Shipped"
+                  - option "Delivered"
+          - table [ref=f7e57]:
+            - rowgroup [ref=f7e58]:
+              - row [ref=f7e59]:
+                - columnheader "Order Ref" [ref=f7e60]
+                - columnheader "Customer Details" [ref=f7e61]
+                - columnheader "Payment Method & UTR" [ref=f7e62]
+                - columnheader "Proof" [ref=f7e63]
+                - columnheader "Pay Status" [ref=f7e64]
+                - columnheader "Fulfillment" [ref=f7e65]
+                - columnheader "Amount" [ref=f7e66]
+                - columnheader "Actions" [ref=f7e67]
+            - rowgroup [ref=f7e68]:
+              - row [ref=f7e282]:
+                - cell "BA-2026-2568 17 Oct 2026, 07:33 pm" [ref=f7e70]:
+                  - generic [ref=f7e71]: BA-2026-2568
+                  - text: 17 Oct 2026, 07:33 pm
+                - cell "Rahul Sharma +91 98450 12345 Bengaluru, Karnataka" [ref=f7e72]:
+                  - strong [ref=f7e73]: Rahul Sharma
+                  - text: +91 98450 12345
+                  - generic [ref=f7e74]: Bengaluru, Karnataka
+                - cell "upi 407519823412" [ref=f7e75]:
+                  - generic [ref=f7e76]: upi
+                  - generic [ref=f7e77]:
+                    - generic [ref=f7e78]: "407519823412"
+                    - button "Copy UTR" [ref=f7e79] [cursor=pointer]
+                - cell [ref=f7e83]:
+                  - button [ref=f7e84] [cursor=pointer]:
+                    - img "Proof" [ref=f7e85]
+                - cell "verified" [ref=f7e238]
+                - cell "shipped" [ref=f7e283]
+                - cell "₹1,697" [ref=f7e94]
+                - cell [ref=f7e240]:
+                  - button "Inspect Consignment" [ref=f7e98] [cursor=pointer]
+              - row [ref=f7e102]:
+                - cell "BA-2026-8812 22 Mar 2026, 03:15 pm" [ref=f7e103]:
+                  - generic [ref=f7e104]: BA-2026-8812
+                  - text: 22 Mar 2026, 03:15 pm
+                - cell "Rahul Sharma +91 98450 12345 Bengaluru, Karnataka" [ref=f7e105]:
+                  - strong [ref=f7e106]: Rahul Sharma
+                  - text: +91 98450 12345
+                  - generic [ref=f7e107]: Bengaluru, Karnataka
+                - cell "upi 407519823412" [ref=f7e108]:
+                  - generic [ref=f7e109]: upi
+                  - generic [ref=f7e110]:
+                    - generic [ref=f7e111]: "407519823412"
+                    - button "Copy UTR" [ref=f7e112] [cursor=pointer]
+                - cell [ref=f7e116]:
+                  - button [ref=f7e117] [cursor=pointer]:
+                    - img "Proof" [ref=f7e118]
+                - cell "verified" [ref=f7e123]
+                - cell "shipped" [ref=f7e125]
+                - cell "₹1,697" [ref=f7e127]
+                - cell [ref=f7e128]:
+                  - button "Inspect Consignment" [ref=f7e130] [cursor=pointer]
+          - generic [ref=f7e136]:
+            - generic [ref=f7e137]:
+              - generic [ref=f7e138]:
+                - generic [ref=f7e139]:
+                  - text: Consignment Inspection
+                  - 'heading "Order #BA-2026-2568" [level=2] [ref=f7e140]'
+                - generic [ref=f7e141]:
+                  - button "View & Print Tax Invoice" [ref=f7e142] [cursor=pointer]
+                  - button [ref=f7e146] [cursor=pointer]
+              - generic [ref=f7e150]:
+                - generic [ref=f7e151]:
+                  - generic [ref=f7e152]:
+                    - generic [ref=f7e153]: Payment Verification Desk
+                    - generic [ref=f7e158]: verified
+                  - generic [ref=f7e159]:
+                    - generic [ref=f7e160]:
+                      - generic [ref=f7e161]: "Submitted UTR / Transaction ID:"
+                      - text: "407519823412"
+                    - generic [ref=f7e162]:
+                      - generic [ref=f7e163]: "Payable Order Total:"
+                      - text: ₹1,697
+                  - generic [ref=f7e164]:
+                    - generic [ref=f7e165]: "Customer Uploaded Payment Proof:"
+                    - generic [ref=f7e166]:
+                      - img "Payment Proof" [ref=f7e167]
+                      - button "Click to Zoom & Inspect" [ref=f7e168] [cursor=pointer]
+                - generic [ref=f7e183]:
+                  - generic [ref=f7e184]:
+                    - generic [ref=f7e185]: Courier & Air Cargo Dispatch
+                    - generic [ref=f7e192]: shipped
+                  - generic [ref=f7e193]:
+                    - generic [ref=f7e284]:
+                      - generic [ref=f7e285]:
+                        - generic [ref=f7e286]: "Courier Partner:"
+                        - strong [ref=f7e287]: Bluedart Air Express (Apex Live)
+                      - generic [ref=f7e288]:
+                        - generic [ref=f7e289]: "Tracking AWB:"
+                        - strong [ref=f7e290]: BLUEDART-882947192
+                    - generic [ref=f7e291]:
+                      - generic [ref=f7e292]: "External Tracking Link:"
+                      - link "https://www.bluedart.com/tracking?trackNumber=BLUEDART-882947192" [ref=f7e293] [cursor=pointer]:
+                        - /url: https://www.bluedart.com/tracking?trackNumber=BLUEDART-882947192
+                    - button "Edit Tracking Information" [ref=f7e299] [cursor=pointer]
+                - generic [ref=f7e202]:
+                  - heading "Consignment Items (1)" [level=3] [ref=f7e203]
+                  - generic [ref=f7e205]:
+                    - generic [ref=f7e207]:
+                      - generic [ref=f7e208]: Royal Blue Halfmoon Betta (Show Class Male)
+                      - generic [ref=f7e209]: "SKU: BA-HM-001 • Qty: 1"
+                    - generic [ref=f7e210]: ₹1,499
+                  - generic [ref=f7e211]:
+                    - generic [ref=f7e212]:
+                      - generic [ref=f7e213]: "Subtotal:"
+                      - generic [ref=f7e214]: ₹1,499
+                    - generic [ref=f7e215]:
+                      - generic [ref=f7e216]: "Medical Oxygen Packing:"
+                      - generic [ref=f7e217]: ₹149
+                    - generic [ref=f7e218]:
+                      - generic [ref=f7e219]: "Air Express Freight:"
+                      - generic [ref=f7e220]: ₹199
+                    - generic [ref=f7e221]:
+                      - generic [ref=f7e222]: "Net Total:"
+                      - generic [ref=f7e223]: ₹1,697
+                - generic [ref=f7e224]:
+                  - heading "Delivery Address & Acclimation Destination" [level=3] [ref=f7e225]
+                  - generic [ref=f7e226]: Rahul Sharma
+                  - generic [ref=f7e227]:
+                    - text: 402, Aqua Green Apartments, 12th Main Road, Indiranagar, Opposite BDA Complex, Bengaluru, Karnataka -
+                    - strong [ref=f7e228]: "560038"
+                  - generic [ref=f7e229]: "Contact: +91 98450 12345"
+            - generic [ref=f7e230]:
+              - button "View GST Tax Invoice" [ref=f7e231] [cursor=pointer]
+              - button "Close Drawer" [ref=f7e236] [cursor=pointer]
+  - region "Notifications"

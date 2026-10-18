@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HeroCarousel } from '../components/home/HeroCarousel';
 import { CategoryBar } from '../components/home/CategoryBar';
 import { FlashDealSection } from '../components/home/FlashDealSection';
@@ -11,33 +11,44 @@ import { QuickViewModal } from '../components/common/QuickViewModal';
 import { SEO } from '../components/common/SEO';
 import { Product, HomepageSection } from '../lib/types';
 import { mockDb } from '../lib/mockDatabase';
+import { useBranding } from '../contexts/BrandingContext';
 
 export const HomePage: React.FC = () => {
+  const { branding } = useBranding();
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [sections] = useState<HomepageSection[]>(() => {
+  const [sections, setSections] = useState<HomepageSection[]>(() => {
     const list = mockDb.getHomepageSections();
     return list.filter(s => s.is_active).sort((a, b) => a.display_order - b.display_order);
   });
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      const list = mockDb.getHomepageSections();
+      setSections(list.filter(s => s.is_active).sort((a, b) => a.display_order - b.display_order));
+    };
+    window.addEventListener('ba_homepage_updated', handleUpdate);
+    return () => window.removeEventListener('ba_homepage_updated', handleUpdate);
+  }, []);
+
   const renderSection = (sec: HomepageSection) => {
     switch (sec.type) {
       case 'hero':
-        return <HeroCarousel key={sec.id} />;
+        return <HeroCarousel key={sec.id} section={sec} />;
       case 'categories':
-        return <CategoryBar key={sec.id} />;
+        return <CategoryBar key={sec.id} section={sec} />;
       case 'flash_deal':
-        return <FlashDealSection key={sec.id} onQuickView={(p) => setQuickViewProduct(p)} />;
+        return <FlashDealSection key={sec.id} section={sec} onQuickView={(p) => setQuickViewProduct(p)} />;
       case 'specimen_showcase':
       case 'curated_collection':
-        return <SpecimenShowcase key={sec.id} onQuickView={(p) => setQuickViewProduct(p)} />;
+        return <SpecimenShowcase key={sec.id} section={sec} onQuickView={(p) => setQuickViewProduct(p)} />;
       case 'breeder_story':
-        return <BreederStory key={sec.id} />;
+        return <BreederStory key={sec.id} section={sec} />;
       case 'trust_badges':
-        return <TrustBadges key={sec.id} />;
+        return <TrustBadges key={sec.id} section={sec} />;
       case 'care_guide':
-        return <CareGuideSection key={sec.id} />;
+        return <CareGuideSection key={sec.id} section={sec} />;
       case 'testimonials':
-        return <ReviewCarousel key={sec.id} />;
+        return <ReviewCarousel key={sec.id} section={sec} />;
       default:
         return null;
     }
@@ -59,9 +70,9 @@ export const HomePage: React.FC = () => {
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'Betta Aquatics',
-      url: 'https://bettaaquatics.in/',
-      logo: 'https://bettaaquatics.in/logo-fish.svg',
+      name: branding.site_name || 'Betta Aquatics',
+      url: typeof window !== 'undefined' ? window.location.origin : 'https://bettaaquatics.in/',
+      logo: branding.logo_url?.startsWith('http') ? branding.logo_url : `https://bettaaquatics.in${branding.logo_url || '/logo.jpeg'}`,
       contactPoint: {
         '@type': 'ContactPoint',
         telephone: '+91-98765-43210',

@@ -2,21 +2,29 @@ import React from 'react';
 import { Star, ShieldCheck } from 'lucide-react';
 import { mockDb } from '../../lib/mockDatabase';
 
-export const ReviewCarousel: React.FC = () => {
+import { HomepageSection } from '../../lib/types';
+
+interface ReviewCarouselProps {
+  section?: HomepageSection;
+}
+
+export const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ section }) => {
   const reviews = mockDb.getReviews();
+  const title = section?.title || 'Reviews from Fishkeepers Across India';
+  const subtitle = section?.subtitle || 'Read honest reviews from fish lovers across India on our safe packaging and healthy fish.';
 
   return (
     <section className="py-12 bg-slate-50 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-8">
-          <span className="text-xs font-bold uppercase tracking-wider text-teal-700 block mb-1">
+          <span className="text-xs font-bold text-blue-900 block mb-1">
             Customer Feedback
           </span>
           <h2 className="text-xl sm:text-3xl font-bold text-slate-900 font-display mb-2">
-            Reviews from Fishkeepers Across India
+            {title}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Real feedback on live packaging, temperature maintenance, and fish vitality on arrival.
+          <p className="text-xs sm:text-sm text-slate-600">
+            {subtitle}
           </p>
         </div>
 
@@ -28,13 +36,13 @@ export const ReviewCarousel: React.FC = () => {
             >
               <div>
                 <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center text-amber-400 gap-0.5">
+                  <div className="flex items-center text-red-600 gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                      <Star key={i} className="w-4 h-4 fill-red-600 text-red-600" />
                     ))}
                   </div>
-                  <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <div className="flex items-center gap-1 text-xs text-blue-900 font-medium bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-900" />
                     <span>Verified Fishkeeper</span>
                   </div>
                 </div>
@@ -48,8 +56,8 @@ export const ReviewCarousel: React.FC = () => {
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-800">{rev.user_name}</span>
-                <span className="text-slate-400 text-[11px]">Air Cargo Delivery</span>
+                <span className="font-bold text-slate-900">{rev.user_name}</span>
+                <span className="text-slate-600 text-xs">Air Cargo Delivery</span>
               </div>
             </div>
           ))}

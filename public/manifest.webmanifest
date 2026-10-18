@@ -1,0 +1,36 @@
+{
+  "name": "Betta Aquatics — Pure Strain Ornamental Fish",
+  "short_name": "Betta Aquatics",
+  "description": "India's Premier Online Store for Pure Strain Betta Fish, Rare Guppies, Exotic Breeding Pairs, Aquatic Plants & Aquarium Supplies.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#071326",
+  "theme_color": "#071326",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/logo-fish.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live Specimen Shop",
+      "url": "/shop",
+      "description": "Browse live champion bettas and rare aquatic specimens"
+    },
+    {
+      "name": "My Orders & Tracking",
+      "url": "/account/orders",
+      "description": "Track live fish dispatch and AWB courier delivery"
+    }
+  ]
+}

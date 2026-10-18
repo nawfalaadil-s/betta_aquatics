@@ -4,6 +4,16 @@ import { defineConfig } from 'vite';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+  },
   build: {
     rollupOptions: {
       output: {
@@ -17,12 +27,15 @@ export default defineConfig({
           if (id.includes('node_modules/lucide-react')) {
             return 'vendor-icons';
           }
-          if (id.includes('node_modules/@supabase')) {
+          if (id.includes('@supabase')) {
             return 'vendor-supabase';
+          }
+          if (id.includes('/pages/admin/') || id.includes('/components/admin/') || id.includes('\\pages\\admin\\') || id.includes('\\components\\admin\\')) {
+            return 'admin-bundle';
           }
         },
       },
     },
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 1000,
   },
 });

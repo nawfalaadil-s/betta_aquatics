@@ -56,7 +56,9 @@ export function buildTrackingUrl(urlTemplate: string, trackingNumber: string): s
   if (!urlTemplate || !trackingNumber) return '#';
   if (urlTemplate === '{AWB}') {
     // If it's already a full URL or plain text
-    return trackingNumber.startsWith('http') ? trackingNumber : `https://${trackingNumber}`;
+    if (/^https?:\/\//i.test(trackingNumber.trim())) return trackingNumber.trim();
+    return `https://${trackingNumber.trim()}`;
   }
-  return urlTemplate.replace('{AWB}', encodeURIComponent(trackingNumber.trim()));
+  const url = urlTemplate.replace('{AWB}', encodeURIComponent(trackingNumber.trim()));
+  return /^https?:\/\//i.test(url) ? url : '#';
 }

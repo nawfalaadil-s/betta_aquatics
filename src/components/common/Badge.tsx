@@ -14,18 +14,18 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
 }) => {
   const variantStyles = {
-    primary: 'bg-aqua-50 text-aqua-800 border-aqua-200/80',
-    coral: 'bg-coral-50 text-coral-600 border-coral-200/80',
-    gold: 'bg-amber-50 text-amber-800 border-amber-200/80',
-    outline: 'bg-transparent text-slate-700 border-slate-300',
-    specimen: 'bg-gradient-to-r from-ocean-900 to-ocean-800 text-aqua-300 border-aqua-400/40 shadow-sm',
-    dark: 'bg-ocean-950 text-white border-ocean-800',
+    primary: 'bg-blue-50 text-blue-900 border-blue-200',
+    coral: 'bg-red-50 text-red-600 border-red-200',
+    gold: 'bg-blue-100 text-blue-900 border-blue-200',
+    outline: 'bg-white text-slate-900 border-slate-300',
+    specimen: 'bg-blue-900 text-white border-blue-700 shadow-sm',
+    dark: 'bg-slate-900 text-white border-slate-800',
   };
 
   const sizeStyles = {
-    xs: 'text-[10px] px-1.5 py-0.5 font-medium rounded',
-    sm: 'text-xs px-2 py-0.5 font-semibold rounded-md',
-    md: 'text-xs px-2.5 py-1 font-semibold rounded-lg',
+    xs: 'text-xs px-2 py-0.5 font-medium rounded-xl',
+    sm: 'text-xs px-2.5 py-0.5 font-semibold rounded-xl',
+    md: 'text-xs px-3 py-1 font-semibold rounded-xl',
   };
 
   return (

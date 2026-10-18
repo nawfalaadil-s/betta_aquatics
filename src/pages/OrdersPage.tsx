@@ -17,10 +17,12 @@ export const OrdersPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'shipped' | 'delivered'>('all');
 
   const allOrders = mockDb.getOrders();
-  // Filter by user in customer mode, or show all if demo
+  // Strictly isolate orders to the current authenticated customer (or all if admin)
   const userOrders = user?.role === 'admin' 
     ? allOrders 
-    : allOrders.filter(o => o.user_id === user?.id || o.customer_email === user?.email || o.user_id === 'usr-customer-demo');
+    : user
+      ? allOrders.filter(o => o.user_id === user.id || (user.email && o.customer_email?.toLowerCase() === user.email.toLowerCase()))
+      : [];
 
   const filteredOrders = userOrders.filter((order) => {
     if (statusFilter === 'all') return true;
@@ -39,21 +41,21 @@ export const OrdersPage: React.FC = () => {
     switch (status) {
       case 'verified':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Payment Verified</span>
           </span>
         );
       case 'rejected':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full">
             <AlertCircle className="w-3.5 h-3.5" />
             <span>Action Required</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full">
             <Clock className="w-3.5 h-3.5" />
             <span>Verification Pending</span>
           </span>
@@ -65,21 +67,21 @@ export const OrdersPage: React.FC = () => {
     switch (status) {
       case 'shipped':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
             <Truck className="w-3.5 h-3.5" />
             <span>In Transit (Air Cargo)</span>
           </span>
         );
       case 'delivered':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-800 bg-blue-100 border border-blue-300 px-2.5 py-0.5 rounded-full">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Delivered</span>
           </span>
         );
       case 'processing':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
             <Package className="w-3.5 h-3.5" />
             <span>Packaging in Oxygen Crate</span>
           </span>
@@ -99,8 +101,8 @@ export const OrdersPage: React.FC = () => {
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-aqua-700">Account History</span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-ocean-950 font-display">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-700">Account History</span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-950 font-display">
               My Orders & Consignments
             </h1>
           </div>
@@ -113,8 +115,8 @@ export const OrdersPage: React.FC = () => {
                 onClick={() => setStatusFilter(tab)}
                 className={`whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                   statusFilter === tab
-                    ? 'bg-ocean-950 text-aqua-300 shadow-sm border border-ocean-800'
-                    : 'bg-white text-slate-600 hover:text-ocean-950 border border-slate-200'
+                    ? 'bg-blue-950 text-white shadow-sm border border-blue-900'
+                    : 'bg-white text-slate-600 hover:text-blue-950 border border-slate-200'
                 }`}
               >
                 {tab === 'all' ? 'All Orders' : tab}
@@ -124,12 +126,28 @@ export const OrdersPage: React.FC = () => {
         </div>
 
         {/* Orders List */}
-        {filteredOrders.length === 0 ? (
+        {!user ? (
+          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+            <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <h2 className="text-base font-bold text-slate-800 mb-1">Sign In to View Your Consignments</h2>
+            <p className="text-xs text-slate-500 mb-6 max-w-sm mx-auto">
+              Please sign in with your customer account to track your live fish consignments, view invoices, and copy AWB codes.
+            </p>
+            <div className="flex justify-center gap-3">
+              <Link to="/login?redirect=/orders" className="px-5 py-2.5 bg-blue-950 hover:bg-blue-900 text-white rounded-xl text-xs font-bold transition-colors shadow-sm">
+                Sign In
+              </Link>
+              <Link to="/catalogue" className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
+                Browse Fish
+              </Link>
+            </div>
+          </div>
+        ) : filteredOrders.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
             <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <h2 className="text-base font-bold text-slate-800 mb-1">No Orders Found</h2>
             <p className="text-xs text-slate-500 mb-6">You have no consignments matching this filter status.</p>
-            <Link to="/shop" className="px-5 py-2.5 bg-ocean-900 text-white rounded-xl text-xs font-bold">
+            <Link to="/catalogue" className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-colors">
               Shop Bettas & Guppies
             </Link>
           </div>
@@ -145,7 +163,7 @@ export const OrdersPage: React.FC = () => {
                   <div className="flex items-center gap-3 flex-wrap">
                     <div>
                       <span className="text-slate-400 block text-[10px] uppercase font-bold">Order ID</span>
-                      <strong className="text-ocean-950 font-mono text-sm">{order.order_number}</strong>
+                      <strong className="text-blue-950 font-mono text-sm">{order.order_number}</strong>
                     </div>
                     <div className="hidden sm:block text-slate-300">|</div>
                     <div>
@@ -155,7 +173,7 @@ export const OrdersPage: React.FC = () => {
                     <div className="hidden sm:block text-slate-300">|</div>
                     <div>
                       <span className="text-slate-400 block text-[10px] uppercase font-bold">Total Amount</span>
-                      <strong className="text-ocean-950 font-display">{formatCurrency(order.total_amount)}</strong>
+                      <strong className="text-blue-950 font-display">{formatCurrency(order.total_amount)}</strong>
                     </div>
                   </div>
 
@@ -167,9 +185,9 @@ export const OrdersPage: React.FC = () => {
 
                 {/* Courier Tracking Section (Highlighted when Shipped) */}
                 {order.shipment_details && (
-                  <div className="p-4 bg-gradient-to-r from-sky-50 via-sky-50/50 to-white border-b border-sky-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="p-4 bg-gradient-to-r from-blue-50/70 via-blue-50/40 to-white border-b border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-start sm:items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
                         <Truck className="w-5 h-5" />
                       </div>
                       <div className="text-xs">
@@ -181,7 +199,7 @@ export const OrdersPage: React.FC = () => {
                           </span>
                           <button
                             onClick={() => handleCopyAWB(order.shipment_details!.tracking_number)}
-                            className="text-sky-700 hover:text-sky-900 p-0.5"
+                            className="text-blue-700 hover:text-blue-900 p-0.5"
                             title="Copy Tracking ID"
                           >
                             <Copy className="w-3.5 h-3.5" />
@@ -200,10 +218,10 @@ export const OrdersPage: React.FC = () => {
                       href={order.shipment_details.tracking_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-sm transition-colors shrink-0"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-sm transition-colors shrink-0"
                     >
                       <span>Track Shipment</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <ExternalLink className="w-3.5 h-3.5 text-red-400" />
                     </a>
                   </div>
                 )}
@@ -227,7 +245,7 @@ export const OrdersPage: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="font-bold text-xs sm:text-sm text-ocean-950 font-display">
+                      <div className="font-bold text-xs sm:text-sm text-blue-950 font-display">
                         {formatCurrency(item.total_price)}
                       </div>
                     </div>
@@ -241,10 +259,10 @@ export const OrdersPage: React.FC = () => {
                   </div>
                   <Link
                     to={`/account/orders/${order.id}`}
-                    className="font-bold text-aqua-700 hover:text-aqua-800 flex items-center gap-1"
+                    className="font-bold text-blue-700 hover:text-blue-800 flex items-center gap-1"
                   >
                     <span>View Order Details & Invoices</span>
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4 text-red-500" />
                   </Link>
                 </div>
               </div>

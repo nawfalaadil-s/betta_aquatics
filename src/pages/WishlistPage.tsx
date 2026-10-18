@@ -15,10 +15,10 @@ export const WishlistPage: React.FC = () => {
     <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
-          <span className="text-xs font-bold uppercase tracking-wider text-rose-600 block mb-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-red-600 block mb-1">
             Personal Collection
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-ocean-950 font-display">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-950 font-display">
             My Saved Wishlist ({wishlistedProducts.length})
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -28,7 +28,7 @@ export const WishlistPage: React.FC = () => {
 
         {wishlistedProducts.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 max-w-xl mx-auto shadow-sm">
-            <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-400 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4">
               <Heart className="w-8 h-8" />
             </div>
             <h2 className="text-lg font-bold text-slate-800 mb-2">Your Wishlist is Empty</h2>
@@ -37,10 +37,10 @@ export const WishlistPage: React.FC = () => {
             </p>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-ocean-900 text-white font-bold text-xs rounded-xl shadow-md"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md transition-colors"
             >
               <span>Browse Living Specimens</span>
-              <ArrowRight className="w-4 h-4 text-aqua-400" />
+              <ArrowRight className="w-4 h-4 text-red-400" />
             </Link>
           </div>
         ) : (
