@@ -18,6 +18,7 @@ import { formatCurrency } from '../lib/utils';
 import { SEO } from '../components/common/SEO';
 import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
 import { INDIAN_STATES, getStateFromPincode, lookupPincode } from '../lib/shipping';
+import { syncOrderToSupabase } from '../lib/supabaseSync';
 
 export const CheckoutPage: React.FC = () => {
   const { user, addresses, addAddress, register, login, logout } = useAuth();
@@ -355,7 +356,7 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!user) {
@@ -415,7 +416,7 @@ export const CheckoutPage: React.FC = () => {
 
     setIsPlacingOrder(true);
 
-    setTimeout(() => {
+    try {
       const newOrder = mockDb.createOrder({
         user_id: user.id,
         customer_name: shippingAddress.full_name || user.full_name,
@@ -448,6 +449,9 @@ export const CheckoutPage: React.FC = () => {
         },
       });
 
+      // Synchronize directly into Supabase cloud PostgreSQL database
+      await syncOrderToSupabase(newOrder);
+
       // Celebration confetti
       try {
         confetti({
@@ -462,9 +466,13 @@ export const CheckoutPage: React.FC = () => {
       setPlacedOrderNumber(newOrder.order_number);
       setPlacedOrder(newOrder);
       clearCart();
+      showToast('Order placed successfully! Sent to admin payment verification desk.', 'success');
+    } catch (err: any) {
+      console.error('Order placement error:', err);
+      showToast('Order recorded locally; cloud sync is retrying.', 'info');
+    } finally {
       setIsPlacingOrder(false);
-      showToast('Order placed successfully! Awaiting admin payment verification.', 'success');
-    }, 800);
+    }
   };
 
   // SUCCESS SCREEN

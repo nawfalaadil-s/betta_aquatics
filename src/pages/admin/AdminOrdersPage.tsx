@@ -51,17 +51,17 @@ export const AdminOrdersPage: React.FC = () => {
     try {
       const mergedOrders = await fetchOrdersFromSupabase();
       setOrders(mergedOrders);
-      if (selectedOrder) {
-        const found = mergedOrders.find(o => o.id === selectedOrder.id || o.order_number === selectedOrder.order_number);
-        if (found) setSelectedOrder(found);
-      }
+      setSelectedOrder(prev => {
+        if (!prev) return null;
+        return mergedOrders.find(o => o.id === prev.id || o.order_number === prev.order_number) || prev;
+      });
     } catch (err) {
       console.warn('Orders refresh notice:', err);
       setOrders(mockDb.getOrders());
     } finally {
       if (!silent) setIsSyncing(false);
     }
-  }, [selectedOrder]);
+  }, []);
 
   // Initial load and listeners for real-time order updates
   useEffect(() => {
