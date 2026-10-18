@@ -12,6 +12,7 @@ import { formatCurrency } from '../../lib/utils';
 import { mockDb } from '../../lib/mockDatabase';
 import { Product, Category } from '../../lib/types';
 import { useBranding } from '../../contexts/BrandingContext';
+import { useStoreSettings } from '../../contexts/StoreSettingsContext';
 import { BrandLogo } from './BrandLogo';
 
 export const Navbar: React.FC = () => {
@@ -20,11 +21,15 @@ export const Navbar: React.FC = () => {
   const { itemCount, subtotal } = useCart();
   const { wishlistCount } = useWishlist();
   const { activeSettings, branding } = useBranding();
+  const { settings } = useStoreSettings();
   const currentSettings = activeSettings || branding;
-  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || currentSettings.site_name || 'Ra Guppy';
   const brandParts = brandTitle.trim().split(/\s+/);
   const firstWord = brandParts[0] || 'RA';
   const restWords = brandParts.slice(1).join(' ');
+
+  const whatsappDisplay = settings.whatsapp_number || settings.contact_phone || '+91 89211 90590';
+  const whatsappClean = (settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Product[]>([]);
@@ -111,13 +116,13 @@ export const Navbar: React.FC = () => {
 
           <div className="flex items-center gap-4">
             <a
-              href="https://wa.me/919876543210"
+              href={`https://wa.me/${whatsappClean}`}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1.5 text-slate-600 hover:text-blue-900 transition-colors font-medium"
             >
               <MessageCircle className="w-3.5 h-3.5 text-blue-900" />
-              <span>WhatsApp: +91 98765 43210</span>
+              <span>WhatsApp: {whatsappDisplay}</span>
             </a>
             {isAdmin && (
               <>

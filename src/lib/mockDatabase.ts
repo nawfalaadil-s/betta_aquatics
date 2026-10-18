@@ -1329,16 +1329,31 @@ export const mockDb = {
     return { success: true, user: adminProfile };
   },
 
-  registerCustomer: (name: string, email: string, password?: string, phone?: string): { success: boolean; user?: UserProfile; message?: string } => {
-    const existing = mockDb.getUserByEmail(email);
+  registerCustomer: (name: string, email: string, password?: string, phone?: string, customId?: string): { success: boolean; user?: UserProfile; message?: string } => {
+    const cleanEmail = email.trim().toLowerCase();
+    const existing = mockDb.getUserByEmail(cleanEmail);
+    const users = mockDb.getUsers();
+
     if (existing) {
-      return { success: false, message: 'An account with this email address already exists. Please log in.' };
+      if (name.trim()) existing.full_name = name.trim();
+      if (password) existing.password_hash = password;
+      if (phone?.trim()) existing.phone = phone.trim();
+      if (customId) existing.id = customId;
+      setStoredItem(STORAGE_KEYS.USERS, users);
+      const profile: UserProfile = {
+        id: existing.id,
+        email: existing.email,
+        full_name: existing.full_name,
+        phone: existing.phone,
+        role: existing.role || 'customer',
+        created_at: existing.created_at,
+      };
+      return { success: true, user: profile };
     }
 
-    const users = mockDb.getUsers();
     const newUser: StoredUser = {
-      id: 'usr-' + Date.now(),
-      email: email.trim().toLowerCase(),
+      id: customId || ('usr-' + Date.now()),
+      email: cleanEmail,
       full_name: name.trim(),
       phone: phone?.trim() || '+91 99999 00000',
       role: 'customer', // Non-negotiable: Public registration is always customer role

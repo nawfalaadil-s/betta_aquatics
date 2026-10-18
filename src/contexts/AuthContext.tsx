@@ -245,7 +245,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .from('profiles')
             .select('*')
             .eq('id', supaSession.user.id)
-            .single();
+            .maybeSingle();
 
           if (!isMounted) return;
 
@@ -296,7 +296,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .from('profiles')
             .select('*')
             .eq('id', supaUser.id)
-            .single();
+            .maybeSingle();
 
           const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
           const userProfile: UserProfile = {
@@ -334,16 +334,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Please enter your email address.' };
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password || '';
+
     const client = supabase;
     if (isSupabaseConfigured && client) {
       try {
         const { data, error } = await client.auth.signInWithPassword({
-          email: email.trim(),
-          password: password || '',
+          email: cleanEmail,
+          password: cleanPassword,
         });
         if (error) {
           // If Supabase authentication fails, attempt mock fallback for local accounts
-          const mockResult = mockDb.authenticateCustomer(email, password);
+          const mockResult = mockDb.authenticateCustomer(cleanEmail, cleanPassword);
           if (mockResult.success && mockResult.user) {
             const newSession = createSession(mockResult.user);
             setSession(newSession);
@@ -352,27 +355,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { success: false, message: error.message };
         }
         if (data.user) {
-          // Fetch authoritative profile
-          const { data: profile } = await client
-            .from('profiles')
-            .select('*')
-            .eq('id', data.user.id)
-            .single();
+          // Fetch authoritative profile without throwing PGRST116
+          let userProfile: UserProfile;
+          try {
+            const { data: profile } = await client
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .maybeSingle();
 
-          const userProfile: UserProfile = {
-            id: data.user.id,
-            email: data.user.email || email,
-            full_name: profile?.full_name || email.split('@')[0],
-            phone: profile?.phone,
-            role: profile?.role === 'admin' ? 'admin' : 'customer',
-            avatar_url: profile?.avatar_url,
-          };
+            const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
+            userProfile = {
+              id: data.user.id,
+              email: data.user.email || cleanEmail,
+              full_name: profile?.full_name || data.user.user_metadata?.full_name || cleanEmail.split('@')[0],
+              phone: profile?.phone || data.user.user_metadata?.phone,
+              role,
+              avatar_url: profile?.avatar_url,
+            };
+
+            // If profile row didn't exist yet, upsert it now
+            if (!profile) {
+              await client.from('profiles').upsert({
+                id: data.user.id,
+                email: userProfile.email,
+                full_name: userProfile.full_name,
+                phone: userProfile.phone || null,
+                role: userProfile.role,
+                updated_at: new Date().toISOString(),
+              });
+            }
+          } catch (pErr) {
+            userProfile = {
+              id: data.user.id,
+              email: data.user.email || cleanEmail,
+              full_name: data.user.user_metadata?.full_name || cleanEmail.split('@')[0],
+              phone: data.user.user_metadata?.phone,
+              role: 'customer',
+            };
+          }
+
+          // Sync into mockDb for instant offline/fallback access
+          mockDb.registerCustomer(userProfile.full_name, cleanEmail, cleanPassword, userProfile.phone, userProfile.id);
+
           const newSession = createSession(userProfile, data.session?.access_token);
           setSession(newSession);
           return { success: true, user: userProfile };
         }
       } catch (err: any) {
-        const mockResult = mockDb.authenticateCustomer(email, password);
+        const mockResult = mockDb.authenticateCustomer(cleanEmail, cleanPassword);
         if (mockResult.success && mockResult.user) {
           const newSession = createSession(mockResult.user);
           setSession(newSession);
@@ -383,7 +414,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Mock Mode Execution
-    const result = mockDb.authenticateCustomer(email, password);
+    const result = mockDb.authenticateCustomer(cleanEmail, cleanPassword);
     if (result.success && result.user) {
       const newSession = createSession(result.user);
       setSession(newSession);
@@ -474,22 +505,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Please provide full name and email address.' };
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password || 'Customer@123';
+    const cleanName = name.trim();
+    const cleanPhone = phone?.trim();
+
     const client = supabase;
     if (isSupabaseConfigured && client) {
       try {
         const { data, error } = await client.auth.signUp({
-          email: email.trim(),
-          password: password || 'Customer@123',
+          email: cleanEmail,
+          password: cleanPassword,
           options: {
             data: {
-              full_name: name.trim(),
-              phone: phone?.trim(),
+              full_name: cleanName,
+              phone: cleanPhone,
               role: 'customer', // Default
             }
           }
         });
         if (error) {
-          const mockResult = mockDb.registerCustomer(name, email, password, phone);
+          const mockResult = mockDb.registerCustomer(cleanName, cleanEmail, cleanPassword, cleanPhone);
           if (mockResult.success && mockResult.user) {
             const newSession = createSession(mockResult.user);
             setSession(newSession);
@@ -500,17 +536,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.user) {
           const profile: UserProfile = {
             id: data.user.id,
-            email: data.user.email || email,
-            full_name: name.trim(),
-            phone: phone?.trim(),
+            email: data.user.email || cleanEmail,
+            full_name: cleanName,
+            phone: cleanPhone,
             role: 'customer',
           };
+
+          // Guarantee immediate existence in public.profiles table
+          try {
+            await client.from('profiles').upsert({
+              id: data.user.id,
+              email: profile.email,
+              full_name: profile.full_name,
+              phone: profile.phone || null,
+              role: 'customer',
+              updated_at: new Date().toISOString(),
+            });
+          } catch (profileUpsertErr) {
+            console.warn('Profile sync notice:', profileUpsertErr);
+          }
+
+          // Sync into mockDb with Supabase ID so offline/fallback login always finds the account
+          mockDb.registerCustomer(cleanName, cleanEmail, cleanPassword, cleanPhone, data.user.id);
+
           const newSession = createSession(profile, data.session?.access_token);
           setSession(newSession);
           return { success: true, user: profile };
         }
       } catch (err: any) {
-        const mockResult = mockDb.registerCustomer(name, email, password, phone);
+        const mockResult = mockDb.registerCustomer(cleanName, cleanEmail, cleanPassword, cleanPhone);
         if (mockResult.success && mockResult.user) {
           const newSession = createSession(mockResult.user);
           setSession(newSession);
@@ -521,7 +575,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Mock Mode Execution
-    const result = mockDb.registerCustomer(name, email, password, phone);
+    const result = mockDb.registerCustomer(cleanName, cleanEmail, cleanPassword, cleanPhone);
     if (result.success && result.user) {
       const newSession = createSession(result.user);
       setSession(newSession);

@@ -13,10 +13,12 @@ import { SEO } from '../components/common/SEO';
 import { Product, HomepageSection } from '../lib/types';
 import { mockDb } from '../lib/mockDatabase';
 import { useBranding } from '../contexts/BrandingContext';
+import { useStoreSettings } from '../contexts/StoreSettingsContext';
 import { fetchSupabaseHomepageSections } from '../lib/supabaseSync';
 
 export const HomePage: React.FC = () => {
   const { branding } = useBranding();
+  const { settings } = useStoreSettings();
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [sections, setSections] = useState<HomepageSection[]>(() => {
     const list = mockDb.getHomepageSections();
@@ -90,13 +92,13 @@ export const HomePage: React.FC = () => {
       logo: branding.logo_url?.startsWith('http') ? branding.logo_url : `${typeof window !== 'undefined' ? window.location.origin : ''}${branding.logo_url || '/logo.jpeg'}`,
       contactPoint: {
         '@type': 'ContactPoint',
-        telephone: '+91-98765-43210',
+        telephone: settings.whatsapp_number || settings.contact_phone || '+91-89211-90590',
         contactType: 'customer service',
         areaServed: 'IN',
-        availableLanguage: ['English', 'Hindi'],
+        availableLanguage: ['English', 'Hindi', 'Tamil', 'Malayalam'],
       },
       sameAs: [
-        'https://wa.me/919876543210',
+        `https://wa.me/${(settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '')}`,
       ],
     },
   ];

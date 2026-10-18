@@ -1471,10 +1471,10 @@ export const CheckoutPage: React.FC = () => {
                 <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs flex items-center justify-between gap-3">
                   <div>
                     <div className="font-bold text-slate-800">Need help with payment?</div>
-                    <div className="text-[11px] text-slate-500">Chat directly with breeder Anand</div>
+                    <div className="text-[11px] text-slate-500">Chat directly with {settings.upi_payee_name || 'support'} on WhatsApp</div>
                   </div>
                   <a
-                    href="https://wa.me/919845012345?text=Hi%20Anand,%20I%20am%20at%20checkout%20and%20need%20assistance%20with%20payment"
+                    href={`https://wa.me/${(settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '')}?text=${encodeURIComponent(`Hi, I am at checkout on ${settings.brand_name || 'RA Guppy'} and need assistance with payment.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-1.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 shrink-0"

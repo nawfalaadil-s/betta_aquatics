@@ -502,7 +502,7 @@ export const ShopPage: React.FC = () => {
                     Reset Filters
                   </button>
                   <a
-                    href="https://wa.me/919876543210"
+                    href={`https://wa.me/${(settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-500"

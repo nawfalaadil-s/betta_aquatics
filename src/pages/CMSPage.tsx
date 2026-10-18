@@ -5,8 +5,10 @@ import { mockDb } from '../lib/mockDatabase';
 import { formatDate } from '../lib/utils';
 import { CMSPage as CMSPageType } from '../lib/types';
 import { fetchSupabaseCMSPages } from '../lib/supabaseSync';
+import { useStoreSettings } from '../contexts/StoreSettingsContext';
 
 export const CMSPage: React.FC = () => {
+  const { settings } = useStoreSettings();
   const { slug } = useParams<{ slug: string }>();
   const [page, setPage] = useState<CMSPageType | null>(() => mockDb.getCMSPageBySlug(slug || '') || null);
 
@@ -90,7 +92,7 @@ export const CMSPage: React.FC = () => {
               <p className="text-xs text-slate-500">Our aquarists are available on WhatsApp for direct guidance.</p>
             </div>
             <a
-              href="https://wa.me/919876543210"
+              href={`https://wa.me/${(settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '')}`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-sm transition-colors shrink-0"

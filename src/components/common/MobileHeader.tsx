@@ -9,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useBranding } from '../../contexts/BrandingContext';
+import { useStoreSettings } from '../../contexts/StoreSettingsContext';
 import { mockDb } from '../../lib/mockDatabase';
 import { Product } from '../../lib/types';
 import { formatCurrency } from '../../lib/utils';
@@ -20,11 +21,15 @@ export const MobileHeader: React.FC = () => {
   const { itemCount } = useCart();
   const { wishlistCount } = useWishlist();
   const { activeSettings, branding } = useBranding();
+  const { settings } = useStoreSettings();
   const currentSettings = activeSettings || branding;
-  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || currentSettings.site_name || 'Ra Guppy';
   const brandParts = brandTitle.trim().split(/\s+/);
   const firstWord = brandParts[0] || 'RA';
   const restWords = brandParts.slice(1).join(' ');
+
+  const whatsappDisplay = settings.whatsapp_number || settings.contact_phone || '+91 89211 90590';
+  const whatsappClean = (settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -364,7 +369,7 @@ export const MobileHeader: React.FC = () => {
             {/* Drawer Footer */}
             <div className="p-4 bg-slate-50 border-t border-slate-200">
               <a
-                href="https://wa.me/919876543210"
+                href={`https://wa.me/${whatsappClean}`}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-primary w-full"

@@ -3,16 +3,23 @@ import { Link } from 'react-router-dom';
 import { ShieldCheck, Truck, Sparkles, Send, Phone, Mail, Award, Check } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import { useBranding } from '../../contexts/BrandingContext';
+import { useStoreSettings } from '../../contexts/StoreSettingsContext';
 import { BrandLogo } from './BrandLogo';
 
 export const Footer: React.FC = () => {
   const { showToast } = useToast();
   const { activeSettings, branding } = useBranding();
+  const { settings } = useStoreSettings();
   const currentSettings = activeSettings || branding;
-  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || currentSettings.site_name || 'Ra Guppy';
   const brandParts = brandTitle.trim().split(/\s+/);
   const firstWord = brandParts[0] || 'RA';
   const restWords = brandParts.slice(1).join(' ');
+
+  const whatsappDisplay = settings.whatsapp_number || settings.contact_phone || '+91 89211 90590';
+  const whatsappClean = (settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '');
+  const supportEmail = settings.contact_email || 'raguppies00@gmail.com';
+  const tagline = settings.tagline || currentSettings.tagline || "Bengaluru’s trusted online fish store. We deliver healthy show Bettas, exotic guppies, and live plants safely across India.";
 
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -76,16 +83,16 @@ export const Footer: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed mb-4 max-w-sm font-normal">
-              Bengaluru’s trusted online fish store. We deliver healthy show Bettas, exotic guppies, and live plants safely across India.
+              {tagline}
             </p>
             <div className="flex flex-col gap-2 text-xs">
-              <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-white hover:underline transition-colors">
+              <a href={`https://wa.me/${whatsappClean}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-white hover:underline transition-colors">
                 <Phone className="w-4 h-4" />
-                <span>WhatsApp: +91 98765 43210</span>
+                <span>WhatsApp: {whatsappDisplay}</span>
               </a>
-              <a href="mailto:care@bettaaquatics.in" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+              <a href={`mailto:${supportEmail}`} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
                 <Mail className="w-4 h-4" />
-                <span>care@bettaaquatics.in</span>
+                <span>{supportEmail}</span>
               </a>
             </div>
           </div>

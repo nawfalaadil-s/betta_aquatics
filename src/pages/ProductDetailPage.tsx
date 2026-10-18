@@ -719,7 +719,7 @@ export const ProductDetailPage: React.FC = () => {
               <div className="pt-4 flex items-center justify-between text-xs text-slate-500 border-t border-slate-200">
                 <span>Unsure about tank compatibility?</span>
                 <a
-                  href="https://wa.me/919876543210"
+                  href={`https://wa.me/${(settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-1.5 text-blue-700 font-bold hover:underline"
