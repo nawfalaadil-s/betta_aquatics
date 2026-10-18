@@ -21,7 +21,7 @@ export const CSV_COLUMN_DEFINITIONS = [
   { key: 'gender', label: 'Gender', required: false, description: 'Male | Female | Breeding Pair | Unsexed.' },
   { key: 'care_level', label: 'Care Level', required: false, description: 'Easy | Moderate | Advanced.' },
   { key: 'featured', label: 'Featured', required: false, description: 'true | false. Highlights item on homepage.' },
-  { key: 'weight', label: 'Weight (Grams)', required: false, description: 'Package weight in grams for air cargo calculation.' },
+  { key: 'weight', label: 'Weight (Grams)', required: false, description: 'Package weight in grams for road courier delivery calculation.' },
   { key: 'tags', label: 'Tags', required: false, description: 'Semicolon-separated tags (e.g. Bestseller; Show Class; Rare).' },
   { key: 'image_urls', label: 'Image URLs', required: false, description: 'Semicolon-separated HTTPS URLs for high-res photography.' },
   { key: 'video_urls', label: 'Video URLs', required: false, description: 'Semicolon-separated HTTPS URLs for live swimming clips.' },

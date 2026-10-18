@@ -17,6 +17,7 @@ import { MediaPickerModal, SelectedMedia } from '../../components/common/MediaPi
 import { CsvImportModal } from '../../components/admin/CsvImportModal';
 import { BulkEditModal } from '../../components/admin/BulkEditModal';
 import { BulkDeleteModal } from '../../components/admin/BulkDeleteModal';
+import { deleteSupabaseProducts, syncProductToSupabase } from '../../lib/supabaseSync';
 
 export const AdminProductsPage: React.FC = () => {
   const { showToast } = useToast();
@@ -312,6 +313,9 @@ export const AdminProductsPage: React.FC = () => {
       videos,
     });
 
+    // Sync to Supabase in background
+    syncProductToSupabase(saved).catch(console.error);
+
     refreshProducts();
     setIsModalOpen(false);
     showToast(`Specimen ${saved.name} saved successfully!`, 'success');
@@ -321,11 +325,16 @@ export const AdminProductsPage: React.FC = () => {
     setDeleteProductTarget(product);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!deleteProductTarget) return;
-    mockDb.deleteProduct(deleteProductTarget.id);
+    const target = deleteProductTarget;
+    // 1. Delete locally from mock database
+    mockDb.deleteProduct(target.id, { force: true });
+    // 2. Delete from live Supabase
+    await deleteSupabaseProducts([target.id], target.sku ? [target.sku] : undefined);
+    
     refreshProducts();
-    showToast(`Specimen "${deleteProductTarget.name}" removed from inventory`, 'info');
+    showToast(`Specimen "${target.name}" permanently deleted`, 'info');
     setDeleteProductTarget(null);
   };
 

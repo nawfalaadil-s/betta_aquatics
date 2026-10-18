@@ -57,7 +57,7 @@ export const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ section }) => {
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-900">{rev.user_name}</span>
-                <span className="text-slate-600 text-xs">Air Cargo Delivery</span>
+                <span className="text-slate-600 text-xs">The Professional Couriers Delivery</span>
               </div>
             </div>
           ))}

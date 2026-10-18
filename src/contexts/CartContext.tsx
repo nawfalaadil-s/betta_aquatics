@@ -3,6 +3,7 @@ import { CartItem, Product, Coupon } from '../lib/types';
 import { useStoreSettings } from './StoreSettingsContext';
 import { useToast } from './ToastContext';
 import { mockDb } from '../lib/mockDatabase';
+import { calculateShipping, ShippingCalculation } from '../lib/shipping';
 
 interface CartContextType {
   items: CartItem[];
@@ -13,6 +14,9 @@ interface CartContextType {
   discountAmount: number;
   appliedCoupon: Coupon | null;
   total: number;
+  shippingState: string;
+  setShippingState: (state: string) => void;
+  shippingDetails: ShippingCalculation;
   freeShippingRemaining: number;
   freeShippingProgress: number;
   addToCart: (product: Product, quantity?: number, variant?: string) => boolean;
@@ -41,6 +45,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return [];
   });
 
+  const [shippingState, setShippingState] = useState<string>(() => {
+    return localStorage.getItem('ba_shipping_state') || 'Kerala';
+  });
+
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(() => {
     const saved = localStorage.getItem('ba_applied_coupon');
     if (saved) {
@@ -58,6 +66,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [items]);
 
   useEffect(() => {
+    localStorage.setItem('ba_shipping_state', shippingState);
+  }, [shippingState]);
+
+  useEffect(() => {
     if (appliedCoupon) {
       localStorage.setItem('ba_applied_coupon', JSON.stringify(appliedCoupon));
     } else {
@@ -68,20 +80,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
-  // Any live fish requires special oxygen packing charge
-  const hasLiveFish = items.some(item => 
-    item.product.category_id === 'cat-betta' || 
-    item.product.category_id === 'cat-guppy' || 
-    item.product.category_id === 'cat-pairs'
-  );
+  // Live fish road courier calculation via The Professional Couriers
+  const shippingDetails = calculateShipping(shippingState, itemCount);
+  const deliveryFee = items.length === 0 ? 0 : shippingDetails.finalFee;
 
-  const packingCharge = hasLiveFish ? settings.live_packing_charge : 0;
-  const deliveryFee = subtotal >= settings.free_shipping_threshold || items.length === 0 
-    ? 0 
-    : settings.standard_shipping_rate;
+  // Live fish packing fee is included or nominal
+  const packingCharge = 0;
 
-  const freeShippingRemaining = Math.max(0, settings.free_shipping_threshold - subtotal);
-  const freeShippingProgress = Math.min(100, Math.round((subtotal / settings.free_shipping_threshold) * 100));
+  const freeShippingRemaining = 0;
+  const freeShippingProgress = 100;
 
   let discountAmount = 0;
   if (appliedCoupon) {
@@ -193,6 +200,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         discountAmount,
         appliedCoupon,
         total,
+        shippingState,
+        setShippingState,
+        shippingDetails,
         freeShippingRemaining,
         freeShippingProgress,
         addToCart,

@@ -16,10 +16,24 @@ import { Address, Order } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
 import { SEO } from '../components/common/SEO';
 import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
+import { INDIAN_STATES } from '../lib/shipping';
 
 export const CheckoutPage: React.FC = () => {
   const { user, addresses, addAddress } = useAuth();
-  const { items, subtotal, deliveryFee, packingCharge, discountAmount, appliedCoupon, total, clearCart } = useCart();
+  const { 
+    items, 
+    itemCount,
+    subtotal, 
+    deliveryFee, 
+    packingCharge, 
+    discountAmount, 
+    appliedCoupon, 
+    total, 
+    shippingState,
+    setShippingState,
+    shippingDetails,
+    clearCart 
+  } = useCart();
   const { settings } = useStoreSettings();
   const { showToast } = useToast();
 
@@ -35,8 +49,16 @@ export const CheckoutPage: React.FC = () => {
   const [newAddrStreet, setNewAddrStreet] = useState('');
   const [newAddrLandmark, setNewAddrLandmark] = useState('');
   const [newAddrCity, setNewAddrCity] = useState('');
-  const [newAddrState, setNewAddrState] = useState('');
+  const [newAddrState, setNewAddrState] = useState(shippingState || 'Kerala');
   const [newAddrPostalCode, setNewAddrPostalCode] = useState('');
+
+  const handleSelectSavedAddress = (addrId: string) => {
+    setSelectedAddressId(addrId);
+    const matched = addresses.find(a => a.id === addrId);
+    if (matched && matched.state) {
+      setShippingState(matched.state);
+    }
+  };
 
   // Payment method selection & submission
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'bank_transfer'>('upi');
@@ -362,7 +384,7 @@ export const CheckoutPage: React.FC = () => {
                           type="radio"
                           name="address"
                           checked={selectedAddressId === addr.id}
-                          onChange={() => setSelectedAddressId(addr.id)}
+                          onChange={() => handleSelectSavedAddress(addr.id)}
                           className="mt-1 accent-blue-600"
                         />
                         <div className="text-xs flex-1">
@@ -379,7 +401,7 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-3 text-xs">
-                    <p className="text-xs text-slate-500 mb-1">Enter your delivery address for live oxygen-insulated consignment:</p>
+                    <p className="text-xs text-slate-500 mb-1">Enter your delivery address for live oxygen-insulated consignment (Delivery across India only):</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block font-semibold text-slate-700 mb-1">Full Name *</label>
@@ -438,15 +460,26 @@ export const CheckoutPage: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">State *</label>
-                        <input
-                          type="text"
+                        <label className="block font-semibold text-slate-700 mb-1">State (India Only) *</label>
+                        <select
                           required
                           value={newAddrState}
-                          onChange={(e) => setNewAddrState(e.target.value)}
-                          placeholder="State / Province"
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
-                        />
+                          onChange={(e) => {
+                            setNewAddrState(e.target.value);
+                            setShippingState(e.target.value);
+                          }}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500"
+                        >
+                          <option value="">Select Delivery State</option>
+                          <option value="Kerala">Kerala (₹80)</option>
+                          <option value="Tamil Nadu">Tamil Nadu (₹120)</option>
+                          <option value="Karnataka">Karnataka (₹120)</option>
+                          <optgroup label="All Other Indian States (₹200)">
+                            {INDIAN_STATES.filter(s => s !== 'Kerala' && s !== 'Tamil Nadu' && s !== 'Karnataka').map(st => (
+                              <option key={st} value={st}>{st} (₹200)</option>
+                            ))}
+                          </optgroup>
+                        </select>
                       </div>
                       <div>
                         <label className="block font-semibold text-slate-700 mb-1">PIN Code *</label>
@@ -773,9 +806,14 @@ export const CheckoutPage: React.FC = () => {
                   )}
 
                   <div className="flex justify-between text-slate-600">
-                    <span>Express Air Delivery</span>
-                    <span>
-                      {deliveryFee === 0 ? <strong className="text-blue-700">FREE</strong> : formatCurrency(deliveryFee)}
+                    <div>
+                      <span className="font-semibold text-slate-800 block">The Professional Couriers</span>
+                      <span className="text-[11px] text-slate-500">
+                        Road Courier ({shippingDetails.state}) {shippingDetails.isBulkOrder ? '• 2X Bulk Rate applied' : ''}
+                      </span>
+                    </div>
+                    <span className="font-semibold text-slate-900 font-mono">
+                      {deliveryFee === 0 ? '₹0' : formatCurrency(deliveryFee)}
                     </span>
                   </div>
 
@@ -821,7 +859,7 @@ export const CheckoutPage: React.FC = () => {
                     <span>Why Manual Verification?</span>
                   </div>
                   <p className="text-blue-800 text-[11px] leading-relaxed">
-                    Every ornamental fish in your order is a living 1-of-1 specimen. Our head breeder personally inspects fin integrity and vigor before approving cargo transit.
+                    Every ornamental fish in your order is a living 1-of-1 specimen. Our head breeder personally inspects fin integrity and health before approving dispatch via The Professional Couriers road transport.
                   </p>
                 </div>
 

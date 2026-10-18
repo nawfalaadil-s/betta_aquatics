@@ -12,6 +12,8 @@ import {
 const STORAGE_KEYS = {
   PRODUCTS: 'ba_products',
   CATEGORIES: 'ba_categories',
+  DELETED_PRODUCT_IDS: 'ba_deleted_product_ids',
+  DELETED_CATEGORY_IDS: 'ba_deleted_category_ids',
   ORDERS: 'ba_orders',
   STORE_SETTINGS: 'ba_store_settings',
   HOMEPAGE_SECTIONS: 'ba_homepage_sections',
@@ -178,29 +180,28 @@ const INITIAL_ORDERS: Order[] = [
 export const mockDb = {
   // PRODUCTS
   getProducts: (): Product[] => {
-    const prods = getStoredItem<Product[]>(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
-    let modified = false;
-    const currentIds = new Set(prods.map(p => p.id));
-    const missing = INITIAL_PRODUCTS.filter(ip => !currentIds.has(ip.id));
-    let baseList = prods;
-    if (missing.length > 0) {
-      baseList = [...prods, ...missing];
-      modified = true;
-    }
-    const merged = baseList.map(p => {
-      if (!p.videos || p.videos.length === 0) {
-        const init = INITIAL_PRODUCTS.find(ip => ip.id === p.id);
-        if (init && init.videos && init.videos.length > 0) {
-          modified = true;
-          return { ...p, videos: init.videos };
-        }
+    const deletedIds = new Set(getStoredItem<string[]>(STORAGE_KEYS.DELETED_PRODUCT_IDS, []));
+    let prods: Product[];
+
+    try {
+      const raw = typeof window !== 'undefined' && window.localStorage ? window.localStorage.getItem(STORAGE_KEYS.PRODUCTS) : null;
+      if (raw === null) {
+        // First load initialization
+        prods = INITIAL_PRODUCTS.filter(p => !deletedIds.has(p.id));
+        setStoredItem(STORAGE_KEYS.PRODUCTS, prods);
+      } else {
+        prods = JSON.parse(raw);
       }
-      return p;
-    });
-    if (modified) {
-      setStoredItem(STORAGE_KEYS.PRODUCTS, merged);
+    } catch {
+      prods = INITIAL_PRODUCTS.filter(p => !deletedIds.has(p.id));
     }
-    return merged;
+
+    // Filter out any permanently deleted IDs
+    const filtered = prods.filter(p => !deletedIds.has(p.id));
+    if (filtered.length !== prods.length) {
+      setStoredItem(STORAGE_KEYS.PRODUCTS, filtered);
+    }
+    return filtered;
   },
 
   getProductBySlug: (slug: string): Product | undefined => {
@@ -267,32 +268,39 @@ export const mockDb = {
     }
   },
 
-  deleteProduct: (id: string, options?: { force?: boolean; archiveIfInOrders?: boolean }): { success: boolean; action: 'deleted' | 'archived' | 'protected'; message: string } => {
+  deleteProduct: (id: string, options?: { force?: boolean; archiveIfInOrders?: boolean }): { success: boolean; action: 'deleted' | 'archived'; message: string } => {
     let products = mockDb.getProducts();
     const product = products.find(p => p.id === id);
-    if (!product) {
-      throw new Error('Product not found');
-    }
+    const prodName = product ? product.name : id;
 
-    // Safety check: protect historical orders, GST tax invoices, and accounting records
+    // Unlink product from historical mock orders to ensure orders display cleanly without foreign key lock
     const orders = mockDb.getOrders();
-    const hasOrderHistory = orders.some(o => o.items.some(i => i.product_id === id));
-
-    if (hasOrderHistory) {
-      if (options?.archiveIfInOrders) {
-        product.is_active = false;
-        product.status = 'archived';
-        setStoredItem(STORAGE_KEYS.PRODUCTS, products);
-        mockDb.addAuditLog('Archived product (preserved in orders): ' + product.name, 'product', id);
-        return { success: true, action: 'archived', message: `Product "${product.name}" has historical order records and was safely archived rather than deleted.` };
+    let ordersModified = false;
+    for (const order of orders) {
+      for (const item of order.items || []) {
+        if (item.product_id === id) {
+          item.product_id = undefined;
+          ordersModified = true;
+        }
       }
-      return { success: false, action: 'protected', message: `Product "${product.name}" cannot be hard-deleted because it is referenced in past customer orders. Please archive it instead.` };
+    }
+    if (ordersModified) {
+      setStoredItem(STORAGE_KEYS.ORDERS, orders);
     }
 
+    // Permanently remove from products catalog
     products = products.filter(p => p.id !== id);
     setStoredItem(STORAGE_KEYS.PRODUCTS, products);
-    mockDb.addAuditLog('Deleted product: ' + product.name, 'product', id);
-    return { success: true, action: 'deleted', message: `Product "${product.name}" permanently deleted.` };
+
+    // Track in permanent deleted IDs so it is never re-seeded
+    const deletedIds = getStoredItem<string[]>(STORAGE_KEYS.DELETED_PRODUCT_IDS, []);
+    if (!deletedIds.includes(id)) {
+      deletedIds.push(id);
+      setStoredItem(STORAGE_KEYS.DELETED_PRODUCT_IDS, deletedIds);
+    }
+
+    mockDb.addAuditLog('Deleted product: ' + prodName, 'product', id);
+    return { success: true, action: 'deleted', message: `Product "${prodName}" permanently deleted.` };
   },
 
   bulkSaveProducts: (productsToSave: Product[]): { created: number; updated: number } => {
@@ -321,72 +329,66 @@ export const mockDb = {
 
   bulkDeleteProducts: (productIds: string[], options?: { force?: boolean; archiveIfInOrders?: boolean }): { deletedIds: string[]; archivedIds: string[]; protectedIds: string[] } => {
     let products = mockDb.getProducts();
-    const orders = mockDb.getOrders();
+    const idSet = new Set(productIds);
 
-    // Map of product IDs present in historical orders
-    const orderedProductIds = new Set<string>();
+    // Unlink from orders
+    const orders = mockDb.getOrders();
+    let ordersModified = false;
     for (const order of orders) {
-      for (const item of order.items) {
-        if (item.product_id) {
-          orderedProductIds.add(item.product_id);
+      for (const item of order.items || []) {
+        if (item.product_id && idSet.has(item.product_id)) {
+          item.product_id = undefined;
+          ordersModified = true;
         }
       }
     }
+    if (ordersModified) {
+      setStoredItem(STORAGE_KEYS.ORDERS, orders);
+    }
 
-    const deletedIds: string[] = [];
-    const archivedIds: string[] = [];
-    const protectedIds: string[] = [];
+    // Permanently remove all selected IDs from products
+    products = products.filter(p => !idSet.has(p.id));
+    setStoredItem(STORAGE_KEYS.PRODUCTS, products);
 
+    // Track in permanent deleted IDs
+    const deletedIds = getStoredItem<string[]>(STORAGE_KEYS.DELETED_PRODUCT_IDS, []);
     for (const id of productIds) {
-      const prod = products.find(p => p.id === id);
-      if (!prod) continue;
-
-      if (orderedProductIds.has(id)) {
-        if (options?.archiveIfInOrders) {
-          // Soft-delete / Archive to preserve order history and tax invoices
-          prod.is_active = false;
-          prod.status = 'archived';
-          archivedIds.push(id);
-        } else {
-          protectedIds.push(id);
-        }
-      } else {
+      if (!deletedIds.includes(id)) {
         deletedIds.push(id);
       }
     }
-
-    if (deletedIds.length > 0) {
-      const deletedSet = new Set(deletedIds);
-      products = products.filter(p => !deletedSet.has(p.id));
-    }
-
-    setStoredItem(STORAGE_KEYS.PRODUCTS, products);
+    setStoredItem(STORAGE_KEYS.DELETED_PRODUCT_IDS, deletedIds);
 
     mockDb.addAuditLog(
-      `Bulk product deletion: ${deletedIds.length} removed, ${archivedIds.length} archived, ${protectedIds.length} protected (in active orders)`,
+      `Bulk product deletion: ${productIds.length} specimens permanently removed`,
       'product',
       'bulk'
     );
 
-    return { deletedIds, archivedIds, protectedIds };
+    return { deletedIds: productIds, archivedIds: [], protectedIds: [] };
   },
 
-  // CATEGORIES & HIERARCHY
   getCategories: (): Category[] => {
-    const cats = getStoredItem<Category[]>(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
-    // Auto-merge any newly defined initial categories or subcategories
-    let modified = false;
-    const existingIds = new Set(cats.map(c => c.id));
-    for (const initCat of INITIAL_CATEGORIES) {
-      if (!existingIds.has(initCat.id)) {
-        cats.push(initCat);
-        modified = true;
+    const deletedIds = new Set(getStoredItem<string[]>(STORAGE_KEYS.DELETED_CATEGORY_IDS, []));
+    let cats: Category[];
+
+    try {
+      const raw = typeof window !== 'undefined' && window.localStorage ? window.localStorage.getItem(STORAGE_KEYS.CATEGORIES) : null;
+      if (raw === null) {
+        cats = INITIAL_CATEGORIES.filter(c => !deletedIds.has(c.id));
+        setStoredItem(STORAGE_KEYS.CATEGORIES, cats);
+      } else {
+        cats = JSON.parse(raw);
       }
+    } catch {
+      cats = INITIAL_CATEGORIES.filter(c => !deletedIds.has(c.id));
     }
-    if (modified) {
-      setStoredItem(STORAGE_KEYS.CATEGORIES, cats);
+
+    const filtered = cats.filter(c => !deletedIds.has(c.id));
+    if (filtered.length !== cats.length) {
+      setStoredItem(STORAGE_KEYS.CATEGORIES, filtered);
     }
-    return cats.sort((a, b) => a.display_order - b.display_order);
+    return filtered.sort((a, b) => a.display_order - b.display_order);
   },
 
   getCategoryHierarchy: (): Category[] => {
@@ -518,55 +520,53 @@ export const mockDb = {
   },
 
   deleteCategory: (id: string, options?: { reassignToId?: string; archiveProducts?: boolean }): { success: boolean; message: string } => {
-    const categories = mockDb.getCategories();
+    let categories = mockDb.getCategories();
     const cat = categories.find(c => c.id === id);
-    if (!cat) throw new Error('Category not found');
+    const catName = cat ? cat.name : id;
 
-    // 1. Check child subcategories
+    // 1. Move child subcategories to reassign target or top-level root
     const childCategories = categories.filter(c => c.parent_id === id);
     if (childCategories.length > 0) {
-      if (options?.reassignToId !== undefined) {
-        // Move child subcategories to new parent (or root if reassignToId is null/empty)
-        childCategories.forEach(ch => {
-          ch.parent_id = options.reassignToId || null;
-        });
-      } else {
-        throw new Error(`Cannot delete category "${cat.name}" because it contains ${childCategories.length} child subcategory(s). Reassign or move child subcategories first.`);
-      }
+      childCategories.forEach(ch => {
+        ch.parent_id = options?.reassignToId || null;
+      });
     }
 
-    // 2. Check assigned products
+    // 2. Resolve assigned products
     const products = mockDb.getProducts();
     const assignedProducts = products.filter(p => p.category_id === id || p.subcategory_id === id);
     if (assignedProducts.length > 0) {
-      if (options?.reassignToId) {
-        const targetCategory = categories.find(c => c.id === options.reassignToId);
-        assignedProducts.forEach(p => {
-          if (p.category_id === id) {
-            p.category_id = options.reassignToId!;
-            p.category_name = targetCategory?.name;
-          }
-          if (p.subcategory_id === id) {
-            p.subcategory_id = undefined;
-            p.subcategory_name = undefined;
-          }
-        });
-        setStoredItem(STORAGE_KEYS.PRODUCTS, products);
-      } else if (options?.archiveProducts) {
-        assignedProducts.forEach(p => {
+      const targetCategory = options?.reassignToId ? categories.find(c => c.id === options.reassignToId) : null;
+      assignedProducts.forEach(p => {
+        if (p.category_id === id) {
+          p.category_id = options?.reassignToId || '';
+          p.category_name = targetCategory?.name || undefined;
+        }
+        if (p.subcategory_id === id) {
+          p.subcategory_id = undefined;
+          p.subcategory_name = undefined;
+        }
+        if (options?.archiveProducts) {
           p.is_active = false;
           p.status = 'archived';
-        });
-        setStoredItem(STORAGE_KEYS.PRODUCTS, products);
-      } else {
-        throw new Error(`Cannot delete category "${cat.name}" because ${assignedProducts.length} product(s) are currently assigned to it. Please reassign products first.`);
-      }
+        }
+      });
+      setStoredItem(STORAGE_KEYS.PRODUCTS, products);
     }
 
-    const filtered = categories.filter(c => c.id !== id);
-    setStoredItem(STORAGE_KEYS.CATEGORIES, filtered);
-    mockDb.addAuditLog('Deleted category: ' + cat.name, 'category', id);
-    return { success: true, message: `Category "${cat.name}" deleted successfully.` };
+    // 3. Remove category from storage
+    categories = categories.filter(c => c.id !== id);
+    setStoredItem(STORAGE_KEYS.CATEGORIES, categories);
+
+    // 4. Record in permanent deleted category IDs
+    const deletedIds = getStoredItem<string[]>(STORAGE_KEYS.DELETED_CATEGORY_IDS, []);
+    if (!deletedIds.includes(id)) {
+      deletedIds.push(id);
+      setStoredItem(STORAGE_KEYS.DELETED_CATEGORY_IDS, deletedIds);
+    }
+
+    mockDb.addAuditLog('Deleted category: ' + catName, 'category', id);
+    return { success: true, message: `Category "${catName}" permanently deleted.` };
   },
 
   // IMPORT HISTORY
@@ -997,18 +997,18 @@ export const mockDb = {
   },
 
   // PINCODE SERVICEABILITY
-  checkPincodeServiceability: (pincode: string): { serviceable: boolean; estimatedDays: string; expressAir: boolean } => {
+  checkPincodeServiceability: (pincode: string): { serviceable: boolean; estimatedDays: string; expressRoad: boolean } => {
     const trimmed = pincode.trim();
     if (trimmed.length !== 6 || isNaN(Number(trimmed))) {
-      return { serviceable: false, estimatedDays: '', expressAir: false };
+      return { serviceable: false, estimatedDays: '', expressRoad: false };
     }
     const settings = mockDb.getStoreSettings();
-    // In demo, check if it matches prefix or list, default to true for Indian 6-digit pins for pleasant UX
+    // Check if within serviceable Indian pincodes
     const isSpecialExpress = settings.serviceable_pincodes.includes(trimmed);
     return {
       serviceable: true,
-      estimatedDays: isSpecialExpress ? '24 - 36 Hours (Overnight Air)' : '48 Hours (Priority Express)',
-      expressAir: true,
+      estimatedDays: isSpecialExpress ? '2 - 3 Days (The Professional Couriers Express Road)' : '3 - 5 Days (The Professional Couriers Surface Transport)',
+      expressRoad: true,
     };
   },
 

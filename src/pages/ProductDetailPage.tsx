@@ -611,7 +611,7 @@ export const ProductDetailPage: React.FC = () => {
                 {pincodeStatus && (
                   <div className="mt-2.5 text-xs text-blue-800 flex items-center gap-1.5 font-medium">
                     <Check className="w-4 h-4 text-blue-600 shrink-0" />
-                    <span>Eligible for Overnight Air Cargo: Arrives within <strong>{pincodeStatus.days}</strong></span>
+                    <span>The Professional Couriers Road Delivery: Estimated <strong>{pincodeStatus.days}</strong></span>
                   </div>
                 )}
               </div>

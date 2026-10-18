@@ -189,7 +189,7 @@ export const AuthPage: React.FC = () => {
             {mode === 'register' && (
               <div>
                 <label className="block text-slate-700 font-bold mb-1" htmlFor="cust-phone">
-                  Phone Number (For Airport Cargo Updates)
+                  Phone Number (For Road Courier Delivery Updates)
                 </label>
                 <div className="relative">
                   <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />

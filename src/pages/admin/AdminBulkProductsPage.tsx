@@ -15,6 +15,7 @@ import {
   generateCsvTemplate, parseCsv, validateAndDiffCsvRows, 
   executeImport, generateImportAuditReportCsv, applyBulkEdit 
 } from '../../lib/bulkProductService';
+import { deleteSupabaseProducts } from '../../lib/supabaseSync';
 
 export const AdminBulkProductsPage: React.FC = () => {
   const { user } = useAuth();
@@ -311,19 +312,23 @@ export const AdminBulkProductsPage: React.FC = () => {
   };
 
   // Commit Bulk Delete
-  const handleConfirmBulkDelete = () => {
+  const handleConfirmBulkDelete = async () => {
     if (selectedProductIds.size === 0) return;
+    const ids = Array.from(selectedProductIds);
+    const targetProducts = products.filter(p => selectedProductIds.has(p.id));
+    const skus = targetProducts.map(p => p.sku).filter(Boolean);
 
-    const res = mockDb.bulkDeleteProducts(Array.from(selectedProductIds), {
-      archiveIfInOrders: archiveOrdersProtected,
-    });
+    // 1. Delete locally from mock database
+    const res = mockDb.bulkDeleteProducts(ids, { force: true });
+
+    // 2. Delete from live Supabase PostgreSQL
+    await deleteSupabaseProducts(ids, skus);
 
     setIsBulkDeleteModalOpen(false);
     refreshProducts();
     clearSelection();
 
-    const msg = `${res.deletedIds.length} deleted, ${res.archivedIds.length} archived (protected in orders), ${res.protectedIds.length} skipped.`;
-    showToast(msg, res.deletedIds.length > 0 || res.archivedIds.length > 0 ? 'success' : 'info');
+    showToast(`Permanently deleted ${ids.length} products from catalog and database.`, 'success');
   };
 
   // Filter preview rows

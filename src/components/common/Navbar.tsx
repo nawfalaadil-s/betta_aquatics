@@ -92,7 +92,7 @@ export const Navbar: React.FC = () => {
             <span className="text-slate-400">•</span>
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-blue-900" />
-              <span>Overnight Air Cargo with 100% Live Arrival Guarantee</span>
+              <span>The Professional Couriers • Express Road Transport with 100% Live Arrival Guarantee</span>
             </span>
           </div>
 

@@ -248,7 +248,7 @@ export const BlogPostPage: React.FC = () => {
               Ready to Welcome a Champion Show Betta?
             </h3>
             <p className="text-xs text-slate-300 max-w-lg">
-              Explore our current stock of 1-of-1 exact pictured specimens, acclimated and eligible for express Air Cargo delivery.
+              Explore our current stock of 1-of-1 exact pictured specimens, acclimated and shipped safely via The Professional Couriers across India.
             </p>
           </div>
           <Link

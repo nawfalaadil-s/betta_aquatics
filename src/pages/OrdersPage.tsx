@@ -69,7 +69,7 @@ export const OrdersPage: React.FC = () => {
         return (
           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
             <Truck className="w-3.5 h-3.5" />
-            <span>In Transit (Air Cargo)</span>
+            <span>In Transit (The Professional Couriers Road)</span>
           </span>
         );
       case 'delivered':

@@ -120,7 +120,7 @@ export const ShopPage: React.FC = () => {
     ? `${currentSubcategoryName} - ${currentCategoryName} | Betta Aquatics`
     : `${currentCategoryName} | Buy Live Ornamental Fish Online India`;
 
-  const seoDescription = `Browse authentic ${currentCategoryName.toLowerCase()} at Betta Aquatics. Hand-conditioned specimens with certified overnight air transport and live arrival guarantee.`;
+  const seoDescription = `Browse authentic ${currentCategoryName.toLowerCase()} at Betta Aquatics. Hand-conditioned specimens shipped safely via The Professional Couriers with 100% live arrival guarantee across India.`;
 
   const hasActiveFilters = 
     selectedCategory !== 'all' || 

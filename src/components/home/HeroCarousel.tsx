@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Plane, MessageCircle, Play, Pause } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Truck, MessageCircle, Play, Pause } from 'lucide-react';
 import { HomepageSection } from '../../lib/types';
 
 interface HeroCarouselProps {
@@ -87,8 +87,8 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ section }) => {
                 <span>100% Live Arrival Guarantee</span>
               </div>
               <div className="flex items-center gap-1.5 font-medium">
-                <Plane className="w-4 h-4 text-blue-900" />
-                <span>Overnight Air Cargo</span>
+                <Truck className="w-4 h-4 text-blue-900" />
+                <span>The Professional Couriers</span>
               </div>
               <div className="flex items-center gap-1.5 font-medium">
                 <MessageCircle className="w-4 h-4 text-blue-900" />

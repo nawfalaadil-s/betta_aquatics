@@ -242,7 +242,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                   </div>
                   <div className="flex items-center gap-2">
                     <Truck className="w-4 h-4 text-blue-900 shrink-0" />
-                    <span>Overnight Express Air Cargo direct to door</span>
+                    <span>The Professional Couriers road delivery with live oxygen packing</span>
                   </div>
                 </div>
               </div>

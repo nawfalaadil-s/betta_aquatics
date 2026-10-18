@@ -162,7 +162,7 @@ export const AdminSettingsPage: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="set-shipping-rate" className="block text-slate-700 mb-1 font-semibold">Standard Air Cargo Fee (₹)</label>
+              <label htmlFor="set-shipping-rate" className="block text-slate-700 mb-1 font-semibold">Standard Road Courier Base Fee (₹)</label>
               <input
                 id="set-shipping-rate"
                 type="number"

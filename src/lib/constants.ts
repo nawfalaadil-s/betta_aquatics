@@ -2,19 +2,14 @@ import { Category, Product, StoreSettings, HomepageSection, CMSPage, Coupon, Blo
 
 export const COURIER_PRESETS = [
   {
-    name: 'Bluedart Air Express (Apex Live)',
-    urlTemplate: 'https://www.bluedart.com/tracking?trackNumber={AWB}',
-    description: 'Guaranteed 24-48h overnight airport-to-doorstep air transport for live fish.',
+    name: 'The Professional Couriers (Road Courier)',
+    urlTemplate: 'https://www.tpcindia.com/Tracking.aspx?ConsignmentNo={AWB}',
+    description: 'Specialized surface road transport for live ornamental fish across India with 100% Live Arrival Guarantee.',
   },
   {
-    name: 'DTDC Priority Air Cargo',
-    urlTemplate: 'https://www.dtdc.in/tracking.asp?trNo={AWB}',
-    description: 'Fast air transit with live animal temperature control notification.',
-  },
-  {
-    name: 'Delhivery Surface / Direct',
-    urlTemplate: 'https://www.delhivery.com/track/package/{AWB}',
-    description: 'Reliable parcel delivery for aquarium accessories, plants and fish food.',
+    name: 'The Professional Couriers (Express Surface)',
+    urlTemplate: 'https://www.tpcindia.com/Tracking.aspx?ConsignmentNo={AWB}',
+    description: 'Express door-to-door road consignment by The Professional Couriers logistics network.',
   },
   {
     name: 'India Post Speed Post',
@@ -208,7 +203,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     ph_range: '6.5 - 7.5',
     care_level: 'Moderate',
     diet: 'High-protein micro pellets & frozen bloodworms',
-    shipping_restriction: 'Special Live Oxygen Packing required. Express Air Delivery only.',
+    shipping_restriction: 'Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.',
     images: [
       'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=800&q=80'
@@ -1236,10 +1231,10 @@ export const INITIAL_STORE_SETTINGS: StoreSettings = {
   bank_account_no: '002405009988',
   bank_ifsc: 'ICIC0000024',
   bank_account_holder: 'Ra Guppy Aquatics',
-  free_shipping_threshold: 1999,
-  standard_shipping_rate: 199,
-  live_packing_charge: 149,
-  announcement_text: '✨ Special Stock: Pure Strain Guppies & Bettas with live video proof! Use coupon AQUA10 for 10% off',
+  free_shipping_threshold: 999999,
+  standard_shipping_rate: 80,
+  live_packing_charge: 0,
+  announcement_text: '🚚 The Professional Couriers Road Delivery across India! Safe Live Arrival Guarantee.',
   announcement_code: 'AQUA10',
   announcement_active: true,
   announcement_link: '/shop',
@@ -1458,7 +1453,7 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
     content_html: `
       <h2>Ordering & Delivery Questions</h2>
       <h4>How long does delivery take?</h4>
-      <p>We only use Express Overnight Air Cargo (Bluedart/DTDC Priority) for live fish. Most metro locations arrive within 24 to 36 hours from dispatch.</p>
+      <p>We ship live ornamental fish strictly across India using specialized surface road transport via The Professional Couriers. With customized double-bagged oxygen packaging and thermal insulated boxes, shipments arrive safely within 2 to 4 days backed by our 100% Live Arrival Guarantee.</p>
 
       <h4>Why do you use Manual UPI and Bank Transfer verification?</h4>
       <p>Because live fish require individual health inspection before order approval, manual verification prevents accidental automated double-booking of single unique specimens and eliminates high gateway surcharge costs, allowing us to pass savings onto customers.</p>
@@ -1518,11 +1513,11 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
   {
     id: 'post-01',
     slug: 'acclimating-show-grade-betta-fish',
-    title: 'The Ultimate Acclimation Protocol: Protecting High-Grade Bettas After Air Freight',
+    title: 'The Ultimate Acclimation Protocol: Protecting High-Grade Bettas After Courier Transit',
     excerpt: 'Step-by-step master protocol to transition sensitive show-grade Bettas from pressurized oxygen transit pouches into your home aquarium without osmotic shock or fin curl.',
     featured_image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80',
     category: 'Betta Care & Acclimation',
-    tags: ['Acclimation', 'Water Parameters', 'Show Bettas', 'Air Freight'],
+    tags: ['Acclimation', 'Water Parameters', 'Show Bettas', 'Road Courier'],
     author: {
       name: 'Dr. Anand Raman',
       role: 'Chief Marine Biologist & Founder',
@@ -1533,7 +1528,7 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
     views_count: 1420,
     published_at: '2026-03-15T09:00:00Z',
     updated_at: '2026-03-20T11:30:00Z',
-    meta_title: 'Acclimating Show-Grade Betta Fish After Air Shipping | Betta Aquatics',
+    meta_title: 'Acclimating Show-Grade Betta Fish After Shipping | Betta Aquatics',
     meta_description: 'Prevent temperature shock and fin clamp with our veterinarian-approved drip acclimation protocol for live Betta splendens shipments.',
     content_html: `
       <h2>The Critical First 120 Minutes</h2>

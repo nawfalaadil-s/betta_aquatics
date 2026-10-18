@@ -2,24 +2,27 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Trash2, ShoppingBag, ArrowRight, ShieldCheck, 
-  Sparkles, Tag, Check, AlertCircle, ArrowLeft 
+  Sparkles, Tag, Check, AlertCircle, ArrowLeft, Truck, MapPin 
 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useStoreSettings } from '../contexts/StoreSettingsContext';
 import { formatCurrency } from '../lib/utils';
+import { INDIAN_STATES } from '../lib/shipping';
 
 export const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const { 
     items, 
+    itemCount,
     subtotal, 
     deliveryFee, 
     packingCharge, 
     discountAmount, 
     appliedCoupon, 
     total, 
-    freeShippingRemaining, 
-    freeShippingProgress, 
+    shippingState,
+    setShippingState,
+    shippingDetails,
     updateQuantity, 
     removeFromCart, 
     clearCart, 
@@ -73,29 +76,38 @@ export const CartPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Free Shipping Progress Meter */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm mb-6">
-          <div className="flex items-center justify-between text-xs font-semibold mb-2">
-            <span>
-              {freeShippingRemaining > 0 ? (
-                <span className="text-slate-700">
-                  Add <strong className="text-blue-900">{formatCurrency(freeShippingRemaining)}</strong> more for <strong>FREE Live Air Delivery</strong>!
-                </span>
-              ) : (
-                <span className="text-blue-700 flex items-center gap-1 font-bold">
-                  <Check className="w-4 h-4 text-blue-600" />
-                  Congratulations! You unlocked FREE Delivery.
-                </span>
-              )}
-            </span>
-            <span className="text-slate-400">{freeShippingProgress}%</span>
+        {/* The Professional Couriers Logistics Banner */}
+        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm mb-6 space-y-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center shrink-0">
+                <Truck className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="font-bold text-slate-900 block text-xs">The Professional Couriers • Express Road Transport</span>
+                <span className="text-[11px] text-slate-500">Live fish packed with medical oxygen & thermal insulation. Deliveries strictly within India.</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[11px] text-slate-600 font-semibold">Delivery State:</span>
+              <select
+                value={shippingState}
+                onChange={(e) => setShippingState(e.target.value)}
+                className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 outline-none focus:border-blue-600"
+              >
+                <option value="Kerala">Kerala (₹80)</option>
+                <option value="Tamil Nadu">Tamil Nadu (₹120)</option>
+                <option value="Karnataka">Karnataka (₹120)</option>
+                <option value="Other States">All Other States (₹200)</option>
+              </select>
+            </div>
           </div>
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-blue-600 rounded-full transition-all duration-500"
-              style={{ width: `${freeShippingProgress}%` }}
-            />
-          </div>
+          {shippingDetails.isBulkOrder && (
+            <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-center gap-2 font-medium">
+              <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+              <span>Bulk Box Packing ({itemCount} pairs): 2X road courier rate applied for reinforced thermal insulated crates ({formatCurrency(deliveryFee)}).</span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -258,13 +270,14 @@ export const CartPage: React.FC = () => {
               )}
 
               <div className="flex justify-between text-xs text-slate-600">
-                <span>Express Air Delivery</span>
-                <span>
-                  {deliveryFee === 0 ? (
-                    <span className="text-blue-700 font-bold">FREE</span>
-                  ) : (
-                    formatCurrency(deliveryFee)
-                  )}
+                <div>
+                  <span className="font-semibold text-slate-800 block">The Professional Couriers</span>
+                  <span className="text-[11px] text-slate-500">
+                    Road Courier ({shippingDetails.state}) {shippingDetails.isBulkOrder ? '• 2X Bulk Rate' : ''}
+                  </span>
+                </div>
+                <span className="font-semibold text-slate-900">
+                  {deliveryFee === 0 ? '₹0' : formatCurrency(deliveryFee)}
                 </span>
               </div>
 

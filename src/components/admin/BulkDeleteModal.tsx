@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { X, Trash2, AlertTriangle, ShieldCheck } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Trash2, AlertTriangle, Loader2 } from 'lucide-react';
 import { mockDb } from '../../lib/mockDatabase';
+import { deleteSupabaseProducts } from '../../lib/supabaseSync';
 import { useToast } from '../../contexts/ToastContext';
 
 export interface BulkDeleteModalProps {
@@ -17,43 +18,45 @@ export const BulkDeleteModal: React.FC<BulkDeleteModalProps> = ({
   onSuccess,
 }) => {
   const { showToast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Keyboard Escape listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape' && isOpen && !isDeleting) {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isDeleting]);
 
   if (!isOpen) return null;
 
-  // Inspect order references
-  const orders = mockDb.getOrders();
-  const orderedProductIds = new Set<string>();
-  for (const o of orders) {
-    for (const it of o.items || []) {
-      if (it.product_id) orderedProductIds.add(it.product_id);
-    }
-  }
+  // Retrieve products to match SKUs for Supabase
+  const allProducts = mockDb.getProducts();
+  const targetProducts = allProducts.filter(p => selectedProductIds.includes(p.id));
+  const skus = targetProducts.map(p => p.sku).filter(Boolean);
 
-  const inOrderCount = selectedProductIds.filter(id => orderedProductIds.has(id)).length;
-  const hardDeleteCount = selectedProductIds.length - inOrderCount;
-
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    setIsDeleting(true);
     try {
-      const result = mockDb.bulkDeleteProducts(selectedProductIds, { archiveIfInOrders: true });
+      // 1. Delete from local storage & memory state
+      mockDb.bulkDeleteProducts(selectedProductIds, { force: true });
+
+      // 2. Delete from live Supabase PostgreSQL database
+      await deleteSupabaseProducts(selectedProductIds, skus);
+
       showToast(
-        `Bulk operation complete: ${result.deletedIds.length} deleted, ${result.archivedIds.length} archived (order protection)`,
-        'info'
+        `Successfully deleted ${selectedProductIds.length} specimens permanently.`,
+        'success'
       );
       onSuccess();
       onClose();
     } catch (err: any) {
       showToast(err.message || 'Error executing bulk deletion', 'error');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -73,7 +76,7 @@ export const BulkDeleteModal: React.FC<BulkDeleteModalProps> = ({
           </div>
           <div>
             <h2 id="bulk-delete-title" className="text-base font-extrabold text-slate-900 font-display">
-              Confirm Bulk Deletion
+              Confirm Permanent Bulk Deletion
             </h2>
             <span className="text-[11px] text-slate-500 font-medium">
               Targeting <strong className="text-slate-800 font-bold">{selectedProductIds.length}</strong> selected specimens
@@ -81,29 +84,20 @@ export const BulkDeleteModal: React.FC<BulkDeleteModalProps> = ({
           </div>
         </div>
 
-        {/* Body & Legal GST Protection Warning */}
+        {/* Body */}
         <div id="bulk-delete-desc" className="space-y-3 text-xs text-slate-600 leading-relaxed">
-          {inOrderCount > 0 ? (
-            <div className="p-3.5 bg-amber-50/80 border border-amber-200 rounded-2xl space-y-2">
-              <div className="flex items-center gap-2 text-amber-800 font-bold text-xs">
-                <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
-                <span>Active Order History & Tax Invoice Protection</span>
-              </div>
-              <p className="text-[11px] text-amber-900">
-                <strong className="text-amber-950 font-bold">{inOrderCount} of {selectedProductIds.length}</strong> selected specimens are referenced in historical customer orders and GST tax invoices.
-              </p>
-              <p className="text-[11px] text-amber-800">
-                To prevent corrupted receipts or broken tracking links, those {inOrderCount} items will be <strong>safely archived</strong> (hidden from catalog and set inactive). The remaining <strong>{hardDeleteCount}</strong> items will be permanently removed.
-              </p>
+          <div className="p-3.5 bg-red-50/80 border border-red-200 rounded-2xl space-y-1.5">
+            <div className="flex items-center gap-2 text-red-800 font-bold text-xs">
+              <AlertTriangle className="w-4 h-4 text-red-700 shrink-0" />
+              <span>Permanent Deletion Notice</span>
             </div>
-          ) : (
-            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] text-slate-600">
-              None of the selected products have been ordered by customers. All <strong>{selectedProductIds.length}</strong> items will be permanently removed from inventory.
-            </div>
-          )}
+            <p className="text-[11px] text-red-900">
+              All <strong>{selectedProductIds.length}</strong> selected products will be permanently removed from your catalog and deleted from the live Supabase database.
+            </p>
+          </div>
 
           <p className="text-[11px] text-slate-500">
-            This operation will be recorded in the security audit log. Are you sure you wish to proceed?
+            This action cannot be undone. Are you sure you wish to proceed?
           </p>
         </div>
 
@@ -112,16 +106,25 @@ export const BulkDeleteModal: React.FC<BulkDeleteModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-50 transition-colors"
+            disabled={isDeleting}
+            className="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleConfirm}
-            className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
+            disabled={isDeleting}
+            className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm inline-flex items-center gap-1.5 disabled:opacity-50"
           >
-            Confirm & Proceed
+            {isDeleting ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Deleting...</span>
+              </>
+            ) : (
+              <span>Confirm & Delete</span>
+            )}
           </button>
         </div>
       </div>

@@ -131,7 +131,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
               </div>
               {order.shipment_details && (
                 <div className="pt-1">
-                  <span className="text-slate-500">Air Cargo AWB: </span>
+                  <span className="text-slate-500">Courier Consignment No: </span>
                   <strong className="font-mono text-blue-800">{order.shipment_details.tracking_number}</strong>
                   <div className="text-[11px] text-slate-500">Carrier: {order.shipment_details.courier_name}</div>
                 </div>
@@ -197,7 +197,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
               )}
 
               <div className="flex justify-between text-slate-600">
-                <span>Air Cargo Freight:</span>
+                <span>Road Courier Shipping:</span>
                 <span className="font-semibold text-slate-900 font-mono">
                   {order.delivery_fee === 0 ? 'FREE' : formatCurrency(order.delivery_fee)}
                 </span>

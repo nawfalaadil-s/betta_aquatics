@@ -43,8 +43,8 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-3 p-3 bg-slate-800/60 rounded-2xl border border-slate-800">
             <Truck className="w-7 h-7 text-white shrink-0" />
             <div>
-              <div className="text-xs font-bold text-white tracking-wide">Express Air Cargo</div>
-              <div className="text-xs text-slate-400">Overnight 24-36h Delivery</div>
+              <div className="text-xs font-bold text-white tracking-wide">The Professional Couriers</div>
+              <div className="text-xs text-slate-400">Express Road Delivery</div>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 bg-slate-800/60 rounded-2xl border border-slate-800">

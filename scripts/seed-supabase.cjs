@@ -54,16 +54,23 @@ async function seed() {
       {
         key: 'shipping_settings',
         value: {
-          free_shipping_threshold: 1999,
-          standard_shipping_rate: 199,
-          live_packing_charge: 149,
-          announcement_text: '✨ Special Stock: Pure Strain Guppies & Bettas with live video proof! Use coupon AQUA10 for 10% off',
+          courier_partner: 'The Professional Couriers',
+          transport_mode: 'Surface Road Courier',
+          service_country: 'India',
+          kerala_rate: 80,
+          tamilnadu_karnataka_rate: 120,
+          other_states_rate: 200,
+          bulk_threshold_pairs: 10,
+          bulk_multiplier: 2,
+          standard_shipping_rate: 80,
+          live_packing_charge: 0,
+          announcement_text: '🚚 Express Road Courier by The Professional Couriers across India! Safe Live Arrival Guarantee.',
           announcement_code: 'AQUA10',
           announcement_active: true,
           announcement_link: '/shop',
           maintenance_mode: false
         },
-        description: 'Logistics rules, air cargo shipping rates, and promotional ribbon'
+        description: 'Logistics rules, The Professional Couriers road shipping rates, and promotional ribbon'
       },
       {
         key: 'branding',
@@ -668,7 +675,7 @@ async function seed() {
     console.log('Seeding CMS pages...');
     const pages = [
       { id: toUUID('page-about'), slug: 'about-us', title: 'About Ra Guppy', content_html: '<p>Ra Guppy is India’s premier sanctuary for pure-strain Guppies, champion Bettas, and exotic aquatic life.</p>' },
-      { id: toUUID('page-shipping'), slug: 'shipping-policy', title: 'Shipping & Live Arrival Guarantee', content_html: '<p>We ship live specimens via express air cargo in specialized medical oxygen double-sealed packaging with temperature-insulating thermo-boxes.</p>' },
+      { id: toUUID('page-shipping'), slug: 'shipping-policy', title: 'Shipping & Live Arrival Guarantee', content_html: '<p>We ship live specimens strictly across India via The Professional Couriers road transport in specialized medical oxygen double-sealed packaging with temperature-insulating thermo-boxes.</p>' },
       { id: toUUID('page-doa'), slug: 'doa-policy', title: 'Dead on Arrival (DOA) Policy', content_html: '<p>If any specimen does not arrive alive, record a clear 30-second unboxing video of the unopened shipping bag within 2 hours of delivery for a replacement or full refund.</p>' }
     ];
 

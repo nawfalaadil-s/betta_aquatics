@@ -634,7 +634,7 @@ export const AdminOrdersPage: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
                       <Truck className="w-5 h-5 text-blue-700" />
-                      <span>Courier & Air Cargo Dispatch</span>
+                      <span>Courier Dispatch (The Professional Couriers)</span>
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-200 text-slate-800">
                       {selectedOrder.fulfillment_status}
@@ -675,7 +675,7 @@ export const AdminOrdersPage: React.FC = () => {
                   ) : (
                     <div>
                       <p className="text-slate-600 text-xs mb-3 leading-relaxed">
-                        Assign an Air Cargo courier partner and AWB number to notify the customer with an active tracking link.
+                        Assign a courier partner and tracking consignment number to notify the customer with an active tracking link.
                       </p>
                       <button
                         onClick={() => setIsShipModalOpen(true)}

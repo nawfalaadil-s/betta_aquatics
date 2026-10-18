@@ -9,6 +9,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { Category, Product } from '../../lib/types';
 import { MediaPickerModal, SelectedMedia } from '../../components/common/MediaPickerModal';
 import { SEO } from '../../components/common/SEO';
+import { deleteSupabaseCategory, syncCategoryToSupabase } from '../../lib/supabaseSync';
 
 export const AdminCategoriesPage: React.FC = () => {
   const { showToast } = useToast();
@@ -117,7 +118,7 @@ export const AdminCategoriesPage: React.FC = () => {
     }
 
     try {
-      mockDb.saveCategory({
+      const saved = mockDb.saveCategory({
         id: editingCategory?.id,
         name: name.trim(),
         slug: slug.trim() || undefined,
@@ -130,6 +131,9 @@ export const AdminCategoriesPage: React.FC = () => {
         is_active: isActive,
         is_featured: isFeatured,
       });
+
+      // Sync to Supabase
+      syncCategoryToSupabase(saved).catch(console.error);
 
       showToast(editingCategory ? `Updated category "${name}"` : `Created category "${name}"`, 'success');
       setIsEditorOpen(false);
@@ -170,14 +174,20 @@ export const AdminCategoriesPage: React.FC = () => {
   };
 
   // Execute deletion with resolution
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!deleteTarget) return;
+    const target = deleteTarget;
 
     try {
-      const res = mockDb.deleteCategory(deleteTarget.id, {
+      // 1. Delete locally from mock database
+      const res = mockDb.deleteCategory(target.id, {
         reassignToId: reassignTargetId || undefined,
         archiveProducts: archiveOption,
       });
+
+      // 2. Delete from live Supabase
+      await deleteSupabaseCategory(target.id, reassignTargetId || undefined);
+
       showToast(res.message, 'success');
       setDeleteTarget(null);
       refreshData();
