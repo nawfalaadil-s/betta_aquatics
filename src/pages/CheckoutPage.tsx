@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { 
   ShieldCheck, QrCode, 
   Upload, CheckCircle2, ArrowRight, 
-  Copy, Building, Lock, MessageSquare,
+  Copy, Lock, MessageSquare,
   Smartphone, ExternalLink, X, FileText,
   Truck, AlertCircle, User, UserPlus, LogIn, LogOut, Check
 } from 'lucide-react';
@@ -306,7 +306,7 @@ export const CheckoutPage: React.FC = () => {
   };
 
   // Payment method selection & submission
-  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'bank_transfer'>('upi');
+  const paymentMethod = 'upi';
   const [upiReference, setUpiReference] = useState('');
   const [proofImage, setProofImage] = useState<string | null>(null);
   const [hasClickedPayNow, setHasClickedPayNow] = useState(false);
@@ -1096,38 +1096,14 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 ) : (
                   <>
-                {/* Method Tabs */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('upi')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-                      paymentMethod === 'upi'
-                        ? 'border-blue-600 bg-blue-50/60 text-blue-950 shadow-sm ring-1 ring-blue-600'
-                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <QrCode className="w-4 h-4 text-blue-600" />
-                    <span>Instant UPI / QR Code</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('bank_transfer')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-                      paymentMethod === 'bank_transfer'
-                        ? 'border-blue-600 bg-blue-50/60 text-blue-950 shadow-sm ring-1 ring-blue-600'
-                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <Building className="w-4 h-4 text-blue-600" />
-                    <span>Direct Bank Transfer</span>
-                  </button>
+                {/* Payment Method Badge */}
+                <div className="flex items-center gap-2 p-3 bg-blue-50/70 rounded-2xl border border-blue-200 text-xs font-bold text-blue-950 mb-6">
+                  <QrCode className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span>Instant UPI / QR Code Payment</span>
                 </div>
 
                 {/* Payment Details Container */}
-                {paymentMethod === 'upi' ? (
-                  <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-6">
                     {/* Step A: Direct Pay with UPI App */}
                     <div className="p-4 sm:p-5 bg-blue-50/60 rounded-2xl border border-blue-200 text-xs space-y-3.5">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
@@ -1309,44 +1285,6 @@ export const CheckoutPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-4 mb-6">
-                    <div className="font-bold text-sm text-slate-900 mb-1">NEFT / IMPS Bank Transfer Details</div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div><span className="text-slate-400">Bank Name:</span> <strong>{settings.bank_name}</strong></div>
-                      <div><span className="text-slate-400">Account No:</span> <strong className="font-mono">{settings.bank_account_no}</strong></div>
-                      <div><span className="text-slate-400">IFSC Code:</span> <strong className="font-mono">{settings.bank_ifsc}</strong></div>
-                      <div><span className="text-slate-400">Beneficiary:</span> <strong>{settings.bank_account_holder}</strong></div>
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-200 space-y-3">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-800 mb-1">
-                          IMPS / NEFT Reference Number *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={upiReference}
-                          onChange={(e) => setUpiReference(e.target.value)}
-                          placeholder="e.g. 407519823412 or Bank Ref"
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-800 mb-1">
-                          Bank Transfer Receipt Screenshot (Optional)
-                        </label>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileUpload}
-                          className="text-xs"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
                 </>
                 )}
               </div>
@@ -1453,9 +1391,7 @@ export const CheckoutPage: React.FC = () => {
                 </button>
 
                 <p className="text-[10px] text-center text-slate-400 font-medium">
-                  {paymentMethod === 'upi'
-                    ? 'Payment screenshot & 12-digit UTR required for live specimen order approval'
-                    : 'Bank IMPS/NEFT reference required for order approval'}
+                  Payment screenshot & 12-digit UPI UTR reference required for order approval
                 </p>
 
                 <div className="p-4 bg-blue-50 border border-blue-200 text-xs text-blue-950 space-y-1.5 rounded-2xl">

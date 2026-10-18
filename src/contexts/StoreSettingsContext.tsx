@@ -112,7 +112,7 @@ export const StoreSettingsProvider: React.FC<{ children: React.ReactNode }> = ({
           supabase.from('store_settings').upsert({
             key: 'payment_settings',
             value: paymentSettings,
-            description: 'UPI and Direct Bank Transfer payment gateway credentials',
+            description: 'UPI payment gateway and QR credentials',
             updated_at: now,
           }, { onConflict: 'key' }),
 

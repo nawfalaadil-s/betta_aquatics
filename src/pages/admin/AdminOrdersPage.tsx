@@ -30,7 +30,7 @@ export const AdminOrdersPage: React.FC = () => {
 
   // Rejection modal
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState('Payment not credited to ICICI account. Please share valid UTR or banking screenshot.');
+  const [rejectionReason, setRejectionReason] = useState('Payment not credited to UPI account. Please share valid 12-digit UTR or payment screenshot.');
 
   // Shipment fulfillment modal state
   const [isShipModalOpen, setIsShipModalOpen] = useState(false);
@@ -413,8 +413,8 @@ export const AdminOrdersPage: React.FC = () => {
                             <button
                               onClick={() => handleApprovePayment(order.id)}
                               className="px-2.5 py-1 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs font-bold transition-colors shadow-2xs focus-visible:ring-2 focus-visible:ring-blue-900"
-                              title="Approve Bank Credit"
-                              aria-label={`Approve bank credit for order ${order.order_number} for customer ${order.customer_name}`}
+                              title="Approve Payment Credit"
+                              aria-label={`Approve payment for order ${order.order_number} for customer ${order.customer_name}`}
                             >
                               Approve
                             </button>

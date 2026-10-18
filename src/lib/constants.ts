@@ -778,7 +778,7 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
       <p>Kerala: ₹80 | Tamil Nadu & Karnataka: ₹120 | All other Indian states: ₹200. Orders above 10 pairs are charged 2X due to heavy dual-box packing.</p>
 
       <h4>What payment methods are supported?</h4>
-      <p>We support all UPI Apps (Google Pay, PhonePe, Paytm, BHIM) and Direct Bank Transfer. You can simply scan the custom QR code at checkout and submit your 12-digit UTR reference ID.</p>
+      <p>We support all UPI Apps (Google Pay, PhonePe, Paytm, BHIM). You can simply scan the custom QR code or tap Pay at checkout and submit your 12-digit UTR reference ID.</p>
     `
   },
   {

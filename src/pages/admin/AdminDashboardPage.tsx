@@ -85,7 +85,7 @@ export const AdminDashboardPage: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-semibold">Verified Bank Credit</span>
+            <span className="text-xs font-semibold">Verified UPI Revenue</span>
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
@@ -149,7 +149,7 @@ export const AdminDashboardPage: React.FC = () => {
                   Payment Verification Desk ({pendingPayments.length} Orders Awaiting Review)
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Check bank transfer credit and approve before packing living specimens.
+                  Check UPI payment credit and approve before packing living specimens.
                 </p>
               </div>
             </div>

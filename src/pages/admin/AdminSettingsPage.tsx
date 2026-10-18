@@ -54,12 +54,12 @@ export const AdminSettingsPage: React.FC = () => {
       </div>
 
       <form onSubmit={handleSave} className="space-y-6 text-xs text-slate-700">
-        {/* UPI & Bank Transfer Settings */}
+        {/* UPI Payment Settings */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
             <QrCode className="w-5 h-5 text-blue-700" aria-hidden="true" />
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              UPI & Manual Payment Coordinates
+              UPI Payment Settings
             </h2>
           </div>
 
@@ -73,7 +73,7 @@ export const AdminSettingsPage: React.FC = () => {
                 name="upi_id"
                 value={form.upi_id}
                 onChange={handleChange}
-                placeholder="bettaaquatics@icici"
+                placeholder="raguppies00@okicici"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />
             </div>
@@ -87,53 +87,6 @@ export const AdminSettingsPage: React.FC = () => {
                 value={form.upi_payee_name}
                 onChange={handleChange}
                 placeholder="Ra Guppy"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-            <div>
-              <label htmlFor="set-bank-name" className="block text-slate-700 mb-1 font-semibold">Bank Name</label>
-              <input
-                id="set-bank-name"
-                type="text"
-                name="bank_name"
-                value={form.bank_name}
-                onChange={handleChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
-              />
-            </div>
-            <div>
-              <label htmlFor="set-bank-acc" className="block text-slate-700 mb-1 font-semibold">Account Number</label>
-              <input
-                id="set-bank-acc"
-                type="text"
-                name="bank_account_no"
-                value={form.bank_account_no}
-                onChange={handleChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
-              />
-            </div>
-            <div>
-              <label htmlFor="set-bank-ifsc" className="block text-slate-700 mb-1 font-semibold">IFSC Code</label>
-              <input
-                id="set-bank-ifsc"
-                type="text"
-                name="bank_ifsc"
-                value={form.bank_ifsc}
-                onChange={handleChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
-              />
-            </div>
-            <div>
-              <label htmlFor="set-bank-holder" className="block text-slate-700 mb-1 font-semibold">Account Holder Name</label>
-              <input
-                id="set-bank-holder"
-                type="text"
-                name="bank_account_holder"
-                value={form.bank_account_holder}
-                onChange={handleChange}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />
             </div>
