@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { mockDb } from '../../lib/mockDatabase';
@@ -20,7 +20,15 @@ const STRAIN_TABS = [
 
 export const SpecimenShowcase: React.FC<SpecimenShowcaseProps> = ({ section, onQuickView }) => {
   const [activeTab, setActiveTab] = useState('all');
-  const allProducts = mockDb.getProducts();
+  const [allProducts, setAllProducts] = useState<Product[]>(() => mockDb.getProducts());
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setAllProducts(mockDb.getProducts());
+    };
+    window.addEventListener('ba_products_updated', handleUpdate);
+    return () => window.removeEventListener('ba_products_updated', handleUpdate);
+  }, []);
 
   const targetCategory = section?.config?.filterCategory || section?.config?.category;
   let pool = targetCategory ? allProducts.filter((p) => p.category_id === targetCategory) : [];

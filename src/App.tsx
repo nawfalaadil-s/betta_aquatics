@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ToastProvider } from './contexts/ToastContext';
 import { StoreSettingsProvider } from './contexts/StoreSettingsContext';
@@ -6,6 +6,7 @@ import { BrandingProvider } from './contexts/BrandingContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
+import { fetchSupabaseProducts, fetchSupabaseCategories } from './lib/supabaseSync';
 
 // Common Components
 import { AnnouncementBar } from './components/common/AnnouncementBar';
@@ -81,6 +82,12 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 export const App: React.FC = () => {
+  useEffect(() => {
+    // Automatically load live products & categories from Supabase on startup
+    fetchSupabaseProducts();
+    fetchSupabaseCategories();
+  }, []);
+
   return (
     <BrowserRouter>
       <ToastProvider>

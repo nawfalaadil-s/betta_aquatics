@@ -72,6 +72,19 @@ export const Navbar: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Sync category hierarchy when categories or products update
+  useEffect(() => {
+    const handleUpdate = () => {
+      setCategoryHierarchy(mockDb.getCategoryHierarchy());
+    };
+    window.addEventListener('ba_categories_updated', handleUpdate);
+    window.addEventListener('ba_products_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('ba_categories_updated', handleUpdate);
+      window.removeEventListener('ba_products_updated', handleUpdate);
+    };
+  }, []);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;

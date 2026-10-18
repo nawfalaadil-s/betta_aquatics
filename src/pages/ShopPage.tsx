@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   SlidersHorizontal, X, Search, RotateCcw, 
@@ -8,7 +8,7 @@ import { mockDb } from '../lib/mockDatabase';
 import { ProductCard } from '../components/common/ProductCard';
 import { QuickViewModal } from '../components/common/QuickViewModal';
 import { SEO } from '../components/common/SEO';
-import { Product } from '../lib/types';
+import { Product, Category } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
 
 export const ShopPage: React.FC = () => {
@@ -18,8 +18,21 @@ export const ShopPage: React.FC = () => {
   const subcategoryParam = searchParams.get('subcat') || searchParams.get('subcategory') || 'all';
   const filterParam = searchParams.get('filter') || '';
 
-  const categories = mockDb.getCategories();
-  const allProducts = mockDb.getProducts();
+  const [categories, setCategories] = useState<Category[]>(() => mockDb.getCategories());
+  const [allProducts, setAllProducts] = useState<Product[]>(() => mockDb.getProducts());
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setCategories(mockDb.getCategories());
+      setAllProducts(mockDb.getProducts());
+    };
+    window.addEventListener('ba_categories_updated', handleUpdate);
+    window.addEventListener('ba_products_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('ba_categories_updated', handleUpdate);
+      window.removeEventListener('ba_products_updated', handleUpdate);
+    };
+  }, []);
 
   // Filter States
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam);
@@ -52,11 +65,19 @@ export const ShopPage: React.FC = () => {
   // Filtering Logic
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
-      if (selectedCategory !== 'all' && product.category_id !== selectedCategory) {
-        return false;
+      if (selectedCategory !== 'all') {
+        const matchedCat = categories.find(c => c.id === selectedCategory || c.slug === selectedCategory);
+        const targetId = matchedCat ? matchedCat.id : selectedCategory;
+        if (product.category_id !== targetId) {
+          return false;
+        }
       }
-      if (selectedSubcategory !== 'all' && product.subcategory_id !== selectedSubcategory) {
-        return false;
+      if (selectedSubcategory !== 'all') {
+        const matchedSubcat = categories.find(c => c.id === selectedSubcategory || c.slug === selectedSubcategory);
+        const targetSubId = matchedSubcat ? matchedSubcat.id : selectedSubcategory;
+        if (product.subcategory_id !== targetSubId) {
+          return false;
+        }
       }
       if (queryParam) {
         const q = queryParam.toLowerCase();

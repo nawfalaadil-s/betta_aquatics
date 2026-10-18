@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, ArrowRight, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { mockDb } from '../../lib/mockDatabase';
@@ -11,11 +11,25 @@ interface FlashDealSectionProps {
 }
 
 export const FlashDealSection: React.FC<FlashDealSectionProps> = ({ section, onQuickView }) => {
-  const products = mockDb.getProducts().filter(p => p.compare_at_price && p.compare_at_price > p.price).slice(0, 4);
+  const [products, setProducts] = useState<Product[]>(() => {
+    const all = mockDb.getProducts();
+    const deals = all.filter(p => p.compare_at_price && p.compare_at_price > p.price);
+    return deals.length > 0 ? deals.slice(0, 4) : all.slice(0, 4);
+  });
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      const all = mockDb.getProducts();
+      const deals = all.filter(p => p.compare_at_price && p.compare_at_price > p.price);
+      setProducts(deals.length > 0 ? deals.slice(0, 4) : all.slice(0, 4));
+    };
+    window.addEventListener('ba_products_updated', handleUpdate);
+    return () => window.removeEventListener('ba_products_updated', handleUpdate);
+  }, []);
 
   const title = section?.title || 'Weekly Featured Fish & Special Offers';
   const subtitle = section?.subtitle || 'Healthy quarantine-approved specimens ready for immediate dispatch.';
-  const bannerText = section?.config?.bannerText || 'Promotional Pricing';
+  const bannerText = section?.config?.bannerText || section?.config?.banner_text || 'Promotional Pricing';
 
   return (
     <section className="py-10 bg-white border-b border-slate-200">

@@ -14,6 +14,7 @@ import { useToast } from '../contexts/ToastContext';
 import { StarRating } from '../components/common/StarRating';
 import { ProductCard } from '../components/common/ProductCard';
 import { SEO } from '../components/common/SEO';
+import { Product } from '../lib/types';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -21,8 +22,19 @@ export const ProductDetailPage: React.FC = () => {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { showToast } = useToast();
+  const [product, setProduct] = useState<Product | undefined>(() => mockDb.getProductBySlug(slug || ''));
 
-  const product = mockDb.getProductBySlug(slug || '');
+  useEffect(() => {
+    setProduct(mockDb.getProductBySlug(slug || ''));
+  }, [slug]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setProduct(mockDb.getProductBySlug(slug || ''));
+    };
+    window.addEventListener('ba_products_updated', handleUpdate);
+    return () => window.removeEventListener('ba_products_updated', handleUpdate);
+  }, [slug]);
 
   const productImages = product?.images && product.images.length > 0 
     ? product.images 

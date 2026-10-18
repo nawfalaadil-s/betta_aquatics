@@ -1,16 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { mockDb } from '../../lib/mockDatabase';
-import { HomepageSection } from '../../lib/types';
+import { HomepageSection, Category, Product } from '../../lib/types';
 
 interface CategoryBarProps {
   section?: HomepageSection;
 }
 
 export const CategoryBar: React.FC<CategoryBarProps> = ({ section }) => {
-  const categories = mockDb.getCategories();
-  const products = mockDb.getProducts();
+  const [categories, setCategories] = useState<Category[]>(() => mockDb.getCategories());
+  const [products, setProducts] = useState<Product[]>(() => mockDb.getProducts());
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setCategories(mockDb.getCategories());
+      setProducts(mockDb.getProducts());
+    };
+    window.addEventListener('ba_categories_updated', handleUpdate);
+    window.addEventListener('ba_products_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('ba_categories_updated', handleUpdate);
+      window.removeEventListener('ba_products_updated', handleUpdate);
+    };
+  }, []);
 
   const title = section?.title || 'Explore By Category';
   const subtitle = section?.subtitle || 'Curated Collections';

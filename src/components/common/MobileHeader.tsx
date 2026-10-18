@@ -266,27 +266,35 @@ export const MobileHeader: React.FC = () => {
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </Link>
                   <Link
-                    to="/shop?cat=cat-betta"
+                    to="/shop?cat=guppies"
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-900"
                   >
-                    <span>Show Bettas (Halfmoon, Plakat)</span>
+                    <span>Pure Strain Guppies & Pairs</span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </Link>
                   <Link
-                    to="/shop?cat=cat-guppy"
+                    to="/shop?cat=aquatic-plants"
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-900"
                   >
-                    <span>Exotic Guppies & Pairs</span>
+                    <span>Live Aquatic Plants</span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </Link>
                   <Link
-                    to="/shop?cat=cat-plants"
+                    to="/shop?cat=fish-food"
                     onClick={() => setIsDrawerOpen(false)}
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-900"
                   >
-                    <span>Live Aquarium Plants</span>
+                    <span>Fish Food & Live Moina</span>
+                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                  </Link>
+                  <Link
+                    to="/shop?cat=betta-fish"
+                    onClick={() => setIsDrawerOpen(false)}
+                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-900"
+                  >
+                    <span>Show Bettas</span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </Link>
                   <Link

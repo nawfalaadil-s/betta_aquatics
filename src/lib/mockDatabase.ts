@@ -218,6 +218,11 @@ export const mockDb = {
         setStoredItem(STORAGE_KEYS.PRODUCTS, prods);
       } else {
         prods = JSON.parse(raw);
+        // If localStorage has obsolete template mock Bettas, upgrade to INITIAL_PRODUCTS
+        if (prods.some(p => p.id === 'prod-001' || p.name?.includes('Royal Blue Halfmoon Betta') || p.name?.includes('Galaxy Koi Plakat') || p.name?.includes('Black Orchid Crowntail'))) {
+          prods = INITIAL_PRODUCTS.filter(p => !deletedIds.has(p.id));
+          setStoredItem(STORAGE_KEYS.PRODUCTS, prods);
+        }
       }
     } catch {
       prods = INITIAL_PRODUCTS.filter(p => !deletedIds.has(p.id));
@@ -406,6 +411,11 @@ export const mockDb = {
         setStoredItem(STORAGE_KEYS.CATEGORIES, cats);
       } else {
         cats = JSON.parse(raw);
+        // If localStorage has old template category IDs, upgrade to INITIAL_CATEGORIES
+        if (cats.some(c => c.id === 'cat-betta' || c.id === 'cat-sub-halfmoon')) {
+          cats = INITIAL_CATEGORIES.filter(c => !deletedIds.has(c.id));
+          setStoredItem(STORAGE_KEYS.CATEGORIES, cats);
+        }
       }
     } catch {
       cats = INITIAL_CATEGORIES.filter(c => !deletedIds.has(c.id));

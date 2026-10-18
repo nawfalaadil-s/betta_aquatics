@@ -161,6 +161,129 @@ export async function syncCategoryToSupabase(category: Category): Promise<void> 
 }
 
 /**
+ * Fetches products from Supabase PostgreSQL database
+ */
+export async function fetchSupabaseProducts(): Promise<Product[]> {
+  if (!isSupabaseConfigured || !supabase) {
+    return mockDb.getProducts();
+  }
+
+  try {
+    const { data: prodsData, error: prodsErr } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (prodsErr || !prodsData || prodsData.length === 0) {
+      return mockDb.getProducts();
+    }
+
+    const { data: imgsData } = await supabase
+      .from('product_images')
+      .select('*')
+      .order('display_order', { ascending: true });
+
+    const imgsByProd: Record<string, string[]> = {};
+    if (imgsData) {
+      for (const img of imgsData) {
+        if (!imgsByProd[img.product_id]) imgsByProd[img.product_id] = [];
+        imgsByProd[img.product_id].push(img.image_url);
+      }
+    }
+
+    const products: Product[] = prodsData.map((p) => {
+      const images = imgsByProd[p.id] || (Array.isArray(p.images) ? p.images : []);
+      return {
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        sku: p.sku || '',
+        description: p.description || '',
+        short_description: p.short_description || '',
+        price: parseFloat(p.price) || 0,
+        compare_at_price: p.compare_at_price ? parseFloat(p.compare_at_price) : undefined,
+        category_id: p.category_id || '',
+        subcategory_id: p.subcategory_id || undefined,
+        stock_quantity: p.stock_quantity ?? 10,
+        is_unique_specimen: Boolean(p.is_unique_specimen),
+        is_featured: Boolean(p.is_featured),
+        is_active: p.is_active !== undefined ? Boolean(p.is_active) : true,
+        status: p.status || 'published',
+        weight: p.weight ? parseFloat(p.weight) : 150,
+        strain: p.strain || undefined,
+        gender: p.gender || undefined,
+        size: p.size || undefined,
+        water_type: p.water_type || 'Freshwater (Tropical)',
+        temperature_range: p.temperature_range || '24°C - 28°C',
+        ph_range: p.ph_range || '6.5 - 7.5',
+        care_level: p.care_level || 'Easy',
+        diet: p.diet || undefined,
+        shipping_restriction: p.shipping_restriction || undefined,
+        images: images.length > 0 ? images : ['/product_image/afr-flower-dorsal-400.jpeg'],
+        videos: Array.isArray(p.videos) ? p.videos : [],
+        rating: p.rating ? parseFloat(p.rating) : 5.0,
+        review_count: p.review_count || 10,
+        tags: [],
+        created_at: p.created_at || new Date().toISOString(),
+      };
+    });
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('ba_products', JSON.stringify(products));
+      window.dispatchEvent(new CustomEvent('ba_products_updated', { detail: products }));
+    }
+
+    return products;
+  } catch (err) {
+    console.warn('Failed to fetch products from Supabase:', err);
+    return mockDb.getProducts();
+  }
+}
+
+/**
+ * Fetches categories from Supabase PostgreSQL database
+ */
+export async function fetchSupabaseCategories(): Promise<Category[]> {
+  if (!isSupabaseConfigured || !supabase) {
+    return mockDb.getCategories();
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('display_order', { ascending: true });
+
+    if (error || !data || data.length === 0) {
+      return mockDb.getCategories();
+    }
+
+    const categories: Category[] = data.map((c) => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      description: c.description || '',
+      image_url: c.image_url || '',
+      banner_url: c.banner_url || undefined,
+      parent_id: c.parent_id || null,
+      display_order: c.display_order ?? 1,
+      is_active: c.is_active !== undefined ? Boolean(c.is_active) : true,
+      is_featured: Boolean(c.is_featured),
+    }));
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('ba_categories', JSON.stringify(categories));
+      window.dispatchEvent(new CustomEvent('ba_categories_updated', { detail: categories }));
+    }
+
+    return categories;
+  } catch (err) {
+    console.warn('Failed to fetch categories from Supabase:', err);
+    return mockDb.getCategories();
+  }
+}
+
+/**
  * Fetches latest homepage sections from Supabase cloud database
  */
 export async function fetchSupabaseHomepageSections(): Promise<HomepageSection[]> {
