@@ -53,7 +53,7 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ section }) => {
 
         {/* Category Carousel on Mobile / Grid on Desktop */}
         <div className="flex overflow-x-auto no-scrollbar sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 pb-2 snap-x -mx-4 px-4 sm:mx-0 sm:px-0">
-          {categories.map((cat) => {
+          {categories.filter((c) => c.is_active !== false).map((cat) => {
             const count = products.filter((p) => p.category_id === cat.id).length;
             return (
               <Link
@@ -63,9 +63,12 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ section }) => {
               >
                 <div className="aspect-square rounded-xl overflow-hidden bg-slate-100 mb-2 relative">
                   <img
-                    src={cat.image_url}
+                    src={cat.image_url || '/product_image/afr-flower-dorsal-400.jpeg'}
                     alt={cat.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/product_image/afr-flower-dorsal-400.jpeg';
+                    }}
                   />
                   <div className="absolute inset-0 bg-blue-950/20 group-hover:bg-blue-950/10 transition-colors" />
                 </div>

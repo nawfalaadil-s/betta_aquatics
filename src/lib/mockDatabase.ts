@@ -411,9 +411,22 @@ export const mockDb = {
         setStoredItem(STORAGE_KEYS.CATEGORIES, cats);
       } else {
         cats = JSON.parse(raw);
-        // If localStorage has old template category IDs, upgrade to INITIAL_CATEGORIES
+        // If localStorage has old template category IDs or legacy unsplash images, upgrade to INITIAL_CATEGORIES
+        let upgraded = false;
         if (cats.some(c => c.id === 'cat-betta' || c.id === 'cat-sub-halfmoon')) {
           cats = INITIAL_CATEGORIES.filter(c => !deletedIds.has(c.id));
+          upgraded = true;
+        } else {
+          cats = cats.map(c => {
+            const initialMatch = INITIAL_CATEGORIES.find(ic => ic.id === c.id);
+            if (initialMatch && c.image_url && c.image_url.includes('images.unsplash.com')) {
+              upgraded = true;
+              return { ...c, image_url: initialMatch.image_url, banner_url: initialMatch.banner_url || initialMatch.image_url };
+            }
+            return c;
+          });
+        }
+        if (upgraded) {
           setStoredItem(STORAGE_KEYS.CATEGORIES, cats);
         }
       }
