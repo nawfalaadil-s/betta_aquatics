@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { 
@@ -40,23 +40,43 @@ export const CheckoutPage: React.FC = () => {
   const { settings } = useStoreSettings();
   const { showToast } = useToast();
 
-  // Selected address state: only customer-selected or newly entered
+  // Selected address state: automatically select customer's default address or first saved address
+  const defaultSaved = addresses.find(a => a.is_default) || addresses[0];
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    addresses.length > 0 ? '' : 'new'
+    defaultSaved ? defaultSaved.id : 'new'
   );
-  const [isAddingNewAddress, setIsAddingNewAddress] = useState(addresses.length === 0);
+  const [isAddingNewAddress, setIsAddingNewAddress] = useState(!defaultSaved);
+  const [saveNewAddress, setSaveNewAddress] = useState<boolean>(true);
 
-  // New address form state - No default address: customer enters their destination directly
+  // New address form state
   const [newAddrFullName, setNewAddrFullName] = useState(user?.full_name || '');
   const [newAddrPhone, setNewAddrPhone] = useState(user?.phone || '');
   const [newAddrStreet, setNewAddrStreet] = useState('');
   const [newAddrLandmark, setNewAddrLandmark] = useState('');
   const [newAddrCity, setNewAddrCity] = useState('');
-  const [newAddrState, setNewAddrState] = useState(shippingState || 'Kerala');
-  const [newAddrPostalCode, setNewAddrPostalCode] = useState(shippingPincode || '');
+  const [newAddrState, setNewAddrState] = useState(shippingState || (defaultSaved ? defaultSaved.state : 'Kerala'));
+  const [newAddrPostalCode, setNewAddrPostalCode] = useState(shippingPincode || (defaultSaved ? defaultSaved.postal_code : ''));
+
+  // Auto-sync initial shipping calculation on mount or when addresses load
+  useEffect(() => {
+    if (addresses.length > 0) {
+      const active = addresses.find(a => a.id === selectedAddressId);
+      const chosen = active || defaultSaved;
+      if (chosen && !isAddingNewAddress) {
+        setSelectedAddressId(chosen.id);
+        if (chosen.state) {
+          setShippingState(chosen.state);
+        }
+        if (chosen.postal_code) {
+          setShippingPincode(chosen.postal_code);
+        }
+      }
+    }
+  }, [addresses]);
 
   const handleSelectSavedAddress = (addrId: string) => {
     setSelectedAddressId(addrId);
+    setIsAddingNewAddress(false);
     const matched = addresses.find(a => a.id === addrId);
     if (matched) {
       if (matched.state) {
@@ -67,6 +87,7 @@ export const CheckoutPage: React.FC = () => {
         setShippingPincode(matched.postal_code);
         setNewAddrPostalCode(matched.postal_code);
       }
+      showToast(`Selected: ${matched.city ? matched.city + ', ' : ''}${matched.state} • Delivery charge auto-calculated!`, 'info');
     }
   };
 
@@ -391,8 +412,13 @@ export const CheckoutPage: React.FC = () => {
                         setIsAddingNewAddress(next);
                         if (next) {
                           setSelectedAddressId('new');
+                          if (newAddrState) setShippingState(newAddrState);
+                          if (newAddrPostalCode) setShippingPincode(newAddrPostalCode);
                         } else {
-                          setSelectedAddressId('');
+                          const active = addresses.find(a => a.id === selectedAddressId) || defaultSaved;
+                          if (active) {
+                            handleSelectSavedAddress(active.id);
+                          }
                         }
                       }}
                       className="text-xs text-blue-700 hover:underline font-semibold"
@@ -517,56 +543,68 @@ export const CheckoutPage: React.FC = () => {
                           className="w-full bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                         >
                           <option value="">Select Delivery State</option>
-                          <option value="Kerala">Kerala (₹80)</option>
-                          <option value="Tamil Nadu">Tamil Nadu (₹120)</option>
-                          <option value="Karnataka">Karnataka (₹120)</option>
-                          <optgroup label="All Other Indian States (₹200)">
+                          <option value="Kerala">Kerala</option>
+                          <option value="Tamil Nadu">Tamil Nadu</option>
+                          <option value="Karnataka">Karnataka</option>
+                          <optgroup label="All Other Indian States">
                             {INDIAN_STATES.filter(s => s !== 'Kerala' && s !== 'Tamil Nadu' && s !== 'Karnataka').map(st => (
-                              <option key={st} value={st}>{st} (₹200)</option>
+                              <option key={st} value={st}>{st}</option>
                             ))}
                           </optgroup>
                         </select>
                       </div>
                     </div>
 
-                    {/* Auto-Calculated Delivery Rate Indicator Card */}
-                    <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50/50 border border-blue-200/80 rounded-2xl flex items-center justify-between text-xs mt-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-blue-900 text-white flex items-center justify-center shrink-0">
-                          <Truck className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-blue-950">
-                              The Professional Couriers • {shippingDetails.rateDescription}
-                            </span>
-                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
-                              Auto Calculated
-                            </span>
-                          </div>
-                          <span className="text-[11px] text-slate-600 block mt-0.5">
-                            {shippingDetails.region ? `${shippingDetails.region} • ` : ''}
-                            Express Road Transport with 100% Live Arrival Guarantee
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0 pl-2">
-                        <span className="font-mono font-extrabold text-sm text-blue-950 block">
-                          {formatCurrency(deliveryFee)}
-                        </span>
-                        {shippingDetails.isBulkOrder ? (
-                          <span className="text-[9px] text-amber-700 font-bold uppercase tracking-wider block">
-                            2X Bulk ({itemCount} pairs)
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-slate-500 font-medium block">
-                            Standard Road
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    {user && (
+                      <label className="flex items-center gap-2 pt-1 text-slate-700 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={saveNewAddress}
+                          onChange={(e) => setSaveNewAddress(e.target.checked)}
+                          className="accent-blue-600 rounded"
+                        />
+                        <span className="text-[11px] font-medium">Save this address to my account for future orders</span>
+                      </label>
+                    )}
                   </div>
                 )}
+
+                {/* Auto-Calculated Delivery Rate Card - Always visible whether saved address or newly entered */}
+                <div className="p-3.5 bg-gradient-to-r from-blue-50/90 via-slate-50 to-indigo-50/70 border border-blue-200/90 rounded-2xl flex items-center justify-between text-xs mt-4 shadow-2xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-blue-900 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Truck className="w-4.5 h-4.5 text-blue-100" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-blue-950">
+                          The Professional Couriers • Express Road Transport
+                        </span>
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
+                          Auto Calculated
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-slate-600 block mt-0.5">
+                        Destination: <strong className="text-slate-900">{shippingDetails.state}</strong>
+                        {shippingPincode ? ` (PIN: ${shippingPincode})` : ''} • {shippingDetails.estimatedDays} • 100% Live Arrival Guarantee
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0 pl-3">
+                    <span className="font-mono font-black text-base text-blue-950 block">
+                      {deliveryFee === 0 ? '₹0' : formatCurrency(deliveryFee)}
+                    </span>
+                    {shippingDetails.isBulkOrder ? (
+                      <span className="text-[9px] text-amber-700 font-bold uppercase tracking-wider block">
+                        2X Bulk Rate ({itemCount} pairs)
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-slate-500 font-medium block">
+                        {shippingDetails.rateDescription}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Step 3: Manual Payment Verification Instructions */}

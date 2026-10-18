@@ -109,12 +109,12 @@ export const CartPage: React.FC = () => {
                   onChange={(e) => setShippingState(e.target.value)}
                   className="bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-900 outline-none focus:border-blue-600"
                 >
-                  <option value="Kerala">Kerala (₹80)</option>
-                  <option value="Tamil Nadu">Tamil Nadu (₹120)</option>
-                  <option value="Karnataka">Karnataka (₹120)</option>
-                  <optgroup label="All Other Indian States (₹200)">
+                  <option value="Kerala">Kerala</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <optgroup label="All Other Indian States">
                     {INDIAN_STATES.filter(s => s !== 'Kerala' && s !== 'Tamil Nadu' && s !== 'Karnataka').map(st => (
-                      <option key={st} value={st}>{st} (₹200)</option>
+                      <option key={st} value={st}>{st}</option>
                     ))}
                   </optgroup>
                 </select>

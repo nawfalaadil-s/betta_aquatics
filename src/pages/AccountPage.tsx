@@ -13,6 +13,7 @@ import { formatCurrency, formatDate } from '../lib/utils';
 import { SEO } from '../components/common/SEO';
 import { TaxInvoiceModal } from '../components/common/TaxInvoiceModal';
 import { Order } from '../lib/types';
+import { getStateFromPincode } from '../lib/shipping';
 
 export const AccountPage: React.FC = () => {
   const { user, isAdmin, addresses, addAddress, deleteAddress, logout } = useAuth();
@@ -45,12 +46,25 @@ export const AccountPage: React.FC = () => {
     : [];
   const totalSpent = allOrders.reduce((sum, o) => sum + o.total_amount, 0);
 
+  const handlePincodeChange = (val: string) => {
+    const clean = val.replace(/\D/g, '').slice(0, 6);
+    setPincode(clean);
+    if (clean.length === 6) {
+      const pinInfo = getStateFromPincode(clean);
+      if (pinInfo && pinInfo.state) {
+        setState(pinInfo.state);
+        showToast(`Auto-detected: ${pinInfo.state} (${pinInfo.region})`, 'info');
+      }
+    }
+  };
+
   const handleAddAddress = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim() || !street.trim() || !city.trim() || !state.trim() || !pincode.trim()) {
       showToast('Please fill out all address fields', 'error');
       return;
     }
+    const isFirst = addresses.length === 0;
     addAddress({
       full_name: name.trim(),
       phone: phone.trim(),
@@ -59,8 +73,10 @@ export const AccountPage: React.FC = () => {
       city: city.trim(),
       state: state.trim(),
       postal_code: pincode.trim(),
-      is_default: false,
+      is_default: isFirst,
     });
+    localStorage.setItem('ba_shipping_state', state.trim());
+    localStorage.setItem('ba_shipping_pincode', pincode.trim());
     showToast('New delivery address saved!', 'success');
     setName('');
     setPhone('');
@@ -529,9 +545,9 @@ export const AccountPage: React.FC = () => {
                         required
                         maxLength={6}
                         value={pincode}
-                        onChange={(e) => setPincode(e.target.value)}
+                        onChange={(e) => handlePincodeChange(e.target.value)}
                         placeholder="6-digit PIN code"
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500 font-mono"
                       />
                     </div>
                   </div>
