@@ -680,7 +680,120 @@ async function seed() {
         SET title = EXCLUDED.title, content_html = EXCLUDED.content_html, is_published = true;
       `, [p.id, p.slug, p.title, p.content_html]);
     }
-    console.log('✓ CMS pages seeded.');
+    // 6. AUTH USERS & PROFILES
+    console.log('Seeding authentication users and profiles...');
+    await client.query('CREATE EXTENSION IF NOT EXISTS pgcrypto;');
+
+    const seedUsers = [
+      {
+        id: 'a0000000-0000-0000-0000-000000000001',
+        email: 'nawfalaadil@gmail.com',
+        password: 'Admin@123',
+        name: 'Nawfal Aadil (Owner & Admin)',
+        phone: '+91 98765 43210',
+        role: 'admin'
+      },
+      {
+        id: 'a50b1f21-6702-4fbb-9070-7ce8122b72ba',
+        email: 'raguppies@gmail.com',
+        password: 'Admin@123',
+        name: 'Ra Guppy Admin',
+        phone: '+91 98765 43210',
+        role: 'admin'
+      },
+      {
+        id: 'a0000000-0000-0000-0000-000000000003',
+        email: 'admin@bettaaquatics.in',
+        password: 'Admin@123',
+        name: 'Store Administrator',
+        phone: '+91 98765 43210',
+        role: 'admin'
+      },
+      {
+        id: 'a0000000-0000-0000-0000-000000000002',
+        email: 'customer@gmail.com',
+        password: 'Customer@123',
+        name: 'Customer Demo User',
+        phone: '+91 98450 12345',
+        role: 'customer'
+      },
+      {
+        id: 'a0000000-0000-0000-0000-000000000004',
+        email: 'customer@bettaaquatics.in',
+        password: 'Customer@123',
+        name: 'Rahul Sharma',
+        phone: '+91 98450 12345',
+        role: 'customer'
+      }
+    ];
+
+    for (const u of seedUsers) {
+      const rawUserMeta = JSON.stringify({
+        sub: u.id,
+        email: u.email,
+        email_verified: true,
+        phone_verified: false,
+        full_name: u.name,
+        role: u.role
+      });
+
+      const identityData = JSON.stringify({
+        sub: u.id,
+        email: u.email,
+        email_verified: true,
+        phone_verified: false
+      });
+
+      await client.query(`
+        INSERT INTO auth.users (
+          instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+          raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+          confirmation_token, recovery_token, email_change_token_new, email_change, is_super_admin, is_sso_user, is_anonymous
+        ) VALUES (
+          '00000000-0000-0000-0000-000000000000',
+          $1::uuid,
+          'authenticated', 'authenticated', $2,
+          crypt($3, gen_salt('bf', 10)),
+          NOW(),
+          '{"provider": "email", "providers": ["email"]}'::jsonb,
+          $4::jsonb,
+          NOW(), NOW(), encode(gen_random_bytes(16), 'hex'), '', '', '', null, false, false
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          email = EXCLUDED.email,
+          encrypted_password = crypt($3, gen_salt('bf', 10)),
+          email_confirmed_at = NOW(),
+          is_super_admin = null,
+          email_change = '',
+          raw_user_meta_data = EXCLUDED.raw_user_meta_data,
+          updated_at = NOW();
+      `, [u.id, u.email, u.password, rawUserMeta]);
+
+      await client.query(`
+        INSERT INTO auth.identities (
+          id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), $1::uuid,
+          $2::jsonb,
+          'email', $1::text, NOW(), NOW(), NOW()
+        )
+        ON CONFLICT (provider_id, provider) DO UPDATE SET
+          identity_data = EXCLUDED.identity_data,
+          updated_at = NOW();
+      `, [u.id, identityData]);
+
+      await client.query(`
+        INSERT INTO public.profiles (id, email, full_name, phone, role)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (id) DO UPDATE SET
+          email = EXCLUDED.email,
+          full_name = EXCLUDED.full_name,
+          phone = EXCLUDED.phone,
+          role = EXCLUDED.role,
+          updated_at = NOW();
+      `, [u.id, u.email, u.name, u.phone, u.role]);
+    }
+    console.log('✓ Authentication users and profiles provisioned.');
 
     console.log('\n======================================================');
     console.log('🎉 COMPREHENSIVE SUPABASE DATABASE SEEDING COMPLETED!');
