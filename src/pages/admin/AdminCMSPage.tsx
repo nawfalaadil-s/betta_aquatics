@@ -17,6 +17,14 @@ import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { MediaPickerModal, SelectedMedia } from '../../components/common/MediaPickerModal';
 import { checkMediaUsage, safeDeleteMediaAsset, MediaUsageCheckResult } from '../../lib/mediaService';
 import { BrandingThemeEditor } from '../../components/admin/BrandingThemeEditor';
+import { 
+  fetchSupabaseHomepageSections, 
+  syncHomepageSectionsToSupabase, 
+  fetchSupabaseCMSPages, 
+  syncCMSPageToSupabase, 
+  deleteSupabaseCMSPage, 
+  syncAnnouncementToSupabase 
+} from '../../lib/supabaseSync';
 
 export const AdminCMSPage: React.FC = () => {
   const { showToast } = useToast();
@@ -26,6 +34,21 @@ export const AdminCMSPage: React.FC = () => {
   const [pages, setPages] = useState<CMSPage[]>(() => mockDb.getCMSPages());
   const [settings, setSettings] = useState<StoreSettings>(() => mockDb.getStoreSettings());
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>(() => mockDb.getMediaAssets());
+
+  // Load live CMS state from Supabase on mount
+  useEffect(() => {
+    fetchSupabaseHomepageSections().then((fetched) => {
+      if (fetched && fetched.length > 0) {
+        setSections(fetched);
+      }
+    });
+    fetchSupabaseCMSPages().then((fetched) => {
+      if (fetched && fetched.length > 0) {
+        setPages(fetched);
+        setSelectedPage((prev) => prev || fetched[0]);
+      }
+    });
+  }, []);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<'dashboard' | 'homepage' | 'branding' | 'announcement' | 'pages' | 'media'>('dashboard');
@@ -110,17 +133,18 @@ export const AdminCMSPage: React.FC = () => {
     setIsResetHomepageDialogOpen(true);
   };
 
-  const confirmResetHomepageSections = () => {
+  const confirmResetHomepageSections = async () => {
     const resetList = mockDb.resetHomepageSections();
     setSections(resetList);
+    await syncHomepageSectionsToSupabase(resetList);
     setLastSaved(new Date().toISOString());
     setHasUnsavedChanges(false);
     setIsResetHomepageDialogOpen(false);
-    showToast('Homepage layout reset to factory default!', 'success');
+    showToast('Homepage layout reset to factory default & synced across all browsers!', 'success');
   };
 
   // Move section UP
-  const handleMoveUp = (index: number) => {
+  const handleMoveUp = async (index: number) => {
     if (index === 0) return;
     const copy = [...sections];
     const temp = copy[index - 1];
@@ -129,12 +153,13 @@ export const AdminCMSPage: React.FC = () => {
     copy.forEach((s, idx) => { s.display_order = idx + 1; });
     mockDb.updateHomepageSections(copy);
     setSections([...copy]);
+    await syncHomepageSectionsToSupabase(copy);
     setLastSaved(new Date().toISOString());
-    showToast(`"${copy[index - 1].title}" moved up!`, 'success');
+    showToast(`"${copy[index - 1].title}" moved up & synced!`, 'success');
   };
 
   // Move section DOWN
-  const handleMoveDown = (index: number) => {
+  const handleMoveDown = async (index: number) => {
     if (index === sections.length - 1) return;
     const copy = [...sections];
     const temp = copy[index + 1];
@@ -143,8 +168,9 @@ export const AdminCMSPage: React.FC = () => {
     copy.forEach((s, idx) => { s.display_order = idx + 1; });
     mockDb.updateHomepageSections(copy);
     setSections([...copy]);
+    await syncHomepageSectionsToSupabase(copy);
     setLastSaved(new Date().toISOString());
-    showToast(`"${copy[index + 1].title}" moved down!`, 'success');
+    showToast(`"${copy[index + 1].title}" moved down & synced!`, 'success');
   };
 
   // Drag and Drop Handlers
@@ -159,7 +185,7 @@ export const AdminCMSPage: React.FC = () => {
     }
   };
 
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+  const handleDrop = async (e: React.DragEvent, targetIndex: number) => {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) {
       setDraggedIndex(null);
@@ -174,6 +200,7 @@ export const AdminCMSPage: React.FC = () => {
 
     mockDb.updateHomepageSections(copy);
     setSections(copy);
+    await syncHomepageSectionsToSupabase(copy);
     setDraggedIndex(null);
     setDragOverIndex(null);
     setLastSaved(new Date().toISOString());
@@ -186,11 +213,12 @@ export const AdminCMSPage: React.FC = () => {
   };
 
   // Toggle section active
-  const handleToggleActive = (index: number) => {
+  const handleToggleActive = async (index: number) => {
     const copy = [...sections];
     copy[index].is_active = !copy[index].is_active;
     mockDb.updateHomepageSections(copy);
     setSections([...copy]);
+    await syncHomepageSectionsToSupabase(copy);
     setLastSaved(new Date().toISOString());
     showToast(`Section "${copy[index].title}" is now ${copy[index].is_active ? 'Live' : 'Hidden'}`, copy[index].is_active ? 'success' : 'info');
   };
@@ -204,7 +232,7 @@ export const AdminCMSPage: React.FC = () => {
   };
 
   // Save Section Configuration
-  const handleSaveSection = (e: React.FormEvent) => {
+  const handleSaveSection = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingSection) return;
     const copy = sections.map((s) => {
@@ -220,23 +248,24 @@ export const AdminCMSPage: React.FC = () => {
     });
     mockDb.updateHomepageSections(copy);
     setSections(copy);
+    await syncHomepageSectionsToSupabase(copy);
     setEditingSection(null);
     setLastSaved(new Date().toISOString());
-    showToast(`Configuration for "${sectionTitle}" saved & synchronized!`, 'success');
+    showToast(`Configuration for "${sectionTitle}" saved & synchronized across all users!`, 'success');
   };
 
   // Announcement Save
-  const handleSaveAnnouncement = (e: React.FormEvent) => {
+  const handleSaveAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updated = mockDb.updateStoreSettings({
+    await syncAnnouncementToSupabase({
       announcement_text: announcementText,
       announcement_code: announcementCode,
       announcement_active: announcementActive,
       announcement_link: announcementLink,
     });
-    setSettings(updated);
+    setSettings(mockDb.getStoreSettings());
     setLastSaved(new Date().toISOString());
-    showToast('Promotional announcement bar updated across storefront!', 'success');
+    showToast('Promotional announcement bar updated across storefront and all devices!', 'success');
   };
 
   // Select custom page
@@ -277,7 +306,7 @@ export const AdminCMSPage: React.FC = () => {
   };
 
   // Save Page (Edit or New)
-  const handleSavePage = (e: React.FormEvent) => {
+  const handleSavePage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pageTitle.trim() || !pageSlug.trim()) {
       showToast('Page title and slug are required', 'error');
@@ -306,12 +335,13 @@ export const AdminCMSPage: React.FC = () => {
         }]
       };
       mockDb.saveCMSPage(newPage);
+      await syncCMSPageToSupabase(newPage);
       const updatedList = mockDb.getCMSPages();
       setPages(updatedList);
       setSelectedPage(newPage);
       setIsCreatingNewPage(false);
       setLastSaved(new Date().toISOString());
-      showToast(`Custom page "${newPage.title}" created successfully!`, 'success');
+      showToast(`Custom page "${newPage.title}" created & synced across all users!`, 'success');
     } else if (selectedPage) {
       const updated: CMSPage = {
         ...selectedPage,
@@ -334,11 +364,12 @@ export const AdminCMSPage: React.FC = () => {
         ]
       };
       mockDb.saveCMSPage(updated);
+      await syncCMSPageToSupabase(updated);
       const updatedList = mockDb.getCMSPages();
       setPages(updatedList);
       setSelectedPage(updated);
       setLastSaved(new Date().toISOString());
-      showToast(`Page "${updated.title}" updated & revision archived!`, 'success');
+      showToast(`Page "${updated.title}" updated & synced across all browsers!`, 'success');
     }
   };
 
@@ -350,11 +381,12 @@ export const AdminCMSPage: React.FC = () => {
   };
 
   // Delete custom page
-  const handleDeletePage = (id: string) => {
+  const handleDeletePage = async (id: string) => {
     const toDelete = pages.find(p => p.id === id);
     if (!toDelete) return;
 
     mockDb.deleteCMSPage(id);
+    await deleteSupabaseCMSPage(id, toDelete.slug);
     const updatedList = mockDb.getCMSPages();
     setPages(updatedList);
     setDeleteConfirmPageId(null);
@@ -367,7 +399,7 @@ export const AdminCMSPage: React.FC = () => {
       }
     }
     setLastSaved(new Date().toISOString());
-    showToast(`Deleted page "${toDelete.title}"`, 'info');
+    showToast(`Deleted page "${toDelete.title}" across all systems`, 'info');
   };
 
   // Open Media Picker for various CMS targets

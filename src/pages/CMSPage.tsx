@@ -1,12 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ShieldCheck, ArrowLeft, Phone, Calendar, Clock } from 'lucide-react';
 import { mockDb } from '../lib/mockDatabase';
 import { formatDate } from '../lib/utils';
+import { CMSPage as CMSPageType } from '../lib/types';
+import { fetchSupabaseCMSPages } from '../lib/supabaseSync';
 
 export const CMSPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const page = mockDb.getCMSPageBySlug(slug || '');
+  const [page, setPage] = useState<CMSPageType | null>(() => mockDb.getCMSPageBySlug(slug || '') || null);
+
+  useEffect(() => {
+    // Check local cached version
+    const cached = mockDb.getCMSPageBySlug(slug || '');
+    if (cached) setPage(cached);
+
+    // Fetch live CMS pages from Supabase so any browser sees newly published pages
+    fetchSupabaseCMSPages().then(pages => {
+      const match = pages.find(p => p.slug === slug);
+      if (match) {
+        setPage(match);
+      }
+    });
+
+    const handleUpdate = () => {
+      const updated = mockDb.getCMSPageBySlug(slug || '');
+      if (updated) setPage(updated);
+    };
+    window.addEventListener('ba_cms_pages_updated', handleUpdate);
+    return () => window.removeEventListener('ba_cms_pages_updated', handleUpdate);
+  }, [slug]);
 
   if (!page) {
     return (

@@ -12,6 +12,7 @@ import { SEO } from '../components/common/SEO';
 import { Product, HomepageSection } from '../lib/types';
 import { mockDb } from '../lib/mockDatabase';
 import { useBranding } from '../contexts/BrandingContext';
+import { fetchSupabaseHomepageSections } from '../lib/supabaseSync';
 
 export const HomePage: React.FC = () => {
   const { branding } = useBranding();
@@ -22,8 +23,16 @@ export const HomePage: React.FC = () => {
   });
 
   useEffect(() => {
-    const handleUpdate = () => {
-      const list = mockDb.getHomepageSections();
+    // Fetch live sections from Supabase cloud so all devices & browsers see the latest CMS changes
+    fetchSupabaseHomepageSections().then((list) => {
+      if (list && list.length > 0) {
+        setSections(list.filter(s => s.is_active).sort((a, b) => a.display_order - b.display_order));
+      }
+    });
+
+    const handleUpdate = (e?: Event) => {
+      const customEvent = e as CustomEvent<HomepageSection[]>;
+      const list = customEvent?.detail || mockDb.getHomepageSections();
       setSections(list.filter(s => s.is_active).sort((a, b) => a.display_order - b.display_order));
     };
     window.addEventListener('ba_homepage_updated', handleUpdate);
