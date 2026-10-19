@@ -111,9 +111,9 @@ export const AdminLoginPage: React.FC = () => {
               <span>Development Mock Mode Notice:</span>
             </div>
             <p className="text-[11px] text-blue-300/80 leading-relaxed">
-              Running without live Supabase cloud credentials. Authoritative local admin credentials:
+              Running without live Supabase cloud credentials. Authoritative administrator credentials:
               <br />
-              <code className="bg-blue-900/80 px-1.5 py-0.5 rounded text-white font-mono text-[10px]">admin@bettaaquatics.in</code> / <code className="bg-blue-900/80 px-1.5 py-0.5 rounded text-white font-mono text-[10px]">Admin@123</code>
+              <code className="bg-blue-900/80 px-1.5 py-0.5 rounded text-white font-mono text-[10px]">bettaaquticsno1@gmail.com</code> / <code className="bg-blue-900/80 px-1.5 py-0.5 rounded text-white font-mono text-[10px]">betta aquatics</code>
             </p>
           </div>
         )}

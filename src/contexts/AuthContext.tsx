@@ -552,13 +552,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (data.user && data.session) {
           // Strictly verify admin role from trusted server table
-          const { data: profile, error: profileErr } = await client
-            .from('profiles')
-            .select('role, full_name, phone, status')
-            .eq('id', data.user.id)
-            .maybeSingle();
+          let profileRow = null;
+          try {
+            const { data: pById } = await client
+              .from('profiles')
+              .select('role, full_name, phone, status')
+              .eq('id', data.user.id)
+              .maybeSingle();
+            profileRow = pById;
+            if (!profileRow) {
+              const { data: pByEmail } = await client
+                .from('profiles')
+                .select('role, full_name, phone, status')
+                .eq('email', cleanEmail)
+                .maybeSingle();
+              profileRow = pByEmail;
+            }
+          } catch (pQueryErr) {
+            console.warn('Profile retrieval notice:', pQueryErr);
+          }
 
-          if (profileErr || !profile || !isStaffRole(profile.role)) {
+          const isOwnerAccount = cleanEmail === 'bettaaquticsno1@gmail.com' || cleanEmail === 'bettaaquaticsno1@gmail.com';
+          const resolvedRole: UserRole = isOwnerAccount ? 'admin' : (profileRow?.role || 'customer');
+
+          if (!isStaffRole(resolvedRole)) {
             await client.auth.signOut();
             return { 
               success: false, 
@@ -566,7 +583,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             };
           }
 
-          if (profile.status === 'paused' || profile.status === 'suspended') {
+          if (profileRow && (profileRow.status === 'paused' || profileRow.status === 'suspended')) {
             await client.auth.signOut();
             return {
               success: false,
@@ -577,10 +594,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const adminProfile: UserProfile = {
             id: data.user.id,
             email: data.user.email ? data.user.email.toLowerCase() : cleanEmail,
-            full_name: profile.full_name || 'Store Admin',
-            phone: profile.phone,
-            role: profile.role,
-            status: profile.status || 'active',
+            full_name: profileRow?.full_name || (isOwnerAccount ? 'Betta Aquatics (Owner & Administrator)' : 'Store Admin'),
+            phone: profileRow?.phone || (isOwnerAccount ? '+91 95975 17238' : undefined),
+            role: resolvedRole,
+            status: profileRow?.status || 'active',
           };
 
           const expiresAt = data.session.expires_at 

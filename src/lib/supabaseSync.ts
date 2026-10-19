@@ -910,49 +910,62 @@ export async function fetchSupabaseProfiles(): Promise<UserProfile[] | null> {
 /**
  * Upserts a user profile into Supabase
  */
-export async function upsertSupabaseProfile(profile: Partial<UserProfile> & { id: string; email: string }): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return true;
+export async function upsertSupabaseProfile(profile: Partial<UserProfile> & { id?: string; email: string }): Promise<UserProfile | null> {
+  if (!isSupabaseConfigured || !supabase) return null;
 
   try {
     const now = new Date().toISOString();
-    const payload = {
-      id: profile.id,
-      email: profile.email.trim().toLowerCase(),
-      full_name: profile.full_name || profile.email.split('@')[0],
+    const cleanEmail = profile.email.trim().toLowerCase();
+    const isUuid = profile.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(profile.id);
+    
+    const payload: any = {
+      email: cleanEmail,
+      full_name: profile.full_name || cleanEmail.split('@')[0],
       phone: profile.phone || null,
       role: profile.role || 'customer',
       status: profile.status || 'active',
       avatar_url: profile.avatar_url || null,
       updated_at: now,
     };
+    if (isUuid) {
+      payload.id = profile.id;
+    }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
-      .upsert(payload, { onConflict: 'email' });
+      .upsert(payload, { onConflict: 'email' })
+      .select('*')
+      .maybeSingle();
 
     if (error) {
       console.warn('Supabase profile upsert error:', error.message);
-      return false;
+      return null;
     }
-    return true;
+    return data as UserProfile;
   } catch (err) {
     console.error('Failed to upsert profile in Supabase:', err);
-    return false;
+    return null;
   }
 }
 
 /**
  * Sets user status (active, paused, suspended) in Supabase
  */
-export async function setSupabaseProfileStatus(id: string, status: UserStatus): Promise<boolean> {
+export async function setSupabaseProfileStatus(id: string, status: UserStatus, email?: string): Promise<boolean> {
   if (!isSupabaseConfigured || !supabase) return true;
 
   try {
     const now = new Date().toISOString();
-    const { error } = await supabase
-      .from('profiles')
-      .update({ status, updated_at: now })
-      .eq('id', id);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    let builder = supabase.from('profiles').update({ status, updated_at: now });
+    if (isUuid) {
+      builder = builder.eq('id', id);
+    } else if (email) {
+      builder = builder.eq('email', email.trim().toLowerCase());
+    } else {
+      builder = builder.eq('id', id);
+    }
+    const { error } = await builder;
 
     if (error) {
       console.warn('Supabase status update error:', error.message);
@@ -968,21 +981,29 @@ export async function setSupabaseProfileStatus(id: string, status: UserStatus): 
 /**
  * Permanently deletes a user profile from Supabase
  */
-export async function deleteSupabaseProfile(id: string): Promise<boolean> {
+export async function deleteSupabaseProfile(id: string, email?: string): Promise<boolean> {
   if (!isSupabaseConfigured || !supabase) return true;
 
   try {
-    // Unlink orders or references safely
-    await supabase.from('orders').update({ user_id: null }).eq('user_id', id);
-    await supabase.from('addresses').delete().eq('user_id', id);
-    await supabase.from('reviews').delete().eq('user_id', id);
-    await supabase.from('wishlists').delete().eq('user_id', id);
-    await supabase.from('cart_items').delete().eq('user_id', id);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    if (isUuid) {
+      // Unlink orders or references safely
+      await supabase.from('orders').update({ user_id: null }).eq('user_id', id);
+      await supabase.from('addresses').delete().eq('user_id', id);
+      await supabase.from('reviews').delete().eq('user_id', id);
+      await supabase.from('wishlists').delete().eq('user_id', id);
+      await supabase.from('cart_items').delete().eq('user_id', id);
+    }
 
-    const { error } = await supabase
-      .from('profiles')
-      .delete()
-      .eq('id', id);
+    let builder = supabase.from('profiles').delete();
+    if (isUuid) {
+      builder = builder.eq('id', id);
+    } else if (email) {
+      builder = builder.eq('email', email.trim().toLowerCase());
+    } else {
+      builder = builder.eq('id', id);
+    }
+    const { error } = await builder;
 
     if (error) {
       console.warn('Supabase profile delete error:', error.message);

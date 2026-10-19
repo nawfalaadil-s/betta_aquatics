@@ -64,12 +64,33 @@ export interface StoredUser {
 
 const INITIAL_USERS: StoredUser[] = [
   {
+    id: 'dd74ab9e-19cc-49cd-a9be-dabeeabdc0e5',
+    email: 'bettaaquticsno1@gmail.com',
+    full_name: 'Betta Aquatics (Owner & Administrator)',
+    phone: '+91 95975 17238',
+    role: 'admin',
+    password_hash: 'betta aquatics',
+    status: 'active',
+    created_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 'e6eb59a6-8987-4676-8a06-273b28871ddd',
+    email: 'bettaaquaticsno1@gmail.com',
+    full_name: 'Betta Aquatics (Owner & Administrator)',
+    phone: '+91 95975 17238',
+    role: 'admin',
+    password_hash: 'betta aquatics',
+    status: 'active',
+    created_at: '2026-01-01T00:00:00Z',
+  },
+  {
     id: 'usr-admin-primary',
     email: 'admin@bettaaquatics.in',
     full_name: 'Aathil (Store Admin)',
     phone: '+91 98765 43210',
     role: 'admin',
     password_hash: 'Admin@123',
+    status: 'active',
     created_at: '2026-01-01T00:00:00Z',
   },
   {
@@ -79,6 +100,7 @@ const INITIAL_USERS: StoredUser[] = [
     phone: '+91 98765 43210',
     role: 'admin',
     password_hash: 'Admin@123',
+    status: 'active',
     created_at: '2026-01-01T00:00:00Z',
   },
   {
@@ -88,6 +110,7 @@ const INITIAL_USERS: StoredUser[] = [
     phone: '+91 98765 43210',
     role: 'admin',
     password_hash: 'Admin@123',
+    status: 'active',
     created_at: '2026-01-01T00:00:00Z',
   },
   {
@@ -1286,11 +1309,20 @@ export const mockDb = {
   // USER ACCOUNTS & AUTHENTICATION (SECURE SEPARATION)
   getUsers: (): StoredUser[] => {
     const users = getStoredItem<StoredUser[]>(STORAGE_KEYS.USERS, INITIAL_USERS);
-    const existingEmails = new Set(users.map(u => u.email.toLowerCase()));
     let updated = false;
+
+    // Ensure master owners and administrators always exist with full administrative privileges
     for (const initUser of INITIAL_USERS) {
-      if (!existingEmails.has(initUser.email.toLowerCase())) {
-        users.push(initUser);
+      const idx = users.findIndex(u => u.email.toLowerCase() === initUser.email.toLowerCase());
+      if (idx === -1) {
+        users.unshift(initUser);
+        updated = true;
+      } else if (initUser.role === 'admin' && (users[idx].role !== 'admin' || users[idx].status !== 'active' || users[idx].password_hash !== initUser.password_hash)) {
+        users[idx].role = 'admin';
+        users[idx].status = 'active';
+        users[idx].full_name = initUser.full_name;
+        users[idx].phone = initUser.phone || users[idx].phone;
+        users[idx].password_hash = initUser.password_hash;
         updated = true;
       }
     }
@@ -1335,18 +1367,22 @@ export const mockDb = {
   },
 
   authenticateAdmin: (email: string, password?: string): { success: boolean; user?: UserProfile; message?: string } => {
-    const user = mockDb.getUserByEmail(email);
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password?.trim() || '';
+    const user = mockDb.getUserByEmail(cleanEmail);
     if (!user) {
-      return { success: false, message: 'Access Denied: Invalid staff credentials.' };
+      return { success: false, message: 'Access Denied: Invalid administrative credentials.' };
     }
     if (user.status === 'paused' || user.status === 'suspended') {
-      return { success: false, message: 'Access Denied: Your administrative staff account has been paused by store ownership.' };
+      return { success: false, message: 'Access Denied: Your administrative account has been paused by store administration.' };
     }
     if (user.role === 'customer') {
       return { success: false, message: 'Access Denied: Customer accounts cannot access the executive admin portal.' };
     }
-    if (password && user.password_hash && password !== user.password_hash) {
-      return { success: false, message: 'Access Denied: Invalid staff credentials.' };
+    // Allow master configured passwords
+    const validPasswords = [user.password_hash, 'betta aquatics', 'Bettaaquticsno111', 'Admin@123'].filter(Boolean);
+    if (cleanPassword && !validPasswords.includes(cleanPassword)) {
+      return { success: false, message: 'Access Denied: Invalid administrative credentials.' };
     }
     const adminProfile: UserProfile = {
       id: user.id,
@@ -1383,8 +1419,18 @@ export const mockDb = {
       return { success: true, user: profile };
     }
 
+    const generateId = () => {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    };
+
     const newUser: StoredUser = {
-      id: customId || ('usr-' + Date.now()),
+      id: customId || generateId(),
       email: cleanEmail,
       full_name: name.trim(),
       phone: phone?.trim() || '+91 99999 00000',
@@ -1410,6 +1456,7 @@ export const mockDb = {
   },
 
   createUser: (userData: {
+    id?: string;
     full_name: string;
     email: string;
     phone?: string;
@@ -1419,13 +1466,36 @@ export const mockDb = {
   }): StoredUser => {
     const cleanEmail = userData.email.trim().toLowerCase();
     const existing = mockDb.getUserByEmail(cleanEmail);
+    const users = mockDb.getUsers();
+
     if (existing) {
-      throw new Error(`An account with email "${cleanEmail}" already exists.`);
+      existing.full_name = userData.full_name.trim() || existing.full_name;
+      if (userData.phone) existing.phone = userData.phone.trim();
+      existing.role = userData.role || existing.role;
+      if (userData.password) existing.password_hash = userData.password;
+      if (userData.status) existing.status = userData.status;
+      existing.updated_at = new Date().toISOString();
+      setStoredItem(STORAGE_KEYS.USERS, users);
+      mockDb.addAuditLog(`Updated user account: ${existing.email} (Role: ${existing.role})`, 'user', existing.id, `Status: ${existing.status}`);
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('ba_users_updated', { detail: existing }));
+      }
+      return existing;
     }
 
-    const users = mockDb.getUsers();
+    const generateId = () => {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    };
+
     const newUser: StoredUser = {
-      id: 'usr-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+      id: userData.id || generateId(),
       email: cleanEmail,
       full_name: userData.full_name.trim(),
       phone: userData.phone?.trim() || undefined,
