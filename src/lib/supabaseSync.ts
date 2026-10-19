@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { Product, Category, HomepageSection, CMSPage, MediaAsset, StoreSettings, Order, PaymentStatus } from './types';
+import { Product, Category, HomepageSection, CMSPage, MediaAsset, StoreSettings, Order, PaymentStatus, UserProfile, UserStatus } from './types';
 import { mockDb } from './mockDatabase';
 
 /**
@@ -840,6 +840,128 @@ export async function updateSupabaseOrderShipment(
     return true;
   } catch (err) {
     console.error('Failed to update order shipment in Supabase:', err);
+    return false;
+  }
+}
+
+/**
+ * Fetches all user profiles from Supabase PostgreSQL database
+ */
+export async function fetchSupabaseProfiles(): Promise<UserProfile[] | null> {
+  if (!isSupabaseConfigured || !supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !data) {
+      console.warn('Supabase profiles fetch note:', error?.message);
+      return null;
+    }
+
+    return data.map(r => ({
+      id: r.id,
+      email: r.email,
+      full_name: r.full_name,
+      phone: r.phone || undefined,
+      role: r.role,
+      status: (r.status as UserStatus) || 'active',
+      avatar_url: r.avatar_url || undefined,
+      created_at: r.created_at,
+      updated_at: r.updated_at,
+    }));
+  } catch (err) {
+    console.error('Failed to fetch profiles from Supabase:', err);
+    return null;
+  }
+}
+
+/**
+ * Upserts a user profile into Supabase
+ */
+export async function upsertSupabaseProfile(profile: Partial<UserProfile> & { id: string; email: string }): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase) return true;
+
+  try {
+    const now = new Date().toISOString();
+    const payload = {
+      id: profile.id,
+      email: profile.email.trim().toLowerCase(),
+      full_name: profile.full_name || profile.email.split('@')[0],
+      phone: profile.phone || null,
+      role: profile.role || 'customer',
+      status: profile.status || 'active',
+      avatar_url: profile.avatar_url || null,
+      updated_at: now,
+    };
+
+    const { error } = await supabase
+      .from('profiles')
+      .upsert(payload, { onConflict: 'email' });
+
+    if (error) {
+      console.warn('Supabase profile upsert error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Failed to upsert profile in Supabase:', err);
+    return false;
+  }
+}
+
+/**
+ * Sets user status (active, paused, suspended) in Supabase
+ */
+export async function setSupabaseProfileStatus(id: string, status: UserStatus): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase) return true;
+
+  try {
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from('profiles')
+      .update({ status, updated_at: now })
+      .eq('id', id);
+
+    if (error) {
+      console.warn('Supabase status update error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Failed to set profile status in Supabase:', err);
+    return false;
+  }
+}
+
+/**
+ * Permanently deletes a user profile from Supabase
+ */
+export async function deleteSupabaseProfile(id: string): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase) return true;
+
+  try {
+    // Unlink orders or references safely
+    await supabase.from('orders').update({ user_id: null }).eq('user_id', id);
+    await supabase.from('addresses').delete().eq('user_id', id);
+    await supabase.from('reviews').delete().eq('user_id', id);
+    await supabase.from('wishlists').delete().eq('user_id', id);
+    await supabase.from('cart_items').delete().eq('user_id', id);
+
+    const { error } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.warn('Supabase profile delete error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Failed to delete profile in Supabase:', err);
     return false;
   }
 }

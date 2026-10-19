@@ -1,6 +1,6 @@
 import { 
   Product, Category, Order, StoreSettings, HomepageSection, 
-  CMSPage, ProductReview, Coupon, AdminAuditLog, PaymentStatus, FulfillmentStatus, BlogPost, MediaAsset, UserProfile, UserRole,
+  CMSPage, ProductReview, Coupon, AdminAuditLog, PaymentStatus, FulfillmentStatus, BlogPost, MediaAsset, UserProfile, UserRole, UserStatus,
   ImportHistoryItem, BrandingSettings
 } from './types';
 import { 
@@ -57,7 +57,9 @@ export interface StoredUser {
   phone?: string;
   role: UserRole;
   password_hash?: string;
+  status?: UserStatus;
   created_at: string;
+  updated_at?: string;
 }
 
 const INITIAL_USERS: StoredUser[] = [
@@ -1286,10 +1288,18 @@ export const mockDb = {
     return users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
   },
 
+  getUserById: (id: string): StoredUser | undefined => {
+    const users = mockDb.getUsers();
+    return users.find(u => u.id === id);
+  },
+
   authenticateCustomer: (email: string, password?: string): { success: boolean; user?: UserProfile; message?: string } => {
     const user = mockDb.getUserByEmail(email);
     if (!user) {
       return { success: false, message: 'No registered customer account found with this email. Please register.' };
+    }
+    if (user.status === 'paused' || user.status === 'suspended') {
+      return { success: false, message: 'Access Denied: Your account has been temporarily paused by store administration. Please contact customer care.' };
     }
     // In mock mode, check password if provided
     if (password && user.password_hash && password !== user.password_hash) {
@@ -1301,6 +1311,7 @@ export const mockDb = {
       full_name: user.full_name,
       phone: user.phone,
       role: 'customer', // strictly customer
+      status: user.status || 'active',
       created_at: user.created_at,
     };
     return { success: true, user: profile };
@@ -1310,6 +1321,9 @@ export const mockDb = {
     const user = mockDb.getUserByEmail(email);
     if (!user) {
       return { success: false, message: 'Access Denied: Invalid staff credentials.' };
+    }
+    if (user.status === 'paused' || user.status === 'suspended') {
+      return { success: false, message: 'Access Denied: Your administrative staff account has been paused by store ownership.' };
     }
     if (user.role === 'customer') {
       return { success: false, message: 'Access Denied: Customer accounts cannot access the executive admin portal.' };
@@ -1323,6 +1337,7 @@ export const mockDb = {
       full_name: user.full_name,
       phone: user.phone,
       role: user.role,
+      status: user.status || 'active',
       created_at: user.created_at,
     };
     mockDb.addAuditLog(`Staff Login Successful: ${adminProfile.email} (${adminProfile.role})`, 'security', adminProfile.id, 'Staff member authenticated to management console');
@@ -1345,6 +1360,7 @@ export const mockDb = {
         full_name: existing.full_name,
         phone: existing.phone,
         role: existing.role || 'customer',
+        status: existing.status || 'active',
         created_at: existing.created_at,
       };
       return { success: true, user: profile };
@@ -1356,9 +1372,10 @@ export const mockDb = {
       full_name: name.trim(),
       phone: phone?.trim() || '+91 99999 00000',
       role: 'customer', // Non-negotiable: Public registration is always customer role
-      // Avoid plaintext password storage in client storage
-      password_hash: undefined,
+      status: 'active',
+      password_hash: password || 'Customer@123',
       created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     users.push(newUser);
     setStoredItem(STORAGE_KEYS.USERS, users);
@@ -1369,9 +1386,157 @@ export const mockDb = {
       full_name: newUser.full_name,
       phone: newUser.phone,
       role: 'customer',
+      status: 'active',
       created_at: newUser.created_at,
     };
     return { success: true, user: profile };
+  },
+
+  createUser: (userData: {
+    full_name: string;
+    email: string;
+    phone?: string;
+    role: UserRole;
+    password?: string;
+    status?: UserStatus;
+  }): StoredUser => {
+    const cleanEmail = userData.email.trim().toLowerCase();
+    const existing = mockDb.getUserByEmail(cleanEmail);
+    if (existing) {
+      throw new Error(`An account with email "${cleanEmail}" already exists.`);
+    }
+
+    const users = mockDb.getUsers();
+    const newUser: StoredUser = {
+      id: 'usr-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+      email: cleanEmail,
+      full_name: userData.full_name.trim(),
+      phone: userData.phone?.trim() || undefined,
+      role: userData.role || 'customer',
+      password_hash: userData.password || 'Betta@123',
+      status: userData.status || 'active',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    users.unshift(newUser);
+    setStoredItem(STORAGE_KEYS.USERS, users);
+    mockDb.addAuditLog(`Created new user account: ${newUser.email} (${newUser.role})`, 'user', newUser.id, `Status: ${newUser.status}`);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_users_updated', { detail: newUser }));
+    }
+    return newUser;
+  },
+
+  updateUser: (id: string, updates: Partial<StoredUser>): StoredUser => {
+    const users = mockDb.getUsers();
+    const idx = users.findIndex(u => u.id === id);
+    if (idx === -1) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+
+    if (updates.email && updates.email.trim().toLowerCase() !== users[idx].email.toLowerCase()) {
+      const existing = mockDb.getUserByEmail(updates.email);
+      if (existing && existing.id !== id) {
+        throw new Error(`Email "${updates.email}" is already used by another account.`);
+      }
+    }
+
+    const updatedUser: StoredUser = {
+      ...users[idx],
+      ...updates,
+      email: updates.email ? updates.email.trim().toLowerCase() : users[idx].email,
+      full_name: updates.full_name ? updates.full_name.trim() : users[idx].full_name,
+      updated_at: new Date().toISOString(),
+    };
+
+    users[idx] = updatedUser;
+    setStoredItem(STORAGE_KEYS.USERS, users);
+    mockDb.addAuditLog(`Updated user account: ${updatedUser.email}`, 'user', updatedUser.id, `Role: ${updatedUser.role}, Status: ${updatedUser.status}`);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_users_updated', { detail: updatedUser }));
+    }
+    return updatedUser;
+  },
+
+  setUserStatus: (id: string, status: UserStatus, adminActor?: string): { success: boolean; message: string; user?: StoredUser } => {
+    const users = mockDb.getUsers();
+    const user = users.find(u => u.id === id);
+    if (!user) {
+      return { success: false, message: 'User not found.' };
+    }
+
+    // Protection: Prevent pausing all admins or the primary admin
+    if (user.role === 'admin' && (status === 'paused' || status === 'suspended')) {
+      const activeAdmins = users.filter(u => u.role === 'admin' && (u.status === 'active' || !u.status) && u.id !== id);
+      if (activeAdmins.length === 0) {
+        return { success: false, message: 'Security restriction: Cannot pause the only remaining active administrator account.' };
+      }
+    }
+
+    user.status = status;
+    user.updated_at = new Date().toISOString();
+    setStoredItem(STORAGE_KEYS.USERS, users);
+
+    const actionText = status === 'paused' ? 'Paused account access for' : status === 'active' ? 'Re-activated account for' : 'Suspended';
+    mockDb.addAuditLog(`${actionText}: ${user.email} by ${adminActor || 'Admin'}`, 'user', user.id, `New Status: ${status}`);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_users_updated', { detail: user }));
+    }
+    return { 
+      success: true, 
+      message: status === 'paused' 
+        ? `Account for ${user.full_name} has been paused. Login is temporarily disabled.`
+        : `Account for ${user.full_name} is now active.`,
+      user 
+    };
+  },
+
+  deleteUser: (id: string, currentAdminId?: string): { success: boolean; message: string } => {
+    const users = mockDb.getUsers();
+    const user = users.find(u => u.id === id);
+    if (!user) {
+      return { success: false, message: 'User not found.' };
+    }
+
+    // Safety checks: Cannot delete self
+    if (currentAdminId && id === currentAdminId) {
+      return { success: false, message: 'Security restriction: You cannot delete your own currently active administrator session.' };
+    }
+
+    // Safety checks: Cannot delete the last remaining active admin
+    if (user.role === 'admin') {
+      const remainingAdmins = users.filter(u => u.role === 'admin' && u.id !== id);
+      if (remainingAdmins.length === 0) {
+        return { success: false, message: 'Security restriction: Cannot delete the primary/last remaining store administrator.' };
+      }
+    }
+
+    const filtered = users.filter(u => u.id !== id);
+    setStoredItem(STORAGE_KEYS.USERS, filtered);
+    mockDb.addAuditLog(`Permanently deleted user account: ${user.email} (${user.role})`, 'user', id);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_users_updated', { detail: { id, deleted: true } }));
+    }
+    return { success: true, message: `Account for ${user.full_name} (${user.email}) has been permanently deleted.` };
+  },
+
+  resetUserPassword: (id: string, newPassword?: string): { success: boolean; message: string; tempPassword?: string } => {
+    const users = mockDb.getUsers();
+    const user = users.find(u => u.id === id);
+    if (!user) {
+      return { success: false, message: 'User not found.' };
+    }
+    const pwd = newPassword || `Betta@${Math.floor(1000 + Math.random() * 9000)}`;
+    user.password_hash = pwd;
+    user.updated_at = new Date().toISOString();
+    setStoredItem(STORAGE_KEYS.USERS, users);
+    mockDb.addAuditLog(`Admin reset password for user: ${user.email}`, 'security', user.id);
+    return { success: true, message: `Password for ${user.email} has been reset.`, tempPassword: pwd };
   },
 
   requestPasswordReset: (email: string): { success: boolean; message: string } => {

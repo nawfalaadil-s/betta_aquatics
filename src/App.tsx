@@ -6,7 +6,7 @@ import { BrandingProvider } from './contexts/BrandingContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
-import { fetchSupabaseProducts, fetchSupabaseCategories } from './lib/supabaseSync';
+import { fetchSupabaseProducts, fetchSupabaseCategories, fetchSupabaseProfiles } from './lib/supabaseSync';
 
 // Common Components
 import { AnnouncementBar } from './components/common/AnnouncementBar';
@@ -42,6 +42,7 @@ import { AdminCategoriesPage } from './pages/admin/AdminCategoriesPage';
 import { AdminCMSPage } from './pages/admin/AdminCMSPage';
 import { AdminBrandingPage } from './pages/admin/AdminBrandingPage';
 import { AdminBlogsPage } from './pages/admin/AdminBlogsPage';
+import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 import { AdminAuditLogsPage } from './pages/admin/AdminAuditLogsPage';
 
@@ -83,9 +84,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 export const App: React.FC = () => {
   useEffect(() => {
-    // Automatically load live products & categories from Supabase on startup
+    // Automatically load live products, categories & profiles from Supabase on startup
     fetchSupabaseProducts();
     fetchSupabaseCategories();
+    fetchSupabaseProfiles();
   }, []);
 
   return (
@@ -139,6 +141,9 @@ export const App: React.FC = () => {
                           </Route>
                           <Route element={<AdminRoute requiredPermission="manage_blogs" />}>
                             <Route path="blogs" element={<AdminBlogsPage />} />
+                          </Route>
+                          <Route element={<AdminRoute requiredPermission="manage_users" />}>
+                            <Route path="users" element={<AdminUsersPage />} />
                           </Route>
                           <Route element={<AdminRoute requiredPermission="manage_settings" />}>
                             <Route path="settings" element={<AdminSettingsPage />} />

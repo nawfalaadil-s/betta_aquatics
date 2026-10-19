@@ -76,6 +76,11 @@ export const loadInitialSession = (): UserSession | null => {
         if (!isSupabaseConfigured) {
           const authoritativeUser = mockDb.getUserByEmail(parsed.user.email);
           if (authoritativeUser) {
+            if (authoritativeUser.status === 'paused' || authoritativeUser.status === 'suspended') {
+              localStorage.removeItem(STORAGE_KEY_SESSION);
+              localStorage.removeItem(STORAGE_KEY_LEGACY_USER);
+              return null;
+            }
             parsed.user = {
               ...parsed.user,
               id: authoritativeUser.id,
@@ -83,6 +88,7 @@ export const loadInitialSession = (): UserSession | null => {
               full_name: authoritativeUser.full_name,
               phone: authoritativeUser.phone,
               role: authoritativeUser.role,
+              status: authoritativeUser.status || 'active',
               created_at: authoritativeUser.created_at,
             };
             parsed.role = authoritativeUser.role;
@@ -242,6 +248,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (!isMounted) return;
 
+        if (profile && (profile.status === 'paused' || profile.status === 'suspended')) {
+          await client.auth.signOut();
+          setSession(null);
+          setIsLoading(false);
+          return;
+        }
+
         const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
         const userProfile: UserProfile = {
           id: supaSession.user.id,
@@ -249,6 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           full_name: profile?.full_name || supaSession.user.user_metadata?.full_name || supaSession.user.email?.split('@')[0] || 'User',
           phone: profile?.phone || supaSession.user.user_metadata?.phone,
           role,
+          status: profile?.status || 'active',
           avatar_url: profile?.avatar_url,
         };
 
@@ -286,6 +300,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (!isMounted) return;
 
+          if (profile && (profile.status === 'paused' || profile.status === 'suspended')) {
+            await client.auth.signOut();
+            setSession(null);
+            setIsLoading(false);
+            return;
+          }
+
           const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
           const userProfile: UserProfile = {
             id: supaSession.user.id,
@@ -293,6 +314,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             full_name: profile?.full_name || supaSession.user.user_metadata?.full_name || supaSession.user.email?.split('@')[0] || 'User',
             phone: profile?.phone || supaSession.user.user_metadata?.phone,
             role,
+            status: profile?.status || 'active',
             avatar_url: profile?.avatar_url,
           };
 
@@ -340,6 +362,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .eq('id', supaUser.id)
             .maybeSingle();
 
+          if (profile && (profile.status === 'paused' || profile.status === 'suspended')) {
+            await client.auth.signOut();
+            setSession(null);
+            return;
+          }
+
           const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
           const userProfile: UserProfile = {
             id: supaUser.id,
@@ -347,6 +375,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             full_name: profile?.full_name || supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'User',
             phone: profile?.phone || supaUser.user_metadata?.phone,
             role,
+            status: profile?.status || 'active',
             avatar_url: profile?.avatar_url,
           };
 
@@ -417,6 +446,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               .eq('id', data.user.id)
               .maybeSingle();
 
+            if (profile && (profile.status === 'paused' || profile.status === 'suspended')) {
+              await client.auth.signOut();
+              return {
+                success: false,
+                message: 'Access Denied: Your account has been temporarily paused by store administration. Please contact support.',
+              };
+            }
+
             const role: UserRole = profile?.role === 'admin' ? 'admin' : (profile?.role || 'customer');
             userProfile = {
               id: data.user.id,
@@ -424,6 +461,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               full_name: profile?.full_name || data.user.user_metadata?.full_name || cleanEmail.split('@')[0],
               phone: profile?.phone || data.user.user_metadata?.phone,
               role,
+              status: profile?.status || 'active',
               avatar_url: profile?.avatar_url,
             };
 
@@ -435,6 +473,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 full_name: userProfile.full_name,
                 phone: userProfile.phone || null,
                 role: userProfile.role,
+                status: 'active',
                 updated_at: new Date().toISOString(),
               });
             }
@@ -515,7 +554,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Strictly verify admin role from trusted server table
           const { data: profile, error: profileErr } = await client
             .from('profiles')
-            .select('role, full_name, phone')
+            .select('role, full_name, phone, status')
             .eq('id', data.user.id)
             .maybeSingle();
 
@@ -527,12 +566,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             };
           }
 
+          if (profile.status === 'paused' || profile.status === 'suspended') {
+            await client.auth.signOut();
+            return {
+              success: false,
+              message: 'Access Denied: This administrative account has been paused by store administration.',
+            };
+          }
+
           const adminProfile: UserProfile = {
             id: data.user.id,
             email: data.user.email ? data.user.email.toLowerCase() : cleanEmail,
             full_name: profile.full_name || 'Store Admin',
             phone: profile.phone,
             role: profile.role,
+            status: profile.status || 'active',
           };
 
           const expiresAt = data.session.expires_at 

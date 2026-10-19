@@ -6,14 +6,18 @@ export type UserRole =
   | 'payment_reviewer' 
   | 'content_manager';
 
+export type UserStatus = 'active' | 'paused' | 'suspended';
+
 export interface UserProfile {
   id: string;
   email: string;
   full_name: string;
   phone?: string;
   role: UserRole;
+  status?: UserStatus;
   avatar_url?: string;
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface UserSession {

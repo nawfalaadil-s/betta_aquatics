@@ -9,7 +9,8 @@ export type AdminPermission =
   | 'manage_cms'
   | 'manage_blogs'
   | 'manage_settings'
-  | 'view_audit_logs';
+  | 'view_audit_logs'
+  | 'manage_users';
 
 export const ROLE_PERMISSIONS: Record<UserRole, AdminPermission[]> = {
   customer: [],
@@ -22,6 +23,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, AdminPermission[]> = {
     'manage_blogs',
     'manage_settings',
     'view_audit_logs',
+    'manage_users',
   ],
   product_manager: [
     'view_dashboard',
