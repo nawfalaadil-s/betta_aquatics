@@ -5,6 +5,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { useBranding } from '../../contexts/BrandingContext';
 import { useStoreSettings } from '../../contexts/StoreSettingsContext';
 import { BrandLogo } from './BrandLogo';
+import { InstagramIcon } from './InstagramIcon';
 
 export const Footer: React.FC = () => {
   const { showToast } = useToast();
@@ -19,6 +20,7 @@ export const Footer: React.FC = () => {
   const whatsappDisplay = settings.whatsapp_number || settings.contact_phone || '+91 89211 90590';
   const whatsappClean = (settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '');
   const supportEmail = settings.contact_email || 'care@bettaaquatics.in';
+  const instagramUrl = settings.instagram_url || currentSettings?.instagram_url || 'https://instagram.com/betta_aquatic_no1?utm_source=qr&dlrf=MTN4eGt5Nmk3Z3Izbw==';
   const tagline = settings.tagline || currentSettings.tagline || "Bengaluru’s trusted online fish store. We deliver healthy show Bettas, exotic guppies, and live plants safely across India.";
 
   const [email, setEmail] = useState('');
@@ -87,8 +89,12 @@ export const Footer: React.FC = () => {
             </p>
             <div className="flex flex-col gap-2 text-xs">
               <a href={`https://wa.me/${whatsappClean}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-white hover:underline transition-colors">
-                <Phone className="w-4 h-4" />
+                <Phone className="w-4 h-4 text-emerald-400" />
                 <span>WhatsApp: {whatsappDisplay}</span>
+              </a>
+              <a href={instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-pink-400 hover:text-pink-300 transition-colors">
+                <InstagramIcon className="w-4 h-4 text-pink-400" />
+                <span>Instagram: @betta_aquatic_no1</span>
               </a>
               <a href={`mailto:${supportEmail}`} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
                 <Mail className="w-4 h-4" />
@@ -161,8 +167,19 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Disclaimer */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
-          <div>
-            © {new Date().getFullYear()} {brandTitle} India. All rights reserved.
+          <div className="flex items-center gap-3">
+            <span>© {new Date().getFullYear()} {brandTitle} India. All rights reserved.</span>
+            <span className="text-slate-600">•</span>
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-pink-400 hover:text-pink-300 transition-colors font-medium"
+              title="Official Instagram Page"
+            >
+              <InstagramIcon className="w-3.5 h-3.5" />
+              <span>@betta_aquatic_no1</span>
+            </a>
           </div>
           <div className="text-xs text-slate-300 text-center sm:text-right">
             <span>Live Arrival Guarantee: Record a short video of the unopened box within 2 hours of delivery for a fast replacement or refund.</span>

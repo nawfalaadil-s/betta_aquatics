@@ -219,8 +219,8 @@ export const mockDb = {
         setStoredItem(STORAGE_KEYS.PRODUCTS, prods);
       } else {
         prods = JSON.parse(raw);
-        // If localStorage has obsolete template mock Bettas, upgrade to INITIAL_PRODUCTS
-        if (prods.some(p => p.id === 'prod-001' || p.name?.includes('Royal Blue Halfmoon Betta') || p.name?.includes('Galaxy Koi Plakat') || p.name?.includes('Black Orchid Crowntail'))) {
+        // If localStorage has obsolete products or different catalog length, upgrade to final INITIAL_PRODUCTS
+        if (prods.length !== INITIAL_PRODUCTS.length || !prods.every(p => p.id.startsWith('ba000001-0000-4000-8000-'))) {
           prods = INITIAL_PRODUCTS.filter(p => !deletedIds.has(p.id));
           setStoredItem(STORAGE_KEYS.PRODUCTS, prods);
         }

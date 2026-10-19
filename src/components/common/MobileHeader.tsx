@@ -14,6 +14,7 @@ import { mockDb } from '../../lib/mockDatabase';
 import { Product } from '../../lib/types';
 import { formatCurrency } from '../../lib/utils';
 import { BrandLogo } from './BrandLogo';
+import { InstagramIcon } from './InstagramIcon';
 
 export const MobileHeader: React.FC = () => {
   const navigate = useNavigate();
@@ -367,7 +368,7 @@ export const MobileHeader: React.FC = () => {
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-200">
+            <div className="p-4 bg-slate-50 border-t border-slate-200 space-y-2">
               <a
                 href={`https://wa.me/${whatsappClean}`}
                 target="_blank"
@@ -377,13 +378,22 @@ export const MobileHeader: React.FC = () => {
                 <Phone className="w-4 h-4" />
                 <span>Chat on WhatsApp</span>
               </a>
+              <a
+                href={settings.instagram_url || currentSettings?.instagram_url || 'https://instagram.com/betta_aquatic_no1?utm_source=qr&dlrf=MTN4eGt5Nmk3Z3Izbw=='}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl font-medium text-xs text-pink-700 bg-pink-50 border border-pink-200 hover:bg-pink-100 transition-colors shadow-2xs"
+              >
+                <InstagramIcon className="w-4 h-4 text-pink-600" />
+                <span>Follow on Instagram (@betta_aquatic_no1)</span>
+              </a>
               {user && (
                 <button
                   onClick={() => {
                     logout();
                     setIsDrawerOpen(false);
                   }}
-                  className="btn-ghost w-full mt-2 text-red-600 hover:text-red-700"
+                  className="btn-ghost w-full text-red-600 hover:text-red-700"
                 >
                   Sign Out
                 </button>

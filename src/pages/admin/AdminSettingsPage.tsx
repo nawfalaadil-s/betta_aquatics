@@ -240,6 +240,18 @@ export const AdminSettingsPage: React.FC = () => {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />
             </div>
+            <div>
+              <label htmlFor="set-instagram" className="block text-slate-700 mb-1 font-semibold">Official Instagram URL</label>
+              <input
+                id="set-instagram"
+                type="url"
+                name="instagram_url"
+                value={form.instagram_url || ''}
+                onChange={handleChange}
+                placeholder="https://instagram.com/betta_aquatic_no1"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
+              />
+            </div>
           </div>
         </div>
 

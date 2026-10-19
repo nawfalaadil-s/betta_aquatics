@@ -246,6 +246,7 @@ export interface StoreSettings {
   announcement_link?: string;
   serviceable_pincodes: string[];
   maintenance_mode: boolean;
+  instagram_url?: string;
   branding?: BrandingSettings;
 }
 
@@ -256,6 +257,7 @@ export interface BrandingSettings {
   favicon_url: string;
   site_name: string;
   tagline?: string;
+  instagram_url?: string;
   primary_color: string;
   secondary_color: string;
   accent_color?: string;

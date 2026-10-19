@@ -99,6 +99,7 @@ export const HomePage: React.FC = () => {
       },
       sameAs: [
         `https://wa.me/${(settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '')}`,
+        settings.instagram_url || 'https://instagram.com/betta_aquatic_no1?utm_source=qr&dlrf=MTN4eGt5Nmk3Z3Izbw==',
       ],
     },
   ];

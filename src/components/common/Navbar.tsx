@@ -14,6 +14,7 @@ import { Product, Category } from '../../lib/types';
 import { useBranding } from '../../contexts/BrandingContext';
 import { useStoreSettings } from '../../contexts/StoreSettingsContext';
 import { BrandLogo } from './BrandLogo';
+import { InstagramIcon } from './InstagramIcon';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -123,6 +124,17 @@ export const Navbar: React.FC = () => {
             >
               <MessageCircle className="w-3.5 h-3.5 text-blue-900" />
               <span>WhatsApp: {whatsappDisplay}</span>
+            </a>
+            <span className="text-slate-400">•</span>
+            <a
+              href={settings.instagram_url || currentSettings?.instagram_url || 'https://instagram.com/betta_aquatic_no1?utm_source=qr&dlrf=MTN4eGt5Nmk3Z3Izbw=='}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 text-slate-600 hover:text-pink-600 transition-colors font-medium"
+              title="Follow Betta Aquatics on Instagram"
+            >
+              <InstagramIcon className="w-3.5 h-3.5 text-pink-600" />
+              <span>@betta_aquatic_no1</span>
             </a>
             {isAdmin && (
               <>

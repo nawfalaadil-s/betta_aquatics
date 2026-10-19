@@ -79,6 +79,7 @@ export const StoreSettingsProvider: React.FC<{ children: React.ReactNode }> = ({
           contact_email: updated.contact_email,
           contact_phone: updated.contact_phone,
           whatsapp_number: updated.whatsapp_number,
+          instagram_url: updated.instagram_url,
         };
 
         const paymentSettings = {
