@@ -73,7 +73,7 @@ export const AdminSettingsPage: React.FC = () => {
                 name="upi_id"
                 value={form.upi_id}
                 onChange={handleChange}
-                placeholder="raguppies00@okicici"
+                placeholder="bettaaquatics@okicici"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />
             </div>

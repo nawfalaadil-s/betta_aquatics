@@ -71,8 +71,8 @@ const INITIAL_USERS: StoredUser[] = [
     created_at: '2026-01-01T00:00:00Z',
   },
   {
-    id: 'usr-admin-raguppies',
-    email: 'raguppies@gmail.com',
+    id: 'usr-admin-bettaaquatics',
+    email: 'bettaaquatics@gmail.com',
     full_name: 'Betta Aquatics Admin',
     phone: '+91 98765 43210',
     role: 'admin',
