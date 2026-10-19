@@ -277,7 +277,7 @@ export const AdminProductsPage: React.FC = () => {
     });
   };
 
-  const handleSaveProduct = (e: React.FormEvent) => {
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !price) {
       showToast('Name and price are required', 'error');
@@ -313,8 +313,8 @@ export const AdminProductsPage: React.FC = () => {
       videos,
     });
 
-    // Sync to Supabase in background
-    syncProductToSupabase(saved).catch(console.error);
+    // Await sync to Supabase so live database is immediately updated
+    await syncProductToSupabase(saved);
 
     refreshProducts();
     setIsModalOpen(false);

@@ -28,9 +28,9 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: '9ebb7d17-8998-46b7-8e97-46a0812f7a80',
     name: 'Guppies & Livebearers',
     slug: 'guppies',
-    description: 'Pure strain Albino Full Red, Dumbo Ear Mosaic, Green Tail, and Blue Dragon imported guppy pairs.',
-    image_url: '/product_image/afr-flower-dorsal-400.jpeg',
-    banner_url: '/product_image/afr-flower-dorsal-400.jpeg',
+    description: 'Pure strain Albino Red Koi, Dumbo Ear Mosaic, Green Zeiltail, and Blue Guppy breeding pairs.',
+    image_url: '/product_image/blue-guppy-120.png',
+    banner_url: '/product_image/blue-guppy-120.png',
     parent_id: null,
     display_order: 1,
     is_active: true,
@@ -40,9 +40,9 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: '61282e57-e6d0-419d-8947-c63859e11560',
     name: 'Aquatic Plants',
     slug: 'aquatic-plants',
-    description: 'Snail-free natural floating plants, hornwort stems, and terrarium creeping vines.',
-    image_url: '/product_image/guppy-grass-50.jpeg',
-    banner_url: '/product_image/guppy-grass-50.jpeg',
+    description: 'Snail-free natural floating plants, Foxtail bunches, and aquarium conditioning botanicals.',
+    image_url: '/product_image/foxtail-50.jpg',
+    banner_url: '/product_image/foxtail-50.jpg',
     parent_id: null,
     display_order: 2,
     is_active: true,
@@ -52,9 +52,9 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: 'a71581d6-2d40-4436-834e-75ffb933faaa',
     name: 'Fish Food & Nutrition',
     slug: 'fish-food',
-    description: 'High-protein micro pellets and live Moina starter cultures.',
-    image_url: '/product_image/insecta-pro-200.jpeg',
-    banner_url: '/product_image/insecta-pro-200.jpeg',
+    description: 'High-protein micro pellets and live Grindal worms starter cultures.',
+    image_url: '/product_image/grindal-worms-100.jpeg',
+    banner_url: '/product_image/grindal-worms-100.jpeg',
     parent_id: null,
     display_order: 3,
     is_active: true,
@@ -65,7 +65,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Breeding Pairs & Rare Strains',
     slug: 'breeding-pairs',
     description: 'Carefully conditioned, proven fertile breeding pairs with lineage certificates.',
-    image_url: '/product_image/green-platinum-dumbo-500.jpeg',
+    image_url: '/product_image/black-samurai.png',
     parent_id: null,
     display_order: 4,
     is_active: true,
@@ -75,8 +75,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: '1957f7ab-11a1-43d1-88bc-b96b9d7c069e',
     name: 'Aquarium Accessories',
     slug: 'accessories',
-    description: 'Gentle sponge filters, conditioning botanicals, and water treatments.',
-    image_url: '/product_image/duckweed-50.jpeg',
+    description: 'Ultra-clear glass tanks, silent air pumps, air stones, and Indian almond leaves.',
+    image_url: '/product_image/fish-tank-4x4x4-150.jpeg',
     parent_id: null,
     display_order: 5,
     is_active: true,
@@ -87,7 +87,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Betta Fish',
     slug: 'betta-fish',
     description: 'Exquisite show specimen Bettas sourced from champion bloodlines.',
-    image_url: '/product_image/purple-hm-tail-400.jpeg',
+    image_url: '/product_image/betta-main.png',
     parent_id: null,
     display_order: 6,
     is_active: true,
@@ -98,7 +98,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Halfmoon Bettas',
     slug: 'halfmoon-bettas',
     description: '180-degree caudal spread show-class specimen males and females.',
-    image_url: '/product_image/tiger-halfmoon-300.jpeg',
+    image_url: '/product_image/full-moon-betta-750.jpeg',
     parent_id: '0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4',
     display_order: 1,
     is_active: true,
@@ -109,7 +109,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Crowntail Bettas',
     slug: 'crowntail-bettas',
     description: 'Dramatic ray web reductions creating crown-like finnage.',
-    image_url: '/product_image/electric-blue-300.jpeg',
+    image_url: '/product_image/white-betta.png',
     parent_id: '0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4',
     display_order: 2,
     is_active: true,
@@ -120,7 +120,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Plakat & Fighter Bettas',
     slug: 'plakat-bettas',
     description: 'Short-finned, muscular traditional and modern HMPK fighters.',
-    image_url: '/product_image/purple-hm-tail-400.jpeg',
+    image_url: '/product_image/betta-main.png',
     parent_id: '0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4',
     display_order: 3,
     is_active: true,
@@ -131,109 +131,6 @@ export const INITIAL_CATEGORIES: Category[] = [
 export const INITIAL_PRODUCTS: Product[] = [
   {
     "id": "ba000001-0000-4000-8000-000000000001",
-    "name": "Air Stone Aeration Diffuser",
-    "slug": "air-stone-aeration-diffuser-20",
-    "sku": "BA-ACC-001",
-    "description": "High-density porous mineral air stone for consistent micro-bubble diffusion. Provides maximum oxygen saturation, gentle water movement, and optimal gas exchange for Bettas, guppies, and planted aquariums.",
-    "short_description": "Micro-bubble mineral air stone diffuser for optimal aeration.",
-    "price": 20,
-    "compare_at_price": 35,
-    "category_id": "1957f7ab-11a1-43d1-88bc-b96b9d7c069e",
-    "category_name": "Aquarium Accessories",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": false,
-    "is_active": true,
-    "status": "published",
-    "weight": 50,
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "20°C - 32°C",
-    "ph_range": "6.0 - 8.0",
-    "care_level": "Easy",
-    "images": [
-      "/product_image/air-stone-20.jpeg"
-    ],
-    "videos": [],
-    "rating": 4.8,
-    "review_count": 14,
-    "tags": [
-      "Accessories",
-      "Aeration",
-      "Aquarium Care"
-    ],
-    "created_at": "2026-10-19T10:00:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000002",
-    "name": "Indian Almond Leaves (10 pcs Pack)",
-    "slug": "almond-leaves-10pc-20",
-    "sku": "BA-ACC-002",
-    "description": "Sun-dried organic Indian Almond Leaves (Terminalia Catappa) pack of 10. Naturally releases beneficial humic acids and tannins, lowers pH gently, provides anti-bacterial and anti-fungal immunity, and replicates native blackwater habitats for Bettas.",
-    "short_description": "10 pcs organic sun-dried Catappa leaves for conditioning & immunity.",
-    "price": 20,
-    "compare_at_price": 40,
-    "category_id": "1957f7ab-11a1-43d1-88bc-b96b9d7c069e",
-    "category_name": "Aquarium Accessories",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 80,
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "22°C - 30°C",
-    "ph_range": "5.5 - 7.5",
-    "care_level": "Easy",
-    "images": [
-      "/product_image/almond-leaves-20.jpeg"
-    ],
-    "videos": [],
-    "rating": 4.9,
-    "review_count": 38,
-    "tags": [
-      "Catappa Leaves",
-      "Natural Conditioning",
-      "Betta Care",
-      "Bestseller"
-    ],
-    "created_at": "2026-10-19T10:01:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000003",
-    "name": "Aqua Silent Air Pump",
-    "slug": "aqua-silent-air-pump-180",
-    "sku": "BA-ACC-003",
-    "description": "Ultra-quiet, energy-efficient electric aquarium air pump. Delivers constant air flow with minimal vibration noise. Perfect for powering sponge filters, corner filters, and air stones in Betta and nano shrimp setups.",
-    "short_description": "Ultra-quiet energy-efficient electric aquarium aeration pump.",
-    "price": 180,
-    "compare_at_price": 250,
-    "category_id": "1957f7ab-11a1-43d1-88bc-b96b9d7c069e",
-    "category_name": "Aquarium Accessories",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": false,
-    "is_active": true,
-    "status": "published",
-    "weight": 250,
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "18°C - 32°C",
-    "ph_range": "6.0 - 8.0",
-    "care_level": "Easy",
-    "images": [
-      "/product_image/aqua-air-pump-180.jpeg"
-    ],
-    "videos": [],
-    "rating": 4.7,
-    "review_count": 19,
-    "tags": [
-      "Air Pump",
-      "Filtration",
-      "Accessories"
-    ],
-    "created_at": "2026-10-19T10:02:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000004",
     "name": "Fighter Betta Male",
     "slug": "fighter-betta-male-100",
     "sku": "BA-BETTA-001",
@@ -243,14 +140,11 @@ export const INITIAL_PRODUCTS: Product[] = [
     "compare_at_price": 150,
     "category_id": "0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4",
     "category_name": "Betta Fish",
-    "subcategory_id": "71a4e4f4-1405-4fb7-8bd5-930700b65da8",
-    "subcategory_name": "Plakat & Fighter Bettas",
     "stock_quantity": 30,
     "is_unique_specimen": false,
     "is_featured": true,
     "is_active": true,
     "status": "published",
-    "weight": 120,
     "strain": "Fighter Betta",
     "gender": "Male",
     "size": "4.5 - 5.5 cm",
@@ -260,28 +154,437 @@ export const INITIAL_PRODUCTS: Product[] = [
     "care_level": "Easy",
     "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
     "images": [
-      "/product_image/purple-hm-tail-400.jpeg"
+      "/product_image/betta-main.png"
     ],
     "videos": [
       {
         "id": "vid-betta-male",
         "url": "/videos/betta-male-100.mp4",
         "title": "Active Fighter Betta Male Swimming & Flaring Video",
-        "thumbnail_url": "/product_image/purple-hm-tail-400.jpeg"
+        "thumbnail_url": "/product_image/betta-main.png"
       }
     ],
-    "rating": 4.9,
-    "review_count": 27,
-    "tags": [
-      "Fighter Betta",
-      "Live Betta",
-      "Active Male",
-      "Video Included"
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:05.448Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000002",
+    "name": "Black Samurai Betta (1 Pair)",
+    "slug": "black-samurai-betta-pair-350",
+    "sku": "BA-BETTA-002",
+    "description": "Striking pure lineage Black Samurai Plakat Betta breeding pair. Features intense midnight black body scale pigmentation contrasted with metallic silver-platinum samurai armor mask spanning the head and dorsal crest. Vigorous and conditioned for breeding.",
+    "short_description": "1 Male + 1 Female pure lineage Black Samurai metallic armor breeding pair.",
+    "price": 350,
+    "compare_at_price": 500,
+    "category_id": "0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4",
+    "category_name": "Betta Fish",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Black Samurai Plakat",
+    "gender": "Breeding Pair",
+    "size": "4.0 - 5.2 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.5 - 7.5",
+    "care_level": "Moderate",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/black-samurai.png"
     ],
-    "created_at": "2026-10-19T10:03:00.000Z"
+    "videos": [
+      {
+        "id": "vid-samurai-betta",
+        "url": "/videos/betta-350.mp4",
+        "title": "Black Samurai Betta Pair Active Flaring Video",
+        "thumbnail_url": "/product_image/black-samurai.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:06.046Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000003",
+    "name": "White Betta (1 Pair)",
+    "slug": "white-betta-pair-250",
+    "sku": "BA-BETTA-003",
+    "description": "Pristine opaque snowy Platinum White Betta breeding pair. Displays clean, uniform porcelain white coloration with zero blemishes. Broad finnage and vigorous flaring drive. Conditioned and ready for display or spawning setups.",
+    "short_description": "1 Male + 1 Female immaculate opaque Platinum White Betta breeding pair.",
+    "price": 250,
+    "compare_at_price": 350,
+    "category_id": "0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4",
+    "category_name": "Betta Fish",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Platinum White Betta",
+    "gender": "Breeding Pair",
+    "size": "4.0 - 5.0 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.5 - 7.5",
+    "care_level": "Moderate",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/white-betta.png"
+    ],
+    "videos": [
+      {
+        "id": "vid-white-betta",
+        "url": "/videos/betta-250.mp4",
+        "title": "White Betta Pair Swimming Video",
+        "thumbnail_url": "/product_image/white-betta.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:06.641Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000004",
+    "name": "Full Moon Betta (10 pcs Pack)",
+    "slug": "full-moon-betta-10pc-750",
+    "sku": "BA-BETTA-004",
+    "description": "Special wholesale breeder bundle of 10 selected Full Moon Bettas. Features expansive 180-degree spread caudal finnage, brilliant varied iridescent colors, and prime health. Conditioned for retail display or breeding projects.",
+    "short_description": "Wholesale breeder lot of 10 selected Full Moon Bettas.",
+    "price": 750,
+    "compare_at_price": 1100,
+    "category_id": "0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4",
+    "category_name": "Betta Fish",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Full Moon Betta",
+    "gender": "Unsexed",
+    "size": "4.0 - 5.5 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.5 - 7.5",
+    "care_level": "Moderate",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/full-moon-betta-750.jpeg"
+    ],
+    "videos": [],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:07.239Z"
   },
   {
     "id": "ba000001-0000-4000-8000-000000000005",
+    "name": "Green Zeiltail (1 Pair)",
+    "slug": "green-zeiltail-pair-100",
+    "sku": "BA-GUPPY-001",
+    "description": "Vibrant active breeding pair of Green Zeiltail guppies. Displays iridescent emerald green coloration, long flowing caudal finnage, and energetic schooling behavior. Conditioned and ready for breeding setups.",
+    "short_description": "1 Male + 1 Female pure strain Green Zeiltail breeding pair.",
+    "price": 100,
+    "compare_at_price": 160,
+    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
+    "category_name": "Guppies & Livebearers",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Green Zeiltail",
+    "gender": "Breeding Pair",
+    "size": "3.5 - 4.5 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.8 - 7.8",
+    "care_level": "Easy",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/green-zeiltail-100.png"
+    ],
+    "videos": [
+      {
+        "id": "vid-green-tail",
+        "url": "/videos/green-tail-100.mp4",
+        "title": "Green Zeiltail Guppy Swimming Video",
+        "thumbnail_url": "/product_image/green-zeiltail-100.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:07.842Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000006",
+    "name": "Zeiltail (5 Pair Pack)",
+    "slug": "zeiltail-5-pair-150",
+    "sku": "BA-GUPPY-002",
+    "description": "Complete colony pack of 5 breeding pairs (5 males + 5 females) of hardy Zeiltails. Rich iridescent fin patterns, strong genetics, and high fertility. Ideal for stocking vibrant planted tanks or starting a prolific breeding colony.",
+    "short_description": "Colony starter pack of 5 pairs (10 fish) selected Zeiltails.",
+    "price": 150,
+    "compare_at_price": 250,
+    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
+    "category_name": "Guppies & Livebearers",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Zeiltail",
+    "gender": "Breeding Pair",
+    "size": "3.5 - 4.5 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.8 - 7.8",
+    "care_level": "Easy",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/zeiltail.png"
+    ],
+    "videos": [
+      {
+        "id": "vid-zebra-5pair",
+        "url": "/videos/zebra-5pair-150.mp4",
+        "title": "Zeiltail 5 Pair Pack Swimming Video",
+        "thumbnail_url": "/product_image/zeiltail.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:08.425Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000007",
+    "name": "Blue Guppy (1 Pair)",
+    "slug": "blue-guppy-pair-120",
+    "sku": "BA-GUPPY-003",
+    "description": "Deep oceanic blue pure strain fancy guppy pair. Vivid electric blue metallic shine covering the body and broad delta caudal fin. Extremely active and healthy, conditioned for breeding and community aquariums.",
+    "short_description": "1 Male + 1 Female pure strain Electric Blue fancy guppy pair.",
+    "price": 120,
+    "compare_at_price": 180,
+    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
+    "category_name": "Guppies & Livebearers",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": false,
+    "is_active": true,
+    "status": "published",
+    "strain": "Electric Blue Guppy",
+    "gender": "Breeding Pair",
+    "size": "3.2 - 4.5 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.8 - 7.8",
+    "care_level": "Easy",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/blue-guppy-120.png"
+    ],
+    "videos": [
+      {
+        "id": "vid-guppy-120",
+        "url": "/videos/guppy-120.mp4",
+        "title": "Blue Guppy Pair Swimming Video",
+        "thumbnail_url": "/product_image/blue-guppy-120.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:09.011Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000008",
+    "name": "Albino Red Koi Guppy (1 Pair)",
+    "slug": "albino-red-koi-guppy-pair-120",
+    "sku": "BA-GUPPY-004",
+    "description": "Premium pure Albino Red Koi Guppy breeding pair. Features distinctive clear ruby-red albino eyes, creamy pearl white flanks, and intense scarlet-red koi pattern capping the head and caudal fin. High aesthetic appeal.",
+    "short_description": "1 Male + 1 Female pure strain Albino Red Koi guppy breeding pair.",
+    "price": 120,
+    "compare_at_price": 190,
+    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
+    "category_name": "Guppies & Livebearers",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Albino Red Koi",
+    "gender": "Breeding Pair",
+    "size": "3.2 - 4.2 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.8 - 7.8",
+    "care_level": "Easy",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/albino-red-koi.png"
+    ],
+    "videos": [
+      {
+        "id": "vid-red-koi",
+        "url": "/videos/guppy-pair-120.mp4",
+        "title": "Albino Red Koi Guppy Pair Swimming Video",
+        "thumbnail_url": "/product_image/albino-red-koi.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:09.595Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000009",
+    "name": "Dumbo Ear Guppy (1 Pair)",
+    "slug": "dumbo-ear-guppy-pair-120",
+    "sku": "BA-GUPPY-005",
+    "description": "Stunning Dumbo Ear (Big Ear) fancy guppy breeding pair. Distinguished by greatly enlarged, fan-like pectoral fins that flutter gracefully like elephant ears, coupled with vibrant multi-hued body patterns.",
+    "short_description": "1 Male + 1 Female oversized pectoral Dumbo Ear fancy guppy pair.",
+    "price": 120,
+    "compare_at_price": 180,
+    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
+    "category_name": "Guppies & Livebearers",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Dumbo Ear Fancy",
+    "gender": "Breeding Pair",
+    "size": "3.5 - 4.5 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.8 - 7.8",
+    "care_level": "Easy",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/dumbo-ear-120.png"
+    ],
+    "videos": [],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:10.193Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000010",
+    "name": "Hardy Community Guppy (1 Pair)",
+    "slug": "hardy-community-guppy-pair-45",
+    "sku": "BA-GUPPY-006",
+    "description": "Resilient and active colorful community guppy pair. Acclimated to regular tap water conditions, highly disease-resistant, and ideal for beginners, planted nano tanks, and lively community setups.",
+    "short_description": "1 Male + 1 Female resilient colorful community guppy pair.",
+    "price": 45,
+    "compare_at_price": 70,
+    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
+    "category_name": "Guppies & Livebearers",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": false,
+    "is_active": true,
+    "status": "published",
+    "strain": "Community Guppy",
+    "gender": "Breeding Pair",
+    "size": "3.0 - 4.2 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "22°C - 29°C",
+    "ph_range": "6.5 - 8.0",
+    "care_level": "Easy",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/guppy-45.png"
+    ],
+    "videos": [
+      {
+        "id": "vid-guppy-45",
+        "url": "/videos/guppy-45.mp4",
+        "title": "Hardy Community Guppy Active Swimming Video",
+        "thumbnail_url": "/product_image/guppy-45.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:11.282Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000011",
+    "name": "Pure White Guppy (1 Pair - Exhibition Grade)",
+    "slug": "pure-white-guppy-pair-799",
+    "sku": "BA-GUPPY-007",
+    "description": "Exclusive Exhibition-Grade Pure Snow White Guppy breeding pair. Bred from champion lineages exhibiting clean non-yellowing albino snow-white scales, expansive delta caudal fins, and high genetic purity.",
+    "short_description": "1 Male + 1 Female rare Exhibition Grade Pure White breeding pair.",
+    "price": 799,
+    "compare_at_price": 1200,
+    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
+    "category_name": "Guppies & Livebearers",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Pure Snow White",
+    "gender": "Breeding Pair",
+    "size": "3.8 - 4.8 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.8 - 7.6",
+    "care_level": "Moderate",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/white-guppy.png"
+    ],
+    "videos": [
+      {
+        "id": "vid-white-guppy",
+        "url": "/videos/guppy-800.mp4",
+        "title": "Pure White Guppy Pair Swimming Video",
+        "thumbnail_url": "/product_image/white-guppy.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:11.868Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000012",
+    "name": "High Dorsal Fancy Guppy (1 Pair)",
+    "slug": "high-dorsal-fancy-guppy-pair-150",
+    "sku": "BA-GUPPY-008",
+    "description": "Show lineage high dorsal fancy guppy breeding pair. Features an elongated dorsal sail that extends gracefully across the body with rich patterns and expansive caudal spread.",
+    "short_description": "1 Male + 1 Female high dorsal sail fancy guppy pair.",
+    "price": 150,
+    "compare_at_price": 220,
+    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
+    "category_name": "Guppies & Livebearers",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "High Dorsal Fancy",
+    "gender": "Breeding Pair",
+    "size": "3.5 - 4.8 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.8 - 7.8",
+    "care_level": "Easy",
+    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
+    "images": [
+      "/product_image/blue-guppy-120.png"
+    ],
+    "videos": [
+      {
+        "id": "vid-guppy-150",
+        "url": "/videos/guppy-150.mp4",
+        "title": "High Dorsal Fancy Guppy Swimming Video",
+        "thumbnail_url": "/product_image/blue-guppy-120.png"
+      }
+    ],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:12.451Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000013",
     "name": "Nano Glass Fish Tank (4x4x4 inch)",
     "slug": "nano-glass-fish-tank-4x4x4-150",
     "sku": "BA-TANK-001",
@@ -305,17 +608,12 @@ export const INITIAL_PRODUCTS: Product[] = [
       "/product_image/fish-tank-4x4x4-150.jpeg"
     ],
     "videos": [],
-    "rating": 4.8,
+    "rating": 5,
     "review_count": 15,
-    "tags": [
-      "Glass Tank",
-      "Nano Cube",
-      "Desktop Aquarium"
-    ],
-    "created_at": "2026-10-19T10:04:00.000Z"
+    "created_at": "2026-10-19T16:49:13.034Z"
   },
   {
-    "id": "ba000001-0000-4000-8000-000000000006",
+    "id": "ba000001-0000-4000-8000-000000000014",
     "name": "Compact Glass Fish Tank (5x5x5 inch)",
     "slug": "compact-glass-fish-tank-5x5x5-230",
     "sku": "BA-TANK-002",
@@ -339,18 +637,105 @@ export const INITIAL_PRODUCTS: Product[] = [
       "/product_image/fish-tank-5x5x5-230.jpeg"
     ],
     "videos": [],
-    "rating": 4.9,
-    "review_count": 22,
-    "tags": [
-      "Glass Tank",
-      "Rimless Cube",
-      "Show Tank",
-      "Bestseller"
-    ],
-    "created_at": "2026-10-19T10:05:00.000Z"
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:14.124Z"
   },
   {
-    "id": "ba000001-0000-4000-8000-000000000007",
+    "id": "ba000001-0000-4000-8000-000000000015",
+    "name": "Air Stone Aeration Diffuser",
+    "slug": "air-stone-aeration-diffuser-20",
+    "sku": "BA-ACC-001",
+    "description": "High-density porous mineral air stone for consistent micro-bubble diffusion. Provides maximum oxygen saturation, gentle water movement, and optimal gas exchange for Bettas, guppies, and planted aquariums.",
+    "short_description": "Micro-bubble mineral air stone diffuser for optimal aeration.",
+    "price": 20,
+    "compare_at_price": 35,
+    "category_id": "1957f7ab-11a1-43d1-88bc-b96b9d7c069e",
+    "category_name": "Aquarium Accessories",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": false,
+    "is_active": true,
+    "status": "published",
+    "strain": "Mineral Diffuser",
+    "gender": "Unsexed",
+    "size": "4 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.5 - 7.5",
+    "care_level": "Easy",
+    "images": [
+      "/product_image/air-stone-20.jpeg"
+    ],
+    "videos": [],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:14.717Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000016",
+    "name": "Indian Almond Leaves (10 pcs Pack)",
+    "slug": "almond-leaves-10pc-20",
+    "sku": "BA-ACC-002",
+    "description": "Sun-dried organic Indian Almond Leaves (Terminalia Catappa) pack of 10. Naturally releases beneficial humic acids and tannins, lowers pH gently, provides anti-bacterial and anti-fungal immunity, and replicates native blackwater habitats for Bettas.",
+    "short_description": "10 pcs organic sun-dried Catappa leaves for conditioning & immunity.",
+    "price": 20,
+    "compare_at_price": 40,
+    "category_id": "1957f7ab-11a1-43d1-88bc-b96b9d7c069e",
+    "category_name": "Aquarium Accessories",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": true,
+    "is_active": true,
+    "status": "published",
+    "strain": "Catappa Botanicals",
+    "gender": "Unsexed",
+    "size": "15 - 20 cm",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.5 - 7.5",
+    "care_level": "Easy",
+    "images": [
+      "/product_image/almond-leaves-20.jpeg"
+    ],
+    "videos": [],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:15.308Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000017",
+    "name": "Aqua Silent Air Pump",
+    "slug": "aqua-silent-air-pump-180",
+    "sku": "BA-ACC-003",
+    "description": "Ultra-quiet, energy-efficient electric aquarium air pump. Delivers constant air flow with minimal vibration noise. Perfect for powering sponge filters, corner filters, and air stones in Betta and nano shrimp setups.",
+    "short_description": "Ultra-quiet energy-efficient electric aquarium aeration pump.",
+    "price": 180,
+    "compare_at_price": 250,
+    "category_id": "1957f7ab-11a1-43d1-88bc-b96b9d7c069e",
+    "category_name": "Aquarium Accessories",
+    "stock_quantity": 30,
+    "is_unique_specimen": false,
+    "is_featured": false,
+    "is_active": true,
+    "status": "published",
+    "strain": "Aeration Hardware",
+    "gender": "Unsexed",
+    "size": "Compact",
+    "water_type": "Freshwater (Tropical)",
+    "temperature_range": "24°C - 28°C",
+    "ph_range": "6.5 - 7.5",
+    "care_level": "Easy",
+    "images": [
+      "/product_image/aqua-air-pump-180.jpeg"
+    ],
+    "videos": [],
+    "rating": 5,
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:15.891Z"
+  },
+  {
+    "id": "ba000001-0000-4000-8000-000000000018",
     "name": "Foxtail Aquatic Bunch Plant",
     "slug": "foxtail-aquatic-bunch-plant-50",
     "sku": "BA-PLANT-001",
@@ -374,105 +759,12 @@ export const INITIAL_PRODUCTS: Product[] = [
       "/product_image/foxtail-50.jpg"
     ],
     "videos": [],
-    "rating": 4.8,
-    "review_count": 18,
-    "tags": [
-      "Live Plant",
-      "Foxtail",
-      "Nitrate Absorber",
-      "Planted Tank"
-    ],
-    "created_at": "2026-10-19T10:06:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000008",
-    "name": "Full Moon Betta (10 pcs Pack)",
-    "slug": "full-moon-betta-10pc-750",
-    "sku": "BA-BETTA-002",
-    "description": "Special wholesale breeder bundle of 10 selected Full Moon Bettas. Features expansive 180-degree spread caudal finnage, brilliant varied iridescent colors, and prime health. Conditioned for retail display or breeding projects.",
-    "short_description": "Wholesale breeder lot of 10 selected Full Moon Bettas.",
-    "price": 750,
-    "compare_at_price": 1100,
-    "category_id": "0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4",
-    "category_name": "Betta Fish",
-    "subcategory_id": "a1e2811c-ab3d-407b-8d46-213ee3058f07",
-    "subcategory_name": "Halfmoon Bettas",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 600,
-    "strain": "Full Moon Betta",
-    "gender": "Unsexed",
-    "size": "4.0 - 5.5 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "24°C - 28°C",
-    "ph_range": "6.5 - 7.5",
-    "care_level": "Moderate",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/full-moon-betta-750.jpeg"
-    ],
-    "videos": [],
     "rating": 5,
-    "review_count": 31,
-    "tags": [
-      "Full Moon",
-      "Breeder Pack",
-      "Wholesale Lot",
-      "Betta"
-    ],
-    "created_at": "2026-10-19T10:07:00.000Z"
+    "review_count": 15,
+    "created_at": "2026-10-19T16:49:16.476Z"
   },
   {
-    "id": "ba000001-0000-4000-8000-000000000009",
-    "name": "Green Zeiltail Guppy (1 Pair)",
-    "slug": "green-zeiltail-guppy-pair-100",
-    "sku": "BA-GUPPY-001",
-    "description": "Vibrant active breeding pair of Green Zeiltail guppies. Displays iridescent emerald green coloration, long flowing caudal finnage, and energetic schooling behavior. Conditioned and ready for breeding setups.",
-    "short_description": "1 Male + 1 Female pure strain Green Zeiltail breeding pair.",
-    "price": 100,
-    "compare_at_price": 160,
-    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
-    "category_name": "Guppies & Livebearers",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 150,
-    "strain": "Green Zeiltail",
-    "gender": "Breeding Pair",
-    "size": "3.5 - 4.5 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "24°C - 28°C",
-    "ph_range": "6.8 - 7.8",
-    "care_level": "Easy",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/green-platinum-dumbo-500.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-green-tail",
-        "url": "/videos/green-tail-100.mp4",
-        "title": "Green Zeiltail Guppy Swimming Video",
-        "thumbnail_url": "/product_image/green-platinum-dumbo-500.jpeg"
-      }
-    ],
-    "rating": 4.8,
-    "review_count": 16,
-    "tags": [
-      "Zeiltail",
-      "Guppy Pair",
-      "Green Strain",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:08:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000010",
+    "id": "ba000001-0000-4000-8000-000000000019",
     "name": "Grindal Worms Live Starter Culture",
     "slug": "grindal-worms-live-starter-culture-100",
     "sku": "BA-FOOD-001",
@@ -496,388 +788,9 @@ export const INITIAL_PRODUCTS: Product[] = [
       "/product_image/grindal-worms-100.jpeg"
     ],
     "videos": [],
-    "rating": 4.9,
-    "review_count": 24,
-    "tags": [
-      "Live Food",
-      "Grindal Worms",
-      "Conditioning Culture",
-      "Bestseller"
-    ],
-    "created_at": "2026-10-19T10:09:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000011",
-    "name": "Premium Strain Guppy (1 Pair - Grade A)",
-    "slug": "premium-strain-guppy-pair-120",
-    "sku": "BA-GUPPY-002",
-    "description": "Selected Grade-A pure strain fancy guppy pair. Bred for deep coloration, strong dorsal structure, and broad delta tail spread. Highly active and conditioned for aquarium communities or pure breeding colonies.",
-    "short_description": "1 Male + 1 Female Grade-A premium fancy guppy pair.",
-    "price": 120,
-    "compare_at_price": 180,
-    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
-    "category_name": "Guppies & Livebearers",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": false,
-    "is_active": true,
-    "status": "published",
-    "weight": 150,
-    "strain": "Grade A Fancy Guppy",
-    "gender": "Breeding Pair",
-    "size": "3.2 - 4.5 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "24°C - 28°C",
-    "ph_range": "6.8 - 7.8",
-    "care_level": "Easy",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/electric-blue-300.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-guppy-120",
-        "url": "/videos/guppy-120.mp4",
-        "title": "Premium Strain Guppy Pair Swimming Video",
-        "thumbnail_url": "/product_image/electric-blue-300.jpeg"
-      }
-    ],
-    "rating": 4.8,
+    "rating": 5,
     "review_count": 15,
-    "tags": [
-      "Guppy Pair",
-      "Breeding Pair",
-      "Grade A",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:10:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000012",
-    "name": "High Dorsal Fancy Guppy (1 Pair)",
-    "slug": "high-dorsal-fancy-guppy-pair-150",
-    "sku": "BA-GUPPY-003",
-    "description": "Show lineage high dorsal fancy guppy breeding pair. Features an elongated dorsal sail that extends gracefully across the body with rich patterns and expansive caudal spread.",
-    "short_description": "1 Male + 1 Female high dorsal sail fancy guppy pair.",
-    "price": 150,
-    "compare_at_price": 220,
-    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
-    "category_name": "Guppies & Livebearers",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 150,
-    "strain": "High Dorsal Fancy",
-    "gender": "Breeding Pair",
-    "size": "3.5 - 4.8 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "24°C - 28°C",
-    "ph_range": "6.8 - 7.8",
-    "care_level": "Easy",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/afr-flower-dorsal-400.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-guppy-150",
-        "url": "/videos/guppy-150.mp4",
-        "title": "High Dorsal Fancy Guppy Swimming Video",
-        "thumbnail_url": "/product_image/afr-flower-dorsal-400.jpeg"
-      }
-    ],
-    "rating": 4.9,
-    "review_count": 21,
-    "tags": [
-      "High Dorsal",
-      "Fancy Guppy",
-      "Breeding Pair",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:11:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000013",
-    "name": "Hardy Community Guppy (1 Pair)",
-    "slug": "hardy-community-guppy-pair-45",
-    "sku": "BA-GUPPY-004",
-    "description": "Resilient and active colorful community guppy pair. Acclimated to regular tap water conditions, highly disease-resistant, and ideal for beginners, planted nano tanks, and lively community setups.",
-    "short_description": "1 Male + 1 Female resilient colorful community guppy pair.",
-    "price": 45,
-    "compare_at_price": 70,
-    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
-    "category_name": "Guppies & Livebearers",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": false,
-    "is_active": true,
-    "status": "published",
-    "weight": 150,
-    "strain": "Community Guppy",
-    "gender": "Breeding Pair",
-    "size": "3.0 - 4.2 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "22°C - 29°C",
-    "ph_range": "6.5 - 8.0",
-    "care_level": "Easy",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/guppy-grass-50.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-guppy-45",
-        "url": "/videos/guppy-45.mp4",
-        "title": "Hardy Community Guppy Active Swimming Video",
-        "thumbnail_url": "/product_image/guppy-grass-50.jpeg"
-      }
-    ],
-    "rating": 4.7,
-    "review_count": 28,
-    "tags": [
-      "Community Guppy",
-      "Affordable",
-      "Hardy Pair",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:12:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000014",
-    "name": "Full Red Guppy (1 Pair)",
-    "slug": "full-red-guppy-pair-120",
-    "sku": "BA-GUPPY-005",
-    "description": "Solid crimson Full Red line-bred guppy pair. Vivid red coloration covers the head, body, dorsal, and delta caudal fin. High fertility strain conditioned on live cultures for maximum vibrancy.",
-    "short_description": "1 Male + 1 Female pure strain solid Full Red guppy pair.",
-    "price": 120,
-    "compare_at_price": 180,
-    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
-    "category_name": "Guppies & Livebearers",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 150,
-    "strain": "Full Red",
-    "gender": "Breeding Pair",
-    "size": "3.5 - 4.5 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "24°C - 28°C",
-    "ph_range": "6.8 - 7.8",
-    "care_level": "Easy",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/afr-flower-dorsal-400.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-red-guppy-120",
-        "url": "/videos/guppy-pair-120.mp4",
-        "title": "Full Red Guppy Courtship & Swimming Video",
-        "thumbnail_url": "/product_image/afr-flower-dorsal-400.jpeg"
-      }
-    ],
-    "rating": 4.9,
-    "review_count": 32,
-    "tags": [
-      "Full Red",
-      "Red Guppy",
-      "Breeding Pair",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:13:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000015",
-    "name": "Samurai Betta (1 Pair)",
-    "slug": "samurai-betta-pair-350",
-    "sku": "BA-BETTA-003",
-    "description": "Rare Black Samurai dragon-scale Betta breeding pair. Features heavy metallic silver-white armor plating across the dorsal cap contrasting sharply against a midnight black body. Distinctive, bold flaring posture and championship genetics.",
-    "short_description": "1 Male + 1 Female rare Black Samurai Dragon Scale Betta pair.",
-    "price": 350,
-    "compare_at_price": 500,
-    "category_id": "0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4",
-    "category_name": "Betta Fish",
-    "subcategory_id": "71a4e4f4-1405-4fb7-8bd5-930700b65da8",
-    "subcategory_name": "Plakat & Fighter Bettas",
-    "stock_quantity": 30,
-    "is_unique_specimen": true,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 150,
-    "strain": "Black Samurai Dragon Scale",
-    "gender": "Breeding Pair",
-    "size": "4.5 - 5.5 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "24°C - 28°C",
-    "ph_range": "6.5 - 7.5",
-    "care_level": "Moderate",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/purple-hm-tail-400.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-samurai-350",
-        "url": "/videos/betta-350.mp4",
-        "title": "Samurai Betta Flaring & Swimming Video",
-        "thumbnail_url": "/product_image/purple-hm-tail-400.jpeg"
-      }
-    ],
-    "rating": 5,
-    "review_count": 18,
-    "tags": [
-      "Samurai Betta",
-      "Dragon Scale",
-      "Rare Pair",
-      "WYSIWYG 1-of-1",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:14:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000016",
-    "name": "Pure White Betta (1 Pair)",
-    "slug": "pure-white-betta-pair-250",
-    "sku": "BA-BETTA-004",
-    "description": "Snow-white Platinum Betta breeding pair. Flawless solid white coloration with thick scales and pure translucent-free finnage. Acclimated and conditioned together for high fertility and show-grade offspring.",
-    "short_description": "1 Male + 1 Female pristine Platinum Snow White Betta pair.",
-    "price": 250,
-    "compare_at_price": 380,
-    "category_id": "0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4",
-    "category_name": "Betta Fish",
-    "subcategory_id": "a1e2811c-ab3d-407b-8d46-213ee3058f07",
-    "subcategory_name": "Halfmoon Bettas",
-    "stock_quantity": 30,
-    "is_unique_specimen": true,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 150,
-    "strain": "Platinum Snow White",
-    "gender": "Breeding Pair",
-    "size": "4.5 - 5.5 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "24°C - 28°C",
-    "ph_range": "6.5 - 7.5",
-    "care_level": "Moderate",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/tiger-halfmoon-300.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-white-betta-250",
-        "url": "/videos/betta-250.mp4",
-        "title": "Pure White Betta Active Swimming Video",
-        "thumbnail_url": "/product_image/tiger-halfmoon-300.jpeg"
-      }
-    ],
-    "rating": 4.9,
-    "review_count": 23,
-    "tags": [
-      "White Betta",
-      "Platinum White",
-      "Breeding Pair",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:15:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000017",
-    "name": "Platinum White Albino Guppy (1 Pair - Show Grade)",
-    "slug": "platinum-white-albino-guppy-pair-799",
-    "sku": "BA-GUPPY-006",
-    "description": "Champion exhibition grade pure Platinum White Albino guppy breeding pair. Features piercing ruby albino eyes, gleaming pearlescent platinum white body, and broad high-dorsal delta tail spread. Bred under strict quarantine conditions.",
-    "short_description": "1 Male + 1 Female show-grade Platinum White Albino collector pair.",
-    "price": 799,
-    "compare_at_price": 1199,
-    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
-    "category_name": "Guppies & Livebearers",
-    "stock_quantity": 30,
-    "is_unique_specimen": true,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 150,
-    "strain": "Platinum White Albino",
-    "gender": "Breeding Pair",
-    "size": "3.8 - 4.8 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "24°C - 28°C",
-    "ph_range": "6.8 - 7.6",
-    "care_level": "Moderate",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/green-platinum-dumbo-500.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-white-guppy-799",
-        "url": "/videos/guppy-800.mp4",
-        "title": "Platinum White Albino Guppy Swimming Video",
-        "thumbnail_url": "/product_image/green-platinum-dumbo-500.jpeg"
-      }
-    ],
-    "rating": 5,
-    "review_count": 19,
-    "tags": [
-      "Albino Guppy",
-      "Platinum White",
-      "Show Grade Pair",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:16:00.000Z"
-  },
-  {
-    "id": "ba000001-0000-4000-8000-000000000018",
-    "name": "Zeiltail Guppy Colony (5 Pairs Pack)",
-    "slug": "zeiltail-guppy-colony-5pairs-150",
-    "sku": "BA-GUPPY-007",
-    "description": "Value colony package of 5 healthy breeding pairs (5 Males + 5 Females / 10 guppies total) of Zeiltail fancy guppies. Instant schooling community for planted aquariums with diverse shimmering colors and active swimming.",
-    "short_description": "Colony pack of 5 breeding pairs (10 guppies total) Zeiltail guppies.",
-    "price": 150,
-    "compare_at_price": 250,
-    "category_id": "9ebb7d17-8998-46b7-8e97-46a0812f7a80",
-    "category_name": "Guppies & Livebearers",
-    "stock_quantity": 30,
-    "is_unique_specimen": false,
-    "is_featured": true,
-    "is_active": true,
-    "status": "published",
-    "weight": 350,
-    "strain": "Zeiltail Fancy Colony",
-    "gender": "Breeding Pair",
-    "size": "3.0 - 4.2 cm",
-    "water_type": "Freshwater (Tropical)",
-    "temperature_range": "23°C - 28°C",
-    "ph_range": "6.8 - 7.8",
-    "care_level": "Easy",
-    "shipping_restriction": "Special Live Oxygen Packing required. The Professional Couriers Road Delivery only.",
-    "images": [
-      "/product_image/electric-blue-300.jpeg"
-    ],
-    "videos": [
-      {
-        "id": "vid-zebra-5pair-150",
-        "url": "/videos/zebra-5pair-150.mp4",
-        "title": "Zeiltail Guppy Colony Pack Swimming Video",
-        "thumbnail_url": "/product_image/electric-blue-300.jpeg"
-      }
-    ],
-    "rating": 4.8,
-    "review_count": 29,
-    "tags": [
-      "Zeiltail Colony",
-      "5 Pairs Pack",
-      "Bulk Pack",
-      "Video Included"
-    ],
-    "created_at": "2026-10-19T10:17:00.000Z"
+    "created_at": "2026-10-19T16:49:17.056Z"
   }
 ];
 

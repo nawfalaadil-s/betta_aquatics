@@ -111,21 +111,50 @@ export async function syncProductToSupabase(product: Product): Promise<void> {
       short_description: product.short_description || '',
       price: product.price,
       compare_at_price: product.compare_at_price || null,
-      stock_quantity: product.stock_quantity ?? 1,
+      category_id: product.category_id || null,
+      subcategory_id: product.subcategory_id || null,
+      stock_quantity: product.stock_quantity ?? 0,
       is_unique_specimen: Boolean(product.is_unique_specimen),
       is_featured: Boolean(product.is_featured),
       is_active: product.is_active !== undefined ? product.is_active : true,
+      status: product.status || 'published',
+      weight: product.weight || null,
       strain: product.strain || null,
       gender: product.gender || null,
+      size: product.size || null,
+      water_type: product.water_type || 'Freshwater (Tropical)',
+      temperature_range: product.temperature_range || '24°C - 28°C',
+      ph_range: product.ph_range || '6.5 - 7.5',
       care_level: product.care_level || 'Moderate',
-      images: product.images || [],
+      diet: product.diet || null,
+      shipping_restriction: product.shipping_restriction || null,
+      rating: product.rating || 5.0,
+      review_count: product.review_count || 0,
       videos: product.videos || [],
       updated_at: new Date().toISOString(),
     };
 
-    await supabase
+    const { error: upsertErr } = await supabase
       .from('products')
       .upsert(payload, { onConflict: 'id' });
+
+    if (upsertErr) {
+      console.warn('Supabase product upsert warning:', upsertErr.message);
+      return;
+    }
+
+    // Sync product images to product_images table
+    if (product.images && product.images.length > 0) {
+      await supabase.from('product_images').delete().eq('product_id', product.id);
+      const imgRows = product.images.map((img, idx) => ({
+        product_id: product.id,
+        image_url: img,
+        is_primary: idx === 0,
+        display_order: idx + 1,
+        alt_text: product.name,
+      }));
+      await supabase.from('product_images').insert(imgRows);
+    }
   } catch (err) {
     console.warn('Supabase product upsert warning:', err);
   }
@@ -219,7 +248,7 @@ export async function fetchSupabaseProducts(): Promise<Product[]> {
         care_level: p.care_level || 'Easy',
         diet: p.diet || undefined,
         shipping_restriction: p.shipping_restriction || undefined,
-        images: images.length > 0 ? images : ['/product_image/afr-flower-dorsal-400.jpeg'],
+        images: images.length > 0 ? images : ['/product_image/betta-main.png'],
         videos: Array.isArray(p.videos) ? p.videos : [],
         rating: p.rating ? parseFloat(p.rating) : 5.0,
         review_count: p.review_count || 10,

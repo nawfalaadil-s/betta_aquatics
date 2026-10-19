@@ -221,8 +221,7 @@ export const mockDb = {
         setStoredItem(STORAGE_KEYS.PRODUCTS, prods);
       } else {
         prods = JSON.parse(raw);
-        // If localStorage has obsolete products or different catalog length, upgrade to final INITIAL_PRODUCTS
-        if (prods.length !== INITIAL_PRODUCTS.length || !prods.every(p => p.id.startsWith('ba000001-0000-4000-8000-'))) {
+        if (!Array.isArray(prods) || prods.length === 0) {
           prods = INITIAL_PRODUCTS.filter(p => !deletedIds.has(p.id));
           setStoredItem(STORAGE_KEYS.PRODUCTS, prods);
         }
@@ -261,6 +260,12 @@ export const mockDb = {
       products[existingIndex] = updated;
       setStoredItem(STORAGE_KEYS.PRODUCTS, products);
       mockDb.addAuditLog('Updated product: ' + updated.name, 'product', updated.id);
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('ba_products_updated', { detail: products }));
+      }
+      import('./supabaseSync').then(m => m.syncProductToSupabase(updated)).catch(console.error);
+
       return updated;
     } else {
       const newProduct: Product = {
@@ -272,7 +277,7 @@ export const mockDb = {
         short_description: product.short_description || '',
         price: Number(product.price),
         compare_at_price: product.compare_at_price ? Number(product.compare_at_price) : undefined,
-        category_id: product.category_id || 'cat-betta',
+        category_id: product.category_id || '0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4',
         category_name: product.category_name,
         stock_quantity: Number(product.stock_quantity ?? 1),
         is_unique_specimen: Boolean(product.is_unique_specimen),
@@ -289,7 +294,7 @@ export const mockDb = {
         shipping_restriction: product.shipping_restriction,
         images: product.images && product.images.length > 0 
           ? product.images 
-          : ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80'],
+          : ['/product_image/betta-main.png'],
         videos: product.videos || [],
         rating: 5.0,
         review_count: 0,
@@ -299,6 +304,12 @@ export const mockDb = {
       products.unshift(newProduct);
       setStoredItem(STORAGE_KEYS.PRODUCTS, products);
       mockDb.addAuditLog('Created product: ' + newProduct.name, 'product', newProduct.id);
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('ba_products_updated', { detail: products }));
+      }
+      import('./supabaseSync').then(m => m.syncProductToSupabase(newProduct)).catch(console.error);
+
       return newProduct;
     }
   },
@@ -335,6 +346,12 @@ export const mockDb = {
     }
 
     mockDb.addAuditLog('Deleted product: ' + prodName, 'product', id);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ba_products_updated', { detail: products }));
+    }
+    import('./supabaseSync').then(m => m.deleteSupabaseProducts([id])).catch(console.error);
+
     return { success: true, action: 'deleted', message: `Product "${prodName}" permanently deleted.` };
   },
 
