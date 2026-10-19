@@ -1,7 +1,15 @@
 const { Client } = require('pg');
 const crypto = require('crypto');
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:raguppies00rishan123@db.mprdfatnknkjohddlaza.supabase.co:5432/postgres';
+if (process.loadEnvFile) {
+  try { process.loadEnvFile('.env'); } catch (e) {}
+}
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('Error: DATABASE_URL is required in .env or environment');
+  process.exit(1);
+}
 
 // Deterministic UUID helper so IDs match across environments
 function toUUID(str) {
