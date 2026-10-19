@@ -108,7 +108,7 @@ async function main() {
       display_order: 6,
       config: {
         quote: '"We are hobbyists first, breeders second, and sellers last."',
-        breederName: 'Ra Guppy Master Team',
+        breederName: 'Betta Aquatics Master Team',
         experienceYears: '9+ Years Experience',
         whatsapp: '+91 98765 43210',
         facilityImage: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=1200&q=80',
@@ -126,7 +126,7 @@ async function main() {
     {
       id: 'sec-trust',
       type: 'trust_badges',
-      title: 'Why Hobbyists Choose Ra Guppy',
+      title: 'Why Hobbyists Choose Betta Aquatics',
       subtitle: 'Built on trust, bio-security, and unmatched specimen quality.',
       is_active: true,
       display_order: 8,
@@ -183,13 +183,13 @@ async function main() {
       id: 'page-shipping-acclimation',
       slug: 'shipping-acclimation',
       title: 'Live Fish Shipping & Acclimation Guide',
-      meta_title: 'Live Fish Shipping & Acclimation Guide | Ra Guppy',
+      meta_title: 'Live Fish Shipping & Acclimation Guide | Betta Aquatics',
       meta_description: 'Step-by-step float and drip acclimation guide and Live Arrival Guarantee policy for ornamental fish.',
       is_published: true,
       updated_at: new Date().toISOString(),
       content_html: `
         <h2>100% Live Arrival Guarantee (DOA Policy)</h2>
-        <p>At Ra Guppy, every fish is conditioned for 72 hours before dispatch. We pack using heavy-gauge medical bags with pure medical oxygen, insulated EPS thermal thermocol boxes, and heat/cooling packs calibrated to transit weather.</p>
+        <p>At Betta Aquatics, every fish is conditioned for 72 hours before dispatch. We pack using heavy-gauge medical bags with pure medical oxygen, insulated EPS thermal thermocol boxes, and heat/cooling packs calibrated to transit weather.</p>
         
         <h3>State-Wise Road Courier Delivery Rates:</h3>
         <ul>
@@ -219,14 +219,14 @@ async function main() {
     {
       id: 'page-about',
       slug: 'about-us',
-      title: 'About Ra Guppy',
-      meta_title: 'About Us | Ra Guppy India',
-      meta_description: 'Learn about India\'s premier specialized guppy and betta breeding sanctuary.',
+      title: 'About Betta Aquatics',
+      meta_title: 'About Us | Betta Aquatics India',
+      meta_description: 'Learn about India\'s premier specialized betta and ornamental fish breeding sanctuary.',
       is_published: true,
       updated_at: new Date().toISOString(),
       content_html: `
         <h2>Ethical Aquaculture & Passion for Living Jewels</h2>
-        <p>Founded by passionate aquatic breeders and biological researchers, <strong>Ra Guppy</strong> was born out of a single mission: to provide the highest-grade pure strain Guppies, championship Bettas, and exotic freshwater specimens across India.</p>
+        <p>Founded by passionate aquatic breeders and biological researchers, <strong>Betta Aquatics</strong> was born out of a single mission: to provide the highest-grade pure strain Guppies, championship Bettas, and exotic freshwater specimens across India.</p>
         <p>Unlike commercial high-density wholesale farms, our indoor biosecure facility maintains individual high-filtration barracks and softwater conditioning for every specimen. Each fish receives balanced live feeds, pristine water conditions, and daily health checks.</p>
         <h3>Our Standards:</h3>
         <ul>
@@ -240,7 +240,7 @@ async function main() {
       id: 'page-faq',
       slug: 'faq',
       title: 'Frequently Asked Questions',
-      meta_title: 'Frequently Asked Questions | Ra Guppy',
+      meta_title: 'Frequently Asked Questions | Betta Aquatics',
       meta_description: 'Answers to your common questions regarding orders, payment verification, shipping, and fish health.',
       is_published: true,
       updated_at: new Date().toISOString(),
@@ -260,13 +260,13 @@ async function main() {
       id: 'page-shipping-policy',
       slug: 'shipping-policy',
       title: 'Shipping Policy & Road Courier Rates',
-      meta_title: 'Shipping Policy & Delivery Rates | Ra Guppy',
+      meta_title: 'Shipping Policy & Delivery Rates | Betta Aquatics',
       meta_description: 'State-wise road courier delivery charges by The Professional Couriers across India for live fish consignments.',
       is_published: true,
       updated_at: new Date().toISOString(),
       content_html: `
         <h2>Reliable Road Courier Logistics across India</h2>
-        <p>Live fish are delicate living animals requiring specialized transit. Ra Guppy partners exclusively with <strong>The Professional Couriers</strong> surface express road network to ensure safe, temperature-stable delivery across India.</p>
+        <p>Live fish are delicate living animals requiring specialized transit. Betta Aquatics partners exclusively with <strong>The Professional Couriers</strong> surface express road network to ensure safe, temperature-stable delivery across India.</p>
         <h3>State-Wise Delivery Rates:</h3>
         <ul>
           <li><strong>Kerala:</strong> ₹80 (Flat rate for up to 10 pairs)</li>
@@ -280,7 +280,7 @@ async function main() {
       id: 'page-doa',
       slug: 'doa-policy',
       title: 'Live Arrival Guarantee & Dead-On-Arrival (DOA) Policy',
-      meta_title: 'Live Arrival Guarantee & DOA Policy | Ra Guppy',
+      meta_title: 'Live Arrival Guarantee & DOA Policy | Betta Aquatics',
       meta_description: 'Complete details on our 100% Live Arrival Guarantee and Dead-On-Arrival unboxing policy.',
       is_published: true,
       updated_at: new Date().toISOString(),

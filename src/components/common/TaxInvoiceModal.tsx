@@ -14,7 +14,7 @@ interface TaxInvoiceModalProps {
 export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen, onClose }) => {
   const { settings } = useStoreSettings();
   const printRef = useRef<HTMLDivElement>(null);
-  const brandTitle = settings.brand_name || settings.branding?.site_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || settings.branding?.site_name || 'Betta Aquatics';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -89,7 +89,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ order, isOpen,
               <p className="text-[11px] text-slate-500 leading-snug">
                 Unit 402, 100ft Road, Indiranagar, Bengaluru, Karnataka, PIN: 560038<br />
                 <strong>GSTIN:</strong> 29AABCB1234F1Z5 &bull; <strong>State Code:</strong> 29 (Karnataka)<br />
-                <strong>Email:</strong> {settings.contact_email || 'orders@raguppy.com'} &bull; <strong>WhatsApp:</strong> {settings.whatsapp_number || settings.contact_phone || '+91 98450 12345'}
+                <strong>Email:</strong> {settings.contact_email || 'care@bettaaquatics.in'} &bull; <strong>WhatsApp:</strong> {settings.whatsapp_number || settings.contact_phone || '+91 98450 12345'}
               </p>
             </div>
 

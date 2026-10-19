@@ -39,9 +39,9 @@ async function seed() {
       {
         key: 'brand_info',
         value: {
-          brand_name: 'Ra Guppy',
-          tagline: 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary',
-          contact_email: 'care@raguppy.in',
+          brand_name: 'Betta Aquatics',
+          tagline: 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary',
+          contact_email: 'care@bettaaquatics.in',
           contact_phone: '+91 98765 43210',
           whatsapp_number: '919876543210'
         },
@@ -50,12 +50,12 @@ async function seed() {
       {
         key: 'payment_settings',
         value: {
-          upi_id: 'raguppy@icici',
-          upi_payee_name: 'Ra Guppy Aquatics',
+          upi_id: 'bettaaquatics@icici',
+          upi_payee_name: 'Betta Aquatics',
           bank_name: 'ICICI Bank',
           bank_account_no: '002405009988',
           bank_ifsc: 'ICIC0000024',
-          bank_account_holder: 'Ra Guppy Aquatics'
+          bank_account_holder: 'Betta Aquatics'
         },
         description: 'Payment collection credentials for direct UPI intent and bank transfer verification'
       },
@@ -87,8 +87,8 @@ async function seed() {
           mobile_logo_url: '/logo.jpeg',
           footer_logo_url: '/logo.jpeg',
           favicon_url: '/favicon.svg',
-          site_name: 'Ra Guppy',
-          tagline: 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary',
+          site_name: 'Betta Aquatics',
+          tagline: 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary',
           primary_color: '#1e3a8a',
           secondary_color: '#dc2626',
           accent_color: '#0284c7',
@@ -682,7 +682,7 @@ async function seed() {
     // 5. CMS PAGES
     console.log('Seeding CMS pages...');
     const pages = [
-      { id: toUUID('page-about'), slug: 'about-us', title: 'About Ra Guppy', content_html: '<p>Ra Guppy is India’s premier sanctuary for pure-strain Guppies, champion Bettas, and exotic aquatic life.</p>' },
+      { id: toUUID('page-about'), slug: 'about-us', title: 'About Betta Aquatics', content_html: '<p>Betta Aquatics is India’s premier sanctuary for pure-strain Guppies, champion Bettas, and exotic aquatic life.</p>' },
       { id: toUUID('page-shipping'), slug: 'shipping-policy', title: 'Shipping & Live Arrival Guarantee', content_html: '<p>We ship live specimens strictly across India via The Professional Couriers road transport in specialized medical oxygen double-sealed packaging with temperature-insulating thermo-boxes.</p>' },
       { id: toUUID('page-doa'), slug: 'doa-policy', title: 'Dead on Arrival (DOA) Policy', content_html: '<p>If any specimen does not arrive alive, record a clear 30-second unboxing video of the unopened shipping bag within 2 hours of delivery for a replacement or full refund.</p>' }
     ];
@@ -712,7 +712,7 @@ async function seed() {
         id: 'a50b1f21-6702-4fbb-9070-7ce8122b72ba',
         email: 'raguppies@gmail.com',
         password: 'Admin@123',
-        name: 'Ra Guppy Admin',
+        name: 'Betta Aquatics Admin',
         phone: '+91 98765 43210',
         role: 'admin'
       },

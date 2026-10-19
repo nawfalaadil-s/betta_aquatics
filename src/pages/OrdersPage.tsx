@@ -113,7 +113,7 @@ export const OrdersPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
+    <div className="bg-slate-50 min-h-screen pt-6 sm:pt-10 pb-24 sm:pb-10">
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

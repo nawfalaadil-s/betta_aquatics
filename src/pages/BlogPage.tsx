@@ -46,7 +46,7 @@ export const BlogPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
+    <div className="bg-slate-50 min-h-screen pt-8 sm:pt-12 pb-24 sm:pb-12">
       <SEO 
         title="Ornamental Fish Care Guides, Genetics & Breeding Journal" 
         description="Comprehensive guides on fish acclimation, genetics, planted nano tanks, and breeding trophy lines."

@@ -86,7 +86,7 @@ export const AdminSettingsPage: React.FC = () => {
                 name="upi_payee_name"
                 value={form.upi_payee_name}
                 onChange={handleChange}
-                placeholder="Ra Guppy"
+                placeholder="Betta Aquatics"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />
             </div>

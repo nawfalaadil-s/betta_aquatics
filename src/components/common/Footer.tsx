@@ -11,14 +11,14 @@ export const Footer: React.FC = () => {
   const { activeSettings, branding } = useBranding();
   const { settings } = useStoreSettings();
   const currentSettings = activeSettings || branding;
-  const brandTitle = settings.brand_name || currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || currentSettings.site_name || 'Betta Aquatics';
   const brandParts = brandTitle.trim().split(/\s+/);
-  const firstWord = brandParts[0] || 'RA';
+  const firstWord = brandParts[0] || 'BETTA';
   const restWords = brandParts.slice(1).join(' ');
 
   const whatsappDisplay = settings.whatsapp_number || settings.contact_phone || '+91 89211 90590';
   const whatsappClean = (settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '');
-  const supportEmail = settings.contact_email || 'raguppies00@gmail.com';
+  const supportEmail = settings.contact_email || 'care@bettaaquatics.in';
   const tagline = settings.tagline || currentSettings.tagline || "Bengaluru’s trusted online fish store. We deliver healthy show Bettas, exotic guppies, and live plants safely across India.";
 
   const [email, setEmail] = useState('');

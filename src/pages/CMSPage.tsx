@@ -46,7 +46,7 @@ export const CMSPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
+    <div className="bg-slate-50 min-h-screen pt-8 sm:pt-12 pb-24 sm:pb-12">
       <div className="max-w-4xl mx-auto px-4">
         {/* Back Link */}
         <Link

@@ -26,9 +26,9 @@ export const AdminLayout: React.FC = () => {
   const { user, hasPermission, logout } = useAuth();
   const { activeSettings, branding } = useBranding();
   const currentSettings = activeSettings || branding;
-  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = currentSettings.site_name || 'Betta Aquatics';
   const brandParts = brandTitle.trim().split(/\s+/);
-  const firstWord = brandParts[0] || 'RA';
+  const firstWord = brandParts[0] || 'BETTA';
   const restWords = brandParts.slice(1).join(' ');
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -260,7 +260,7 @@ export const AdminLayout: React.FC = () => {
                       <BrandLogo variant="admin" className="w-full h-full" imgClassName="w-full h-full object-contain" />
                     </div>
                     <div>
-                      <span className="font-bold text-sm text-blue-950 block leading-tight">Betta Operations</span>
+                      <span className="font-bold text-sm text-blue-950 block leading-tight truncate">{brandTitle}</span>
                       <span className="text-[10px] text-slate-500 font-mono">Control Center</span>
                     </div>
                   </div>

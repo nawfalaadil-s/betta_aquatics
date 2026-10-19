@@ -136,7 +136,7 @@ export const OrderDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
+    <div className="bg-slate-50 min-h-screen pt-6 sm:pt-10 pb-24 sm:pb-10">
       <SEO 
         title={`Order #${order.order_number} Consignment & Invoice`} 
         description={`Track live shipment status and view official GST tax invoice for order #${order.order_number}.`} 

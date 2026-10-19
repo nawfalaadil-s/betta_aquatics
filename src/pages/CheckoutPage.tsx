@@ -114,7 +114,7 @@ export const CheckoutPage: React.FC = () => {
         );
 
         if (res.success && res.user) {
-          showToast(`Account created! Welcome to RA Guppy, ${res.user.full_name}.`, 'success');
+          showToast(`Account created! Welcome to Betta Aquatics, ${res.user.full_name}.`, 'success');
           setNewAddrFullName(res.user.full_name);
           setNewAddrPhone(res.user.phone || authPhone.trim());
         } else {
@@ -330,7 +330,7 @@ export const CheckoutPage: React.FC = () => {
   }
 
   // Generate UPI URI
-  const upiUri = `upi://pay?pa=${encodeURIComponent(settings.upi_id)}&pn=${encodeURIComponent(settings.upi_payee_name)}&am=${total}&cu=INR&tn=${encodeURIComponent('Ra Guppy Order')}`;
+  const upiUri = `upi://pay?pa=${encodeURIComponent(settings.upi_id)}&pn=${encodeURIComponent(settings.upi_payee_name)}&am=${total}&cu=INR&tn=${encodeURIComponent('Betta Aquatics Order')}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(upiUri)}`;
 
   const handleCopyUPI = () => {
@@ -1410,7 +1410,7 @@ export const CheckoutPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500">Chat directly with {settings.upi_payee_name || 'support'} on WhatsApp</div>
                   </div>
                   <a
-                    href={`https://wa.me/${(settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '')}?text=${encodeURIComponent(`Hi, I am at checkout on ${settings.brand_name || 'RA Guppy'} and need assistance with payment.`)}`}
+                    href={`https://wa.me/${(settings.whatsapp_number || settings.contact_phone || '918921190590').replace(/\D/g, '')}?text=${encodeURIComponent(`Hi, I am at checkout on ${settings.brand_name || 'Betta Aquatics'} and need assistance with payment.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-1.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 shrink-0"

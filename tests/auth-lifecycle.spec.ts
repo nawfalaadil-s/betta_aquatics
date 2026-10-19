@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('RA Guppy Customer Authentication Lifecycle', () => {
+test.describe('Betta Aquatics Customer Authentication Lifecycle', () => {
   const timestamp = Date.now();
   const testUser = {
     name: `Test Customer ${timestamp}`,
-    email: `test_customer_${timestamp}@raguppy.in`,
+    email: `test_customer_${timestamp}@bettaaquatics.in`,
     password: 'SecurePassword123!',
     phone: '9845012345',
   };
@@ -16,7 +16,7 @@ test.describe('RA Guppy Customer Authentication Lifecycle', () => {
 
     // Step A: Customer Registration
     await page.goto('/auth');
-    await expect(page.locator('h1')).toContainText('RA');
+    await expect(page.locator('h1')).toContainText('BETTA');
 
     // Switch to Create Account mode
     await page.getByRole('button', { name: 'Create Account' }).click();

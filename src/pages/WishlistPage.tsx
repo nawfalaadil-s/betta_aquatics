@@ -12,7 +12,7 @@ export const WishlistPage: React.FC = () => {
   const wishlistedProducts = allProducts.filter((p) => wishlistIds.includes(p.id));
 
   return (
-    <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
+    <div className="bg-slate-50 min-h-screen pt-6 sm:pt-10 pb-24 sm:pb-10">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
           <span className="text-xs font-bold uppercase tracking-wider text-red-600 block mb-1">

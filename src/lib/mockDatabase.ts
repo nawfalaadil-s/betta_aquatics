@@ -73,7 +73,7 @@ const INITIAL_USERS: StoredUser[] = [
   {
     id: 'usr-admin-raguppies',
     email: 'raguppies@gmail.com',
-    full_name: 'Ra Guppy Admin',
+    full_name: 'Betta Aquatics Admin',
     phone: '+91 98765 43210',
     role: 'admin',
     password_hash: 'Admin@123',
@@ -869,8 +869,8 @@ export const mockDb = {
       needsSave = true;
     }
 
-    if (!migrated.site_name || migrated.site_name === 'Betta Aquatics') {
-      migrated.site_name = 'Ra Guppy';
+    if (!migrated.site_name || migrated.site_name === 'Ra Guppy') {
+      migrated.site_name = 'Betta Aquatics';
       needsSave = true;
     }
 
@@ -1022,7 +1022,7 @@ export const mockDb = {
         user_name: 'Priya Nambiar',
         rating: 5,
         title: 'True Galaxy Koi colours! Exactly as shown in photos',
-        comment: 'I was nervous to buy a fish online, but Ra Guppy sent the exact fish from the photo. Healthy, active, and beautiful!',
+        comment: 'I was nervous to buy a fish online, but Betta Aquatics sent the exact fish from the photo. Healthy, active, and beautiful!',
         is_verified: true,
         status: 'approved',
         created_at: '2026-03-14T15:30:00Z',

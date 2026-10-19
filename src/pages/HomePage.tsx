@@ -68,8 +68,8 @@ export const HomePage: React.FC = () => {
     }
   };
 
-  const currentBrand = branding.site_name || 'Ra Guppy';
-  const currentTagline = branding.tagline || 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary';
+  const currentBrand = branding.site_name || 'Betta Aquatics';
+  const currentTagline = branding.tagline || 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary';
 
   // Schema.org Structured Data for WebSite & Organization
   const homepageSchema = [
@@ -77,7 +77,7 @@ export const HomePage: React.FC = () => {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: currentBrand,
-      url: typeof window !== 'undefined' ? window.location.origin : 'https://raguppies.vercel.app',
+      url: typeof window !== 'undefined' ? window.location.origin : 'https://bettaaquatics.in',
       potentialAction: {
         '@type': 'SearchAction',
         target: `${typeof window !== 'undefined' ? window.location.origin : ''}/shop?q={search_term_string}`,
@@ -88,7 +88,7 @@ export const HomePage: React.FC = () => {
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: currentBrand,
-      url: typeof window !== 'undefined' ? window.location.origin : 'https://raguppies.vercel.app',
+      url: typeof window !== 'undefined' ? window.location.origin : 'https://bettaaquatics.in',
       logo: branding.logo_url?.startsWith('http') ? branding.logo_url : `${typeof window !== 'undefined' ? window.location.origin : ''}${branding.logo_url || '/logo.jpeg'}`,
       contactPoint: {
         '@type': 'ContactPoint',
@@ -108,16 +108,16 @@ export const HomePage: React.FC = () => {
       {/* Homepage SEO Meta & JSON-LD */}
       <SEO
         title={`${currentBrand} — ${currentTagline}`}
-        description="India's premier ornamental fish sanctuary. Buy pure-strain guppy pairs, champion Bettas, and live aquatic plants with 100% Live Arrival Guarantee."
-        canonical={typeof window !== 'undefined' ? window.location.origin : 'https://raguppies.vercel.app'}
+        description="India's premier ornamental fish sanctuary. Buy pure-strain show Bettas, exotic guppy pairs, and live aquatic plants with 100% Live Arrival Guarantee."
+        canonical={typeof window !== 'undefined' ? window.location.origin : 'https://bettaaquatics.in'}
         jsonLd={homepageSchema}
         keywords={[
-          'guppy fish online india',
-          'pure strain guppy pairs',
+          'betta fish online india',
           'buy betta fish bangalore',
           'halfmoon betta price',
+          'pure strain guppy pairs',
           'live aquatic plants online',
-          'ra guppy'
+          'betta aquatics'
         ]}
       />
 

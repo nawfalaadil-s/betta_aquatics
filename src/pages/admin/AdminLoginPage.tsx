@@ -14,9 +14,9 @@ export const AdminLoginPage: React.FC = () => {
   const { showToast } = useToast();
   const { activeSettings, branding } = useBranding();
   const currentSettings = activeSettings || branding;
-  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = currentSettings.site_name || 'Betta Aquatics';
   const brandParts = brandTitle.trim().split(/\s+/);
-  const firstWord = brandParts[0] || 'RA';
+  const firstWord = brandParts[0] || 'BETTA';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

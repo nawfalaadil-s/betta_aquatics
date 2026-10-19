@@ -14,9 +14,9 @@ export const AuthPage: React.FC = () => {
   const { showToast } = useToast();
   const { activeSettings, branding } = useBranding();
   const currentSettings = activeSettings || branding;
-  const brandTitle = currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = currentSettings.site_name || 'Betta Aquatics';
   const brandParts = brandTitle.trim().split(/\s+/);
-  const firstWord = brandParts[0] || 'RA';
+  const firstWord = brandParts[0] || 'BETTA';
   const restWords = brandParts.slice(1).join(' ');
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -118,7 +118,7 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-10 sm:py-16 flex items-center justify-center px-4">
+    <div className="bg-slate-50 min-h-screen pt-10 sm:pt-16 pb-24 sm:pb-16 flex items-center justify-center px-4">
       <SEO 
         title={`Customer Sign In & Account Registration | ${brandTitle}`} 
         description={`Access your ${brandTitle} customer account, view live fish consignments, and manage delivery addresses.`} 

@@ -22,17 +22,17 @@ export const SEO: React.FC<SEOProps> = ({
 }) => {
   const { activeSettings, branding } = useBranding();
   const currentSettings = activeSettings || branding;
-  const brandName = currentSettings.site_name || 'Ra Guppy';
-  const tagline = currentSettings.tagline || 'Pure Strain Guppies, Bettas & Aquatic Sanctuary';
+  const brandName = currentSettings.site_name || 'Betta Aquatics';
+  const tagline = currentSettings.tagline || 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary';
 
-  const defaultDesc = `${brandName} is India's premier ornamental fish sanctuary. Hand-conditioned pure strain guppies, show Bettas, and healthy live plants with guaranteed live arrival.`;
+  const defaultDesc = `${brandName} is India's premier ornamental fish sanctuary. Hand-conditioned show Bettas, pure strain guppies, and healthy live plants with guaranteed live arrival.`;
   const metaDesc = (description || defaultDesc)
-    .replace(/Betta Aquatics India/gi, brandName)
-    .replace(/Betta Aquatics/gi, brandName);
+    .replace(/Ra Guppy India/gi, brandName)
+    .replace(/Ra Guppy/gi, brandName);
 
   const sanitizedTitle = (title || '')
-    .replace(/Betta Aquatics India/gi, brandName)
-    .replace(/Betta Aquatics/gi, brandName);
+    .replace(/Ra Guppy India/gi, brandName)
+    .replace(/Ra Guppy/gi, brandName);
 
   const fullTitle = sanitizedTitle 
     ? (sanitizedTitle.toLowerCase().includes(brandName.toLowerCase()) ? sanitizedTitle : `${sanitizedTitle} | ${brandName}`)

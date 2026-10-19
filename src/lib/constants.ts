@@ -522,17 +522,17 @@ export const INITIAL_PRODUCTS: Product[] = [
 ];
 
 export const INITIAL_STORE_SETTINGS: StoreSettings = {
-  brand_name: 'Ra Guppy',
-  tagline: 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary',
-  contact_email: 'care@raguppy.in',
+  brand_name: 'Betta Aquatics',
+  tagline: 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary',
+  contact_email: 'care@bettaaquatics.in',
   contact_phone: '+91 98765 43210',
   whatsapp_number: '919876543210',
-  upi_id: 'raguppy@icici',
-  upi_payee_name: 'Ra Guppy Aquatics',
+  upi_id: 'bettaaquatics@icici',
+  upi_payee_name: 'Betta Aquatics',
   bank_name: 'ICICI Bank',
   bank_account_no: '002405009988',
   bank_ifsc: 'ICIC0000024',
-  bank_account_holder: 'Ra Guppy Aquatics',
+  bank_account_holder: 'Betta Aquatics',
   free_shipping_threshold: 999999,
   standard_shipping_rate: 80,
   live_packing_charge: 0,
@@ -551,8 +551,8 @@ export const INITIAL_STORE_SETTINGS: StoreSettings = {
     mobile_logo_url: '/logo.jpeg',
     footer_logo_url: '/logo.jpeg',
     favicon_url: '/favicon.svg',
-    site_name: 'Ra Guppy',
-    tagline: 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary',
+    site_name: 'Betta Aquatics',
+    tagline: 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary',
     primary_color: '#1e3a8a',
     secondary_color: '#dc2626',
     accent_color: '#0284c7',
@@ -569,8 +569,8 @@ export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
   mobile_logo_url: '/logo.jpeg',
   footer_logo_url: '/logo.jpeg',
   favicon_url: '/favicon.svg',
-  site_name: 'Ra Guppy',
-  tagline: 'Pure Strain Guppies, Bettas & Ornamental Fish Sanctuary',
+  site_name: 'Betta Aquatics',
+  tagline: 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary',
   primary_color: '#1e3a8a',
   secondary_color: '#dc2626',
   accent_color: '#0284c7',
@@ -659,7 +659,7 @@ export const INITIAL_HOMEPAGE_SECTIONS: HomepageSection[] = [
     display_order: 6,
     config: {
       quote: '"We are hobbyists first, breeders second, and sellers last."',
-      breederName: 'Ra Guppy Master Team',
+      breederName: 'Betta Aquatics Master Team',
       experienceYears: '9+ Years Experience',
       whatsapp: '+91 98765 43210',
       facilityImage: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=1200&q=80',
@@ -677,7 +677,7 @@ export const INITIAL_HOMEPAGE_SECTIONS: HomepageSection[] = [
   {
     id: 'sec-trust',
     type: 'trust_badges',
-    title: 'Why Hobbyists Choose Ra Guppy',
+    title: 'Why Hobbyists Choose Betta Aquatics',
     subtitle: 'Built on trust, bio-security, and unmatched specimen quality.',
     is_active: true,
     display_order: 8,
@@ -708,13 +708,13 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
     id: 'page-shipping',
     slug: 'shipping-acclimation',
     title: 'Live Fish Shipping & Acclimation Guide',
-    meta_title: 'Live Fish Shipping & Acclimation Guide | Ra Guppy',
+    meta_title: 'Live Fish Shipping & Acclimation Guide | Betta Aquatics',
     meta_description: 'Step-by-step float and drip acclimation guide and Live Arrival Guarantee policy for ornamental fish.',
     is_published: true,
     updated_at: '2026-03-20T10:00:00Z',
     content_html: `
       <h2>100% Live Arrival Guarantee (DOA Policy)</h2>
-      <p>At Ra Guppy, every fish is conditioned for 72 hours before dispatch. We pack using heavy-gauge medical bags with pure medical oxygen, insulated EPS thermal thermocol boxes, and heat/cooling packs calibrated to transit weather.</p>
+      <p>At Betta Aquatics, every fish is conditioned for 72 hours before dispatch. We pack using heavy-gauge medical bags with pure medical oxygen, insulated EPS thermal thermocol boxes, and heat/cooling packs calibrated to transit weather.</p>
       
       <h3>State-Wise Road Courier Delivery Rates:</h3>
       <ul>
@@ -744,14 +744,14 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
   {
     id: 'page-about',
     slug: 'about-us',
-    title: 'About Ra Guppy',
-    meta_title: 'About Us | Ra Guppy India',
-    meta_description: 'Learn about India\'s premier specialized guppy and betta breeding sanctuary.',
+    title: 'About Betta Aquatics',
+    meta_title: 'About Us | Betta Aquatics India',
+    meta_description: 'Learn about India\'s premier specialized betta and guppy breeding sanctuary.',
     is_published: true,
     updated_at: '2026-03-20T10:00:00Z',
     content_html: `
       <h2>Ethical Aquaculture & Passion for Living Jewels</h2>
-      <p>Founded by passionate aquatic breeders and biological researchers, <strong>Ra Guppy</strong> was born out of a single mission: to provide the highest-grade pure strain Guppies, championship Bettas, and exotic freshwater specimens across India.</p>
+      <p>Founded by passionate aquatic breeders and biological researchers, <strong>Betta Aquatics</strong> was born out of a single mission: to provide the highest-grade pure strain Bettas, championship Guppies, and exotic freshwater specimens across India.</p>
       <p>Unlike commercial high-density wholesale farms, our indoor biosecure facility maintains individual high-filtration barracks and softwater conditioning for every specimen. Each fish receives balanced live feeds, pristine water conditions, and daily health checks.</p>
       <h3>Our Standards:</h3>
       <ul>
@@ -765,7 +765,7 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
     id: 'page-faq',
     slug: 'faq',
     title: 'Frequently Asked Questions',
-    meta_title: 'Frequently Asked Questions | Ra Guppy',
+    meta_title: 'Frequently Asked Questions | Betta Aquatics',
     meta_description: 'Answers to your common questions regarding orders, payment verification, shipping, and fish health.',
     is_published: true,
     updated_at: '2026-03-20T10:00:00Z',
@@ -785,13 +785,13 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
     id: 'page-shipping-policy',
     slug: 'shipping-policy',
     title: 'Shipping Policy & Road Courier Rates',
-    meta_title: 'Shipping Policy & Delivery Rates | Ra Guppy',
+    meta_title: 'Shipping Policy & Delivery Rates | Betta Aquatics',
     meta_description: 'State-wise road courier delivery charges by The Professional Couriers across India for live fish consignments.',
     is_published: true,
     updated_at: '2026-03-20T10:00:00Z',
     content_html: `
       <h2>Reliable Road Courier Logistics across India</h2>
-      <p>Live fish are delicate living animals requiring specialized transit. Ra Guppy partners exclusively with <strong>The Professional Couriers</strong> surface express road network to ensure safe, temperature-stable delivery across India.</p>
+      <p>Live fish are delicate living animals requiring specialized transit. Betta Aquatics partners exclusively with <strong>The Professional Couriers</strong> surface express road network to ensure safe, temperature-stable delivery across India.</p>
       <h3>State-Wise Delivery Rates:</h3>
       <ul>
         <li><strong>Kerala:</strong> ₹80 (Flat rate for up to 10 pairs)</li>
@@ -805,7 +805,7 @@ export const INITIAL_CMS_PAGES: CMSPage[] = [
     id: 'page-doa',
     slug: 'doa-policy',
     title: 'Live Arrival Guarantee & Dead-On-Arrival (DOA) Policy',
-    meta_title: 'Live Arrival Guarantee & DOA Policy | Ra Guppy',
+    meta_title: 'Live Arrival Guarantee & DOA Policy | Betta Aquatics',
     meta_description: 'Complete details on our 100% Live Arrival Guarantee and Dead-On-Arrival unboxing policy.',
     is_published: true,
     updated_at: '2026-03-20T10:00:00Z',
@@ -882,7 +882,7 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
     views_count: 1420,
     published_at: '2026-03-15T09:00:00Z',
     updated_at: '2026-03-20T11:30:00Z',
-    meta_title: 'Acclimating Show-Grade Ornamental Fish After Shipping | Ra Guppy',
+    meta_title: 'Acclimating Show-Grade Ornamental Fish After Shipping | Betta Aquatics',
     meta_description: 'Prevent temperature shock and fin clamp with our veterinarian-approved drip acclimation protocol for live Betta splendens shipments.',
     content_html: `
       <h2>The Critical First 120 Minutes</h2>
@@ -928,7 +928,7 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
     views_count: 2180,
     published_at: '2026-03-22T14:00:00Z',
     updated_at: '2026-03-24T08:15:00Z',
-    meta_title: 'Betta Genetics Explained: Halfmoon, Alien & Dragonscale | Ra Guppy',
+    meta_title: 'Betta Genetics Explained: Halfmoon, Alien & Dragonscale | Betta Aquatics',
     meta_description: 'Explore the fascinating scientific genetics behind Betta splendens fin spreads, iridescent dragonscale layering, and complex Alien hybrids.',
     content_html: `
       <h2>The 180-Degree Halfmoon Standard</h2>
@@ -966,7 +966,7 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
     views_count: 980,
     published_at: '2026-03-28T16:30:00Z',
     updated_at: '2026-04-01T10:00:00Z',
-    meta_title: 'Best Live Plants for Betta Fish Aquariums | Ra Guppy Guide',
+    meta_title: 'Best Live Plants for Betta Fish Aquariums | Betta Aquatics Guide',
     meta_description: 'Anubias, Java Fern, and Amazon Swords: Learn which aquarium plants are best for Betta splendens tanks with low light and zero CO2.',
     content_html: `
       <h2>Why Real Plants Beat Artificial Decor</h2>
@@ -1065,7 +1065,7 @@ export const INITIAL_MEDIA_ASSETS: MediaAsset[] = [
     id: 'med-04b',
     filename: 'logo.jpeg',
     url: '/logo.jpeg',
-    alt_text: 'Ra Guppy custom primary logo',
+    alt_text: 'Betta Aquatics custom primary logo',
     file_size_bytes: 111539,
     mime_type: 'image/jpeg',
     category: 'ui',

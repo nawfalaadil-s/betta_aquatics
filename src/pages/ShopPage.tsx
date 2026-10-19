@@ -14,7 +14,7 @@ import { useStoreSettings } from '../contexts/StoreSettingsContext';
 
 export const ShopPage: React.FC = () => {
   const { settings } = useStoreSettings();
-  const brandTitle = settings.brand_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || 'Betta Aquatics';
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParam = searchParams.get('q') || '';
   const categoryParam = searchParams.get('cat') || searchParams.get('category') || 'all';
@@ -158,7 +158,7 @@ export const ShopPage: React.FC = () => {
     Boolean(queryParam);
 
   return (
-    <div className="bg-slate-50 min-h-screen py-6 sm:py-8">
+    <div className="bg-slate-50 min-h-screen pt-4 sm:pt-8 pb-24 sm:pb-8">
       {/* SEO Injection */}
       <SEO
         title={seoTitle}

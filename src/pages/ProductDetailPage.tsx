@@ -20,7 +20,7 @@ import { useStoreSettings } from '../contexts/StoreSettingsContext';
 
 export const ProductDetailPage: React.FC = () => {
   const { settings } = useStoreSettings();
-  const brandTitle = settings.brand_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || 'Betta Aquatics';
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { addToCart, setShippingPincode } = useCart();
@@ -200,7 +200,7 @@ export const ProductDetailPage: React.FC = () => {
     .slice(0, 4);
 
   return (
-    <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
+    <div className="bg-slate-50 min-h-screen pt-4 sm:pt-10 pb-28 sm:pb-10">
       {/* SEO Injection */}
       <SEO
         title={product.name}

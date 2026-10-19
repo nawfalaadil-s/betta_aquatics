@@ -23,9 +23,9 @@ export const MobileHeader: React.FC = () => {
   const { activeSettings, branding } = useBranding();
   const { settings } = useStoreSettings();
   const currentSettings = activeSettings || branding;
-  const brandTitle = settings.brand_name || currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || currentSettings.site_name || 'Betta Aquatics';
   const brandParts = brandTitle.trim().split(/\s+/);
-  const firstWord = brandParts[0] || 'RA';
+  const firstWord = brandParts[0] || 'BETTA';
   const restWords = brandParts.slice(1).join(' ');
 
   const whatsappDisplay = settings.whatsapp_number || settings.contact_phone || '+91 89211 90590';
@@ -217,7 +217,7 @@ export const MobileHeader: React.FC = () => {
                     <div className="font-display font-bold text-sm text-white uppercase tracking-tight">
                       {firstWord} {restWords && <span className="text-red-500">{restWords}</span>}
                     </div>
-                    <div className="text-xs text-slate-400">{currentSettings.tagline || 'Pure Strain Guppies & Bettas'}</div>
+                    <div className="text-xs text-slate-400">{currentSettings.tagline || 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary'}</div>
                   </div>
                 </div>
                 <button

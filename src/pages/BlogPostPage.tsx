@@ -68,7 +68,7 @@ export const BlogPostPage: React.FC = () => {
   };
 
   const handleShareWhatsApp = () => {
-    const brandName = branding.site_name || 'Ra Guppy';
+    const brandName = branding.site_name || 'Betta Aquatics';
     const text = encodeURIComponent(`Read "${post.title}" on ${brandName}: ${window.location.href}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
@@ -89,7 +89,7 @@ export const BlogPostPage: React.FC = () => {
     }],
     publisher: {
       '@type': 'Organization',
-      name: branding.site_name || 'Ra Guppy',
+      name: branding.site_name || 'Betta Aquatics',
       logo: {
         '@type': 'ImageObject',
         url: branding.logo_url?.startsWith('http') ? branding.logo_url : branding.logo_url || '/logo-fish.svg',
@@ -102,9 +102,9 @@ export const BlogPostPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
+    <div className="bg-slate-50 min-h-screen pt-8 sm:pt-12 pb-24 sm:pb-12">
       <SEO 
-        title={post.meta_title || `${post.title} | ${branding.site_name || 'Ra Guppy'} Care Journal`}
+        title={post.meta_title || `${post.title} | ${branding.site_name || 'Betta Aquatics'} Care Journal`}
         description={post.meta_description || post.excerpt}
         ogImage={post.featured_image}
         ogType="article"
@@ -213,7 +213,7 @@ export const BlogPostPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
               <strong className="text-xs font-bold uppercase tracking-wider text-blue-900">
-                Official {branding.site_name || 'Ra Guppy'} Quality Protocol
+                Official {branding.site_name || 'Betta Aquatics'} Quality Protocol
               </strong>
             </div>
             <p className="text-xs text-slate-700 leading-relaxed">

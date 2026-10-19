@@ -98,7 +98,7 @@ export const BrandingThemeEditor: React.FC = () => {
 
       const asset = await uploadMediaFile(file, {
         category: 'ui',
-        altText: `${form.site_name || 'Ra Guppy'} ${directUploadTarget.replace('_', ' ')}`,
+        altText: `${form.site_name || 'Betta Aquatics'} ${directUploadTarget.replace('_', ' ')}`,
       });
 
       const targetKeyMap: Record<string, keyof BrandingSettings> = {
@@ -466,7 +466,7 @@ export const BrandingThemeEditor: React.FC = () => {
                     type="text"
                     value={form.site_name}
                     onChange={(e) => handleTextChange('site_name', e.target.value)}
-                    placeholder="Ra Guppy"
+                    placeholder="Betta Aquatics"
                     className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-900 outline-none focus:border-blue-900"
                   />
                 </div>
@@ -712,9 +712,9 @@ export const BrandingThemeEditor: React.FC = () => {
                     </div>
                     <div>
                       <div className="font-extrabold text-slate-900 text-xs font-display">
-                        {form.site_name || 'Ra Guppy'}
+                        {form.site_name || 'Betta Aquatics'}
                       </div>
-                      <div className="text-[9px] text-slate-400">{form.tagline || 'Pure Strain Guppies & Bettas'}</div>
+                      <div className="text-[9px] text-slate-400">{form.tagline || 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary'}</div>
                     </div>
                   </div>
 
@@ -751,7 +751,7 @@ export const BrandingThemeEditor: React.FC = () => {
                     </div>
                     <div>
                       <div className="font-extrabold text-white text-xs tracking-wider uppercase font-display">
-                        {(form.site_name || 'RA GUPPY').split(' ')[0]} <span className="text-red-500">ADMIN</span>
+                        {(form.site_name || 'BETTA AQUATICS').split(' ')[0]} <span className="text-red-500">ADMIN</span>
                       </div>
                       <div className="text-[9px] text-slate-400 font-mono">Single Source of Truth</div>
                     </div>
@@ -829,7 +829,7 @@ export const BrandingThemeEditor: React.FC = () => {
                       onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.svg'; }}
                     />
                     <span className="text-xs font-semibold text-slate-800 truncate">
-                      {form.site_name || 'Ra Guppy'} | Store
+                      {form.site_name || 'Betta Aquatics'} | Store
                     </span>
                     <X className="w-3 h-3 text-slate-400 ml-auto shrink-0" />
                   </div>

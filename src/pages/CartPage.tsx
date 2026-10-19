@@ -59,7 +59,7 @@ export const CartPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-slate-50 min-h-screen py-6 sm:py-10">
+    <div className="bg-slate-50 min-h-screen pt-6 sm:pt-10 pb-24 sm:pb-10">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">

@@ -23,9 +23,9 @@ export const Navbar: React.FC = () => {
   const { activeSettings, branding } = useBranding();
   const { settings } = useStoreSettings();
   const currentSettings = activeSettings || branding;
-  const brandTitle = settings.brand_name || currentSettings.site_name || 'Ra Guppy';
+  const brandTitle = settings.brand_name || currentSettings.site_name || 'Betta Aquatics';
   const brandParts = brandTitle.trim().split(/\s+/);
-  const firstWord = brandParts[0] || 'RA';
+  const firstWord = brandParts[0] || 'BETTA';
   const restWords = brandParts.slice(1).join(' ');
 
   const whatsappDisplay = settings.whatsapp_number || settings.contact_phone || '+91 89211 90590';
@@ -152,7 +152,7 @@ export const Navbar: React.FC = () => {
               {firstWord} {restWords && <span className="text-red-600">{restWords}</span>}
             </span>
             <span className="block text-xs tracking-wide text-slate-600 font-medium">
-              {currentSettings.tagline || 'Pure Strain Guppies & Bettas'}
+              {currentSettings.tagline || 'Pure Strain Bettas, Guppies & Ornamental Fish Sanctuary'}
             </span>
           </div>
         </Link>
