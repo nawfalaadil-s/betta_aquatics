@@ -3,7 +3,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://bettaaquatics.in/</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,104 +11,188 @@
   <!-- Catalog / Shop -->
   <url>
     <loc>https://bettaaquatics.in/shop</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Categories -->
   <url>
-    <loc>https://bettaaquatics.in/shop?cat=cat-betta</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/shop?cat=0fbc7845-bbcb-499a-8ad3-5c3c51c4bca4</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/shop?cat=cat-guppy</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/shop?cat=9ebb7d17-8998-46b7-8e97-46a0812f7a80</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/shop?cat=cat-pairs</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/shop?cat=1957f7ab-11a1-43d1-88bc-b96b9d7c069e</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/shop?cat=cat-plants</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/shop?cat=61282e57-e6d0-419d-8947-c63859e11560</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/shop?cat=cat-food</loc>
-    <lastmod>2026-10-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://bettaaquatics.in/shop?cat=cat-accessories</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/shop?cat=a71581d6-2d40-4436-834e-75ffb933faaa</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Core Specimen Product URLs -->
+  <!-- Live Specimen Products -->
   <url>
-    <loc>https://bettaaquatics.in/product/royal-blue-halfmoon-betta-show-class</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/product/fighter-betta-male-100</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/black-samurai-betta-pair-350</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/white-betta-pair-250</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/full-moon-betta-10pc-750</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/green-zeiltail-pair-100</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/product/galaxy-koi-plakat-betta-candy-marbled</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/product/zeiltail-5-pair-150</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/product/black-orchid-crowntail-betta</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/product/blue-guppy-pair-120</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/product/super-white-dumbo-ear-halfmoon-betta</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/product/albino-red-koi-guppy-pair-120</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/product/albino-full-red-guppy-breeding-pair</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/product/dumbo-ear-guppy-pair-120</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/product/alien-green-betta-wild-hybrid</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/product/hardy-community-guppy-pair-45</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/pure-white-guppy-pair-799</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/high-dorsal-fancy-guppy-pair-150</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/nano-glass-fish-tank-4x4x4-150</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/compact-glass-fish-tank-5x5x5-230</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/air-stone-aeration-diffuser-20</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/almond-leaves-10pc-20</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/aqua-silent-air-pump-180</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/foxtail-aquatic-bunch-plant-50</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/product/grindal-worms-live-starter-culture-100</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 
-  <!-- Educational & Care Guides -->
-  <url>
-    <loc>https://bettaaquatics.in/page/shipping-acclimation</loc>
-    <lastmod>2026-10-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
+  <!-- Educational & Support Pages -->
   <url>
     <loc>https://bettaaquatics.in/page/about-us</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://bettaaquatics.in/page/faq</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://bettaaquatics.in/page/shipping-policy</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/page/live-arrival-guarantee</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/page/contact-us</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://bettaaquatics.in/blog</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
